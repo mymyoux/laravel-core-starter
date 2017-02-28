@@ -214,6 +214,7 @@ class Api
                     {
                         $route->middleware($middleware);
                     }
+
                 }
             }
         }

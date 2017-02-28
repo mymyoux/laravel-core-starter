@@ -74,6 +74,10 @@ class User extends Authenticatable
     {
         return $thi->attributes["roles"] = $this->roles;
     }
+    public function isAdmin()
+    {
+        return $this->type == "admin";
+    }
     protected function _getById($id)
     {
         $user = static::find($id);

@@ -21,7 +21,6 @@ class Format
         {
             return $response;
         }
-
         return ["data"=>$response->getOriginalContent()];
     }
 }

@@ -5,6 +5,7 @@ namespace Core\Http\Middleware\Api;
 use Closure;
 use DB;
 use Route;
+use Auth;
 use Core\Exception\ApiException;
 use Core\Listeners\CacheListener;
 use Illuminate\Http\Response;
@@ -21,6 +22,14 @@ class Stats
      */
     public function handle($request, Closure $next)
     {
+        if(config('api.stats')!==True)
+        {
+            $user = Auth::getUser();
+            if(!isset($user) || !$user->isAdmin())
+            {
+                return $next($request);
+            }
+        }
         StatsService::addApiCall(Route::getFacadeRoot()->current());
         $response = $next($request);
         if(isset($response->exception) && !($response instanceof JsonResponse))
