@@ -139,7 +139,7 @@ class Api
         $namespace = '\App\Http\Controllers\\';
 
         $root = base_path();
-        $folder = join_paths($root, "app/http/Controllers");
+        $folder = join_paths($root, "app/Http/Controllers");
         $files = File::allFiles($folder);
        
 
