@@ -10,6 +10,39 @@ use Core\Exception\ApiException;
 use Core\Exception\Exception;
 class Api
 {
+    public static $data = [[]];
+
+    public static function addAPIData($data)
+    {
+        $len = count(static::$data)-1;
+        $previous = static::$data[$len];
+        static::$data[$len] = static::array_merge($previous, $data);
+    }
+    public static function popAPIData()
+    {
+        return array_pop(static::$data);
+    }
+    protected static function array_merge($array1, $array2)
+    {
+        if(is_numeric_array($array2))
+        {
+            return $array2;
+        }
+        foreach($array2 as $key=> $value)
+        {
+            if(is_array($value))
+            {
+                if(isset($array1[$key]) && is_array($array1[$key]))
+                {
+                    $array1[$key] = static::array_merge($array1[$key], $array2[$key]);
+                    continue;
+                }
+            }
+            $array1[$key] = $array2[$key];
+        }
+        return $array1;
+    }
+
     protected $path;
     protected $method;
     protected $params;
@@ -87,8 +120,9 @@ class Api
     }
     public function response($params = NULL)
     {
+        static::$data[] = [];
         $rawresponse = $this->dispatching($params);
-
+        $api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();
         $response = new ApiResponse();
         if(isset($rawresponse["data"]))
@@ -97,6 +131,7 @@ class Api
             $response->stats = $rawresponse["stats"];
         if(isset($rawresponse["exception"]))
             $response->exception = $rawresponse["exception"];
+        $response->apiData = $api_data;
         return $response;
     }
     public function send($params = NULL)

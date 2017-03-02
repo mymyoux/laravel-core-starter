@@ -4,6 +4,7 @@ use Core\Exception\ApiException;
 use Core\Exception\Exception;
 use Illuminate\Http\Request;
 use DB;
+use Api;
 class Paginate
 {
 	const HAVING = "having";
@@ -13,6 +14,11 @@ class Paginate
 	 * Server Request
 	 */
 	protected $request;
+	protected $next;
+	protected $previous;
+	protected $directions;
+	protected $keys;
+
 	public function __construct(Request $request)
 	{
 		$this->setRequest($request);
@@ -21,24 +27,131 @@ class Paginate
 	{
 		$this->request = $request;
 	}
+	public function onResults($data)
+	{
+		dd($data);
+		$apidata = [];
+		$apidata["count"] = count($data);
+		$keys = $this->keys;
+		if(isset($this->next))
+		{
+	         $data = array_values(array_filter($data, function($item) use($keys)
+            {
+                foreach($keys as $index=>$key)
+                {
+
+                    $direction = $this->directions[$index];
+                    if($direction>0)
+                    {
+                        if($item->$key<=$this->next[$index])
+                        {
+                            continue;
+                        }
+                       // $where = $where->greaterThan($key, $this->next[$index]);
+                    }else
+                    {
+                        if($item->$key>=$this->next[$index])
+                        {
+                            continue;
+                        }
+                        //$where = $where->lessThan($key, $this->next[$index]);
+                    }
+
+                    for($i=0;$i<$index; $i++)
+                    {
+                        if($item->{$keys[$i]}!=$this->next[$i])
+                        {
+                            continue 2;
+                        }
+                        //$where = $where->and;
+                        //$where = $where->equalTo($keys[$i], $this->next[$i]);
+                    }
+                   return true;
+                }
+                return false;
+            }));
+		}
+		 if(isset($this->previous))
+        {
+            $data = array_values(array_filter($data, function($item) use($keys)
+            {
+                foreach($keys as $index=>$key)
+                {
+                     $direction = $this->direction[$index];
+                    if($direction<0)
+                    {
+                        if($item->$key<=$this->previous[$index])
+                        {
+                            continue;
+                        }
+                    }else
+                    {
+                        if($item->$key>=$this->previous[$index])
+                        {
+                            continue;
+                        }
+                    }
+
+                    for($i=0;$i<$index; $i++)
+                    {
+                        if($item->{$keys[$i]}!=$this->previous[$i])
+                        {
+                            continue 2;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }));
+        }
+
+        if(!empty($data))
+        {
+            $previous = [];
+            foreach($this->keys as $key)
+            {
+                if(isset($data[0]->{$key}))
+                {
+                    $previous[] = $data[0]->{$key};
+                }
+            }
+            $next = [];
+            $len = sizeof($data)-1;
+        
+            foreach($this->keys as $key)
+            {
+                if(isset($data[$len]->{$key}))
+                {
+                    $next[] = $data[$len]->{$key};
+                }
+            }
+            $apidata["next"] = $next;
+            $apidata["previous"] = $previous;
+        }
+
+		Api::addApiData(["paginate"=>$apidata]);
+	}
 	public function apply($request, $mapping = NULL, $havingOnly = NULL)
 	{
 		$originalQuery = method_exists($request, "getQuery")?$request->getQuery():$request;
+
+		$originalQuery->processor = new \Core\Api\Paginate\Processor($this);
 
 		$paginate = $this->request->input("paginate");
 		//$request->limit($paginate["limit"]);
 
 		$next= NULL;
 		$previous = NULL;
-		$keys = $paginate["key"];
+		$this->keys = $keys = $paginate["key"];
 
 		if(isset($paginate["next"]))
-			$next = $paginate["next"];
+			$this->next = $next = $paginate["next"];
 		if(isset($paginate["previous"]))
-			$previous = $paginate["previous"];
-		$directions = $paginate["direction"];
+			$this->previous = $previous = $paginate["previous"];
+		$this->directions = $directions = $paginate["direction"];
 
 		$limit = $paginate["limit"];
+
 
 
 
@@ -52,10 +165,6 @@ class Paginate
         $useWhere = [];
         $has_having = False;
 
-        // $selects = $originalQuery->columns;
-        
-
-     
         //mapping
         foreach($keys as $index=>$k)
         {
@@ -81,51 +190,6 @@ class Paginate
                 }
                 $keys[$index] = $key;
             }
-            /*
-            $use_where = False;
-            $use_having = False;
-            if(isset($having))
-            {
-            	 if(isset($having[$k]))
-                 {
-                 	if($having[$k] === True)
-                 	{
-                 		$use_having = True;
-                 		if(strpos($keys[$index], ".")!==False)
-                 		{
-                 			$use_where = True;
-                 		}
-                 	}else
-                 	{
-                 		if(stripos($having[$k], "having") !== False)
-                 		{
-                 			$use_having = true;
-                 		}
-                 		if(stripos($having[$k], "where") !== False)
-                 		{
-                 			$use_where = true;
-                 		}
-                 		if(stripos($having[$k], "both") !== False)
-                 		{
-                 			$use_where = true;
-                 			$use_having = true;
-                 		}
-                 	}
-                 }else
-                 {
-                 	if($has_group)
-                 	{
-                 		$use_where = True;
-                 		$use_having = True;
-                 	}
-                 }
-            }
-            if($use_having)
-            {
-            	$has_having = True;
-            }
-            $useWhere[$index] = $use_where === $use_having && $use_having? Paginate::BOTH:($use_having == True?Paginate::HAVING:Paginate::WHERE);
-            */
         }
         $columns->parseParameters($keys);
         $columns->addSelectForHaving($originalQuery, $keys);
@@ -156,7 +220,6 @@ class Paginate
         {
         	$originalQuery->limit($limit);
         }
-
 
         $originalQuery->where(function($query) use($next, $keys, $useWhere, $directions, $limit, $previous, $columns){
 
@@ -224,7 +287,7 @@ class Paginate
 	                    		$query = $query->where($keys[$i], "=", $data[$i],'and');
 	                        }else
 	                        {
-	                        	$query = $query->where(function($q) use($keys, $i, $data, $directions, $sign)
+	                        	$query = $query->where(function($q) use($keys, $i, $data, $sign)
 	                        	{
 	                        		$q->whereNull($keys[$i])
 	                        		->orWhere($keys[$i], $sign, $data[$i]);
@@ -301,91 +364,22 @@ class Paginate
 	            }
 	        }
 	        $query->havingRaw(")", [], "");
-				
 		}
-		$sql = $originalQuery->toSql();
-		$bindings = $query->getBindings();
-	 	foreach( $bindings as $binding )
-	 	{
-            $sql = preg_replace("#\?#", "'".$binding."'", $sql, 1);
-	 	}
-		echo $sql;
-        dd($originalQuery->get());
-		exit();
-        exit();
-        if($this->hasHaving())
+		if(!empty($directions))
         {
-
-            if(isset($this->direction))
+            $directions = array_map(function($item)
             {
-                if(!is_array($this->direction))
-                {
-                    $temp = $this->direction;
-                    $this->direction = array_map(function($item) use($temp)
-                    {
-                        return $temp;
-                    }, $this->key);
-                }
-                $direction = array_map(function($item)
-                {
-                    return $item>0?'ASC':'DESC';
-                }, $this->direction);
-            }
-            $havingRequest = [];
+                return $item>0?'asc':'desc';
+            }, $directions);
+            $orderRequest = [];
             foreach($keys as $index=>$key)
             {
-                if(!$used[$index])
-                {
-                    continue;
-                }
-
-                if(isset($havingCustom[$index]))
-                {
-                    $havingRequest[] = new expression($havingCustom[$index]." ".$direction[$index]);
-                }else
-                {
-                    $havingRequest[$key] = $direction[$index];
-                }
+                $orderRequest[$key] = $directions[$index];
             }
-            /*
-            $new_having = NULL;
-            if(isset($havingMapping) && !empty($havingMapping))
+            foreach($orderRequest as $key=>$direction)
             {
-                foreach($havingMapping as $havingM)
-                {
-                    if($havingM->match($this->key))
-                    {
-                        $new_having = $havingM;
-                        break;
-                    }
-                }
-                if(isset($new_having))
-                {
-                    $havingRequest[$new_having->getColumn()]=$new_having->getHaving();
-                    $request->addColumns([$this->key=>new Expression("")]);
-                }
-            }*/
-            /*
-            if(isset($havingMapping))
-            {
-                if(is_array($havingMapping))
-                {
-                    if(isset($mapping[$this->key]))
-                    {
-                        $key = $mapping[$this->key];
-                    }else
-                    {
-                        $key = $mapping[0].".".$this->key;
-                    }
-                }else
-                if(is_string($mapping))
-                {
-                    $key = $mapping.".".$this->key;
-                }
-
-            }*/
-            if(!empty($havingRequest))
-                $request = $request->having($havingRequest);
+            	$originalQuery->orderBy($key, $direction);
+            }
         }
 		return $request;
 	}

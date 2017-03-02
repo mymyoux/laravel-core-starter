@@ -6,6 +6,7 @@ class ApiResponse
     public $value;
     public $exception;
     public $stats;
+    public $apiData;
     public function isException()
     {
         return isset($this->exception);
