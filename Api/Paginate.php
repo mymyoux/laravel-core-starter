@@ -29,7 +29,6 @@ class Paginate
 	}
 	public function onResults($data)
 	{
-		dd($data);
 		$apidata = [];
 		$apidata["count"] = count($data);
 		$keys = $this->keys;
@@ -135,7 +134,12 @@ class Paginate
 	{
 		$originalQuery = method_exists($request, "getQuery")?$request->getQuery():$request;
 
-		$originalQuery->processor = new \Core\Api\Paginate\Processor($this);
+		if(!isset($originalQuery->processor) || !method_exists($originalQuery->processor, "setSelectListener"))
+		{
+			$originalQuery->processor = new \Core\Api\Paginate\Processor();
+			
+		}
+		$originalQuery->processor->setSelectListener($this);
 
 		$paginate = $this->request->input("paginate");
 		//$request->limit($paginate["limit"]);

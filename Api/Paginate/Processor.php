@@ -12,6 +12,10 @@ class Processor extends \Illuminate\Database\Query\Processors\Processor
    {
         $this->paginate = $paginate;
    }
+   public function setSelectListener($selectListener)
+    {
+        $this->paginate = $selectListener;
+    }
     public function processSelect(Builder $query, $results)
     {
         $this->lastresults = parent::processSelect($query, $results);
