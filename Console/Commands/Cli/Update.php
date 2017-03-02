@@ -13,12 +13,13 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--cache=d}';
+    protected $signature = 'cli:update {--pull=d} {--cache=d} {--supervisor=d}';
 
     protected $defaultChoices = 
     [
         "pull"=>1,
-        "cache"=>1
+        "cache"=>1,
+        "supervisor"=>1,
     ];
     /**
      * The console command description.
@@ -60,7 +61,7 @@ class Update extends Command
      */
     public function handle()
     {
-        $keys = ["pull","cache"];
+        $keys = array_keys($this->defaultChoices);
         $choices = [];
         foreach($keys as $key)
         {
@@ -109,6 +110,17 @@ class Update extends Command
             $this->pullGit($folder);
         }
     }
+    protected function runCache()
+    {
+        //clear
+         $this->call('cache:clear');
+         $this->call('config:clear');
+         $this->call('route:clear');
+
+         //build
+         $this->call('config:cache');
+         $this->call('route:cache');
+    }
     protected function pullGit($directory = NULL)
     {
         if(!isset($directory))
@@ -127,18 +139,12 @@ class Update extends Command
         }
         chdir($this->current_directory);
     }
-    protected function runCache()
+
+    public function runSupervisor()
     {
-        //clear
-         $this->call('cache:clear');
-         $this->call('config:clear');
-         $this->call('route:clear');
-
-         //build
-         $this->call('config:cache');
-         $this->call('route:cache');
+        $env = App::environment();
+        $result = $this->cmd("supervisorctl", ["restart",$env.":*"]);
     }
-
     protected function cmd($command, $params = NULL, $execute = True)
     {
         if(isset($params))
