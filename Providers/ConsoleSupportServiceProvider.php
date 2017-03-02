@@ -22,13 +22,16 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider
      * @var array
      */
     protected $providers = [
+        //ArtisanServiceProvider::class,
         MigrationServiceProvider::class,
         ComposerServiceProvider::class,
+        ConsoleServiceProvider::class,
     ];
     protected $artisanProviders = [
         ArtisanServiceProvider::class,
         MigrationServiceProvider::class,
         ComposerServiceProvider::class,
+        ConsoleServiceProvider::class,
     ];
     public function register()
     {
