@@ -113,6 +113,7 @@ class Update extends Command
     protected function runCache()
     {
         //clear
+         $this->call('redis:clear');
          $this->call('cache:clear');
          $this->call('config:clear');
          $this->call('route:clear');
