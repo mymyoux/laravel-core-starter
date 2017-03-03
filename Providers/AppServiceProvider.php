@@ -27,6 +27,5 @@ class AppServiceProvider extends ServiceProvider
         
         $this->app->singleton('stats', '\Core\Services\Stats');
         $this->app->singleton('api', '\Core\Api\Api');
-        $this->app->singleton('tables', '\Core\Services\Tables');
     }
 }

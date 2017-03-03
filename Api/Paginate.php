@@ -391,10 +391,11 @@ class Paginate
 
 }
 
-use Tables;
+use Table;
 class ColumnsTester
 {
 	const PATTERN = '/([^ ]+)( +(as)? +([^. ]+))?/';
+	const PATTERN_TABLE= '/([^ ]+)( +(as)? +([^. ]+))?/';
 	protected $whereColumns;
 	protected $havingColumns;
 	protected $tables;
@@ -418,7 +419,14 @@ class ColumnsTester
 		}
 		$tables = array_reduce($tables, function($previous, $item)
 		{
-			$previous[$item] = Tables::getColumns($item);
+			preg_match(ColumnsTester::PATTERN_TABLE, $item , $data);
+			//TODO:not sure => renamed table
+			if(count($data)>2)
+			{
+				$item = $data[1];
+				$previous[$data[4]] = Table::getColumnList($item);
+			}
+			$previous[$item] = Table::getColumnList($item);
 			return $previous;
 		}, []);
 

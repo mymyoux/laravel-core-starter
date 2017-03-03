@@ -20,4 +20,12 @@ class Table
     {
     	return isset(static::$_columns[$name]);
     }
+    public function __get($name)
+    {
+    	return constant("static::$name");
+    }
+    public function __call($name, $arguments)
+    {
+    	return call_user_func_array([static::class, $name], $arguments);
+    }
 }

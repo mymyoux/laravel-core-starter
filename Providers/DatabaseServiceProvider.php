@@ -19,6 +19,9 @@ class DatabaseServiceProvider extends \Illuminate\Database\DatabaseServiceProvid
      */
     protected function registerConnectionServices()
     {
+        $this->app->singleton('table', '\Tables\Table');
+
+        
         parent::registerConnectionServices();
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
