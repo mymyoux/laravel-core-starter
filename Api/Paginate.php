@@ -146,13 +146,13 @@ class Paginate
 
 		$next= NULL;
 		$previous = NULL;
-		$this->keys = $keys = $paginate["key"];
+		$this->keys = $keys = $paginate["keys"];
 
 		if(isset($paginate["next"]))
 			$this->next = $next = $paginate["next"];
 		if(isset($paginate["previous"]))
 			$this->previous = $previous = $paginate["previous"];
-		$this->directions = $directions = $paginate["direction"];
+		$this->directions = $directions = $paginate["directions"];
 
 		$limit = $paginate["limit"];
 

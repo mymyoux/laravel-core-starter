@@ -3,14 +3,9 @@
 namespace Core\Http\Middleware\Api;
 
 use Closure;
-use DB;
-use Route;
-use Auth;
+use Api;
+use Request;
 use Core\Exception\ApiException;
-use Core\Listeners\CacheListener;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
-use Stats as StatsService;
 class Paginate
 {
     /**
@@ -20,12 +15,25 @@ class Paginate
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $params)
     {
-        $response = $next($request);
-        dd($paginate);
-        
-        return $response;
+        $params = Api::unserialize($params);
+        $paginate = $request->input('paginate');
+        $paginate = $params->format($paginate);
+        if(isset($paginate["keys"]))
+        {
+            foreach($paginate["keys"] as $key)
+            {
+                if(!$params->isAllowed($key))
+                {
+                    throw new ApiException('key_not_allowed:'.$key);
+                }
+            }
+        }
+        $input = Request::input();
+        $input["paginate"] = $paginate;
+        Request::replace($input);
+        return $next($request);
     }
     
 }
