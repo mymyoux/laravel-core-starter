@@ -8,8 +8,10 @@ class ConsoleServiceProvider extends ServiceProvider
 
     protected $commands =
     [
+         'Core\Console\Commands\Cli\Update',
          'Core\Console\Commands\Redis\Clear',
-         'Core\Console\Commands\Cli\Update'
+         'Core\Console\Commands\Table\Cache',
+         'Core\Console\Commands\Table\Clear'
     ];
 
     /**

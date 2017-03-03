@@ -33,6 +33,7 @@ class Paginate extends CoreAnnotation
     	{
     		$this->directions = array_map(function($item){return (int)trim($item);}, explode(",", $this->directions.""));
     	}
+
     }
     public function format($paginate)
     {
