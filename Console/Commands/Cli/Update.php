@@ -5,6 +5,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
+use Db;
+
 class Update extends Command
 {
     protected $current_directory;
@@ -15,13 +17,13 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migration=d}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d}';
 
     protected $defaultChoices = 
     [
         "pull"=>1,
         "composer"=>1,
-        "migration"=>1,
+        "migrate"=>1,
         "cache"=>1,
         "supervisor"=>1,
     ];
@@ -80,6 +82,15 @@ class Update extends Command
 
         $this->cache["last_execution"] = date("Y-m-d H:i:s");
         $this->writeCache();
+
+
+        $insert = array_reduce($choices, function($previous, $item)
+        {
+            $previous[$item] = 1;
+            return $previous;
+        }, []);
+        $insert["project"] = config('update.project');
+        Db::table(config('update.table'))->insert($insert);
     }
     protected function start($choices)
     {
@@ -145,7 +156,7 @@ class Update extends Command
             $this->line("no need for update");
         }
     }
-    protected function runMigration()
+    protected function runMigrate()
     {
         $this->call('phinx:migrate');
     }
