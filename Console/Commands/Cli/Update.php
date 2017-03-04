@@ -75,6 +75,10 @@ class Update extends Command
         }, []);
         
         $this->start($choices);
+
+
+        $this->cache["last_execution"] = date("Y-m-d H:i:s");
+        $this->writeCache();
     }
     protected function start($choices)
     {
