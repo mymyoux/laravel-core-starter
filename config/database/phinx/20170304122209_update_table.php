@@ -39,7 +39,6 @@ class UpdateTable extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-      dd('test');
       $this->table('update_git')->addColumn('project','text',['limit'=>200, 'null'=>True])->update();
     }
     public function dropTable($tablename)
