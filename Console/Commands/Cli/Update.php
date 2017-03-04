@@ -15,12 +15,13 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migration=d}';
 
     protected $defaultChoices = 
     [
         "pull"=>1,
         "composer"=>1,
+        "migration"=>1,
         "cache"=>1,
         "supervisor"=>1,
     ];
@@ -143,6 +144,10 @@ class Update extends Command
         {
             $this->line("no need for update");
         }
+    }
+    protected function runMigration()
+    {
+        $this->call('phinx:migrate');
     }
     protected function runCache()
     {
