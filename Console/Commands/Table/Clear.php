@@ -40,7 +40,8 @@ class Clear extends Command
     {
         $folder = base_path('bootstrap/tables');
 
-        $this->recursiveRemoveDirectory($folder);
+        if(file_exists($folder))
+            $this->recursiveRemoveDirectory($folder);
         if(!file_exists($folder))
         {
             mkdir($folder, 0777);
