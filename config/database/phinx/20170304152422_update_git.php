@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 use Phinx\Db\Adapter\MysqlAdapter;
-class UpdateTable extends AbstractMigration
+class UpdateGit extends AbstractMigration
 {
     /**
      * Change Method.
@@ -39,6 +39,24 @@ class UpdateTable extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
+
+          $this->table('update_git', ['id' => false, 'primary_key' => ['id_update_git']])
+            ->addColumn('id_update_git', 'integer', ['limit' => 11, 'null' => false, 'signed' => false,'identity'=>True])
+            ->addColumn('checkerrors', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('pull', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('compile', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('migrate', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('templates', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('composer', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('cachefiles', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('tests', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('supervisor', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('created_time', 'timestamp', ['null' => true])
+            ->addColumn('updated_time', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
+            ->create();
+            
+      
+
     }
     public function dropTable($tablename)
     {
