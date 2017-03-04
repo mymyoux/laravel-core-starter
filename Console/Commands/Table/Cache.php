@@ -8,6 +8,7 @@ use Core\Util\ClassWriter\Body\Table;
 use Core\Util\ClassWriter\Body\General;
 use Schema;
 use ReflectionClass;
+use File;
 class Cache extends Command
 {
     /**
@@ -43,13 +44,23 @@ class Cache extends Command
     {
         //TODO:replace by write new files, unwrite old files
         //clear previous
-        $this->call('table:clear');
+        
+        $start = microtime(True);
+
+        $files = [];
+
+       // $this->call('table:clear');
 
         $folder = base_path('bootstrap/tables');
         if(!file_exists($folder))
         {
             mkdir($folder, 0777);
         }
+
+        $previous = array_map(function($item) use($folder)
+            {
+                return substr($item, strlen($folder)+1);
+            }, File::files($folder));
 
         $platform = Schema::getConnection()->getDoctrineSchemaManager()->getDatabasePlatform();
         $platform->registerDoctrineTypeMapping('enum', 'string');
@@ -77,7 +88,7 @@ class Cache extends Command
             $cls->addMethod(General::class, $method->name);
         }
         
-        
+        $files[] = "Table.php";
         $cls->write(join_paths($folder, "Table.php"));
         $this->info('Table.php generated');
 
@@ -100,7 +111,7 @@ class Cache extends Command
             foreach($columns as $column)
             {
                 $cls->addConstant("s_".strtolower($column), $column);
-                $this->info($tablename.".".$column);
+                //$this->info($tablename.".".$column);
                 $datacolumns[$column] = Schema::getColumnType($tablename, $column);
             }
             foreach($model->getMethods() as $method)
@@ -109,8 +120,22 @@ class Cache extends Command
             }
 
             $cls->addProperty("_columns", "protected", True, $datacolumns);
-            $cls->write(join_paths($folder, strtoupper($tablename).".php"));
-            $this->info(strtoupper($tablename).'.php generated');
+            $files[] = strtoupper($tablename).".php";
+            $export = $cls->export();
+            $path = join_paths($folder, strtoupper($tablename).".php");
+            if(!file_exists($path) || md5($export) != md5_file($path))
+            {
+                $cls->write($path);
+                $this->info(strtoupper($tablename).'.php generated');
+            }
+        }
+        $end = microtime(True);
+
+        $to_remove = array_diff($previous, $files);
+        foreach($to_remove as $remove)
+        {
+            unlink(join_paths($folder, $remove));
+               $this->info($remove.' deleted');
         }
     }
 }
