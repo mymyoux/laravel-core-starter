@@ -50,11 +50,12 @@ class UpdateGit extends AbstractMigration
             ->addColumn('composer', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('cachefiles', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('tests', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
+            ->addColumn('cache', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('supervisor', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('created_time', 'timestamp', ['null' => true])
             ->addColumn('updated_time', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
             ->create();
-            
+
       
 
     }
