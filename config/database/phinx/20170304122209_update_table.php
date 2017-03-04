@@ -2,8 +2,6 @@
 
 use Phinx\Migration\AbstractMigration;
 use Phinx\Db\Adapter\MysqlAdapter;
-require_once "/Users/jeremydubois/Documents/dev/yb/vendor/autoload.php";
-require_once "/Users/jeremydubois/Documents/dev/yb/app_core/Util/Initialize.php";
 class UpdateTable extends AbstractMigration
 {
     /**
@@ -41,6 +39,7 @@ class UpdateTable extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
+      dd('test');
       $this->table('update_git')->addColumn('project','text',['limit'=>200, 'null'=>True])->update();
     }
     public function dropTable($tablename)

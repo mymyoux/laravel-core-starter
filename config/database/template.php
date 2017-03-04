@@ -2,8 +2,6 @@
 
 use $useClassName;
 use Phinx\Db\Adapter\MysqlAdapter;
-require_once "$autoload";
-require_once "$basename/app_core/Util/Initialize.php";
 class $className extends $baseClassName
 {
     /**
