@@ -1,9 +1,9 @@
 <?php 
 namespace Core\Util;
-use Core\util\ClassWriter\Uses;
-use Core\util\ClassWriter\Property;
-use Core\util\ClassWriter\Constant;
-use Core\util\ClassWriter\Method;
+use Core\Util\ClassWriter\Uses;
+use Core\Util\ClassWriter\Property;
+use Core\Util\ClassWriter\Constant;
+use Core\Util\ClassWriter\Method;
 use ReflectionMethod;
 class ClassWriter
 {
