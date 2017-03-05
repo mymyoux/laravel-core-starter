@@ -2,7 +2,6 @@
 
 namespace Core\Providers;
 
-use Illuminate\Foundation\Providers\ArtisanServiceProvider;
 use Illuminate\Foundation\Providers\ComposerServiceProvider;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Database\MigrationServiceProvider;
