@@ -171,6 +171,7 @@ class Update extends Command
          //build
          $this->call('config:cache');
          $this->call('route:cache');
+         $this->call('optimize');
     }
     protected function pullGit($directory = NULL)
     {

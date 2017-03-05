@@ -39,7 +39,9 @@ class ProjectName extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-        $this->table('update_git')->addColumn('project','text',['limit'=>200, 'null'=>True])->update();
+        $this->table('update_git')
+        ->addColumn('project','text',['limit'=>200, 'null'=>True])
+        ->addColumn('cache','integer',['limit'=>1, 'null'=>True,'default'=>0])->update();
     }
     public function dropTable($tablename)
     {
