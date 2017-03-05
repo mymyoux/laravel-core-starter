@@ -93,7 +93,7 @@ class User extends Model implements
         {
             $user->addRole($user->type);
             $user->addRole(static::$ROLE_CONNECTED);
-            $roles = DB::table(USER_ROLE::TABLE)->where([USER_ROLE::id_user=>$user->id_user])->get();
+            $roles = USER_ROLE::where([USER_ROLE::id_user=>$user->id_user])->get();
             foreach($roles as $role)
             {
                 $user->addrole($role->role);
@@ -103,8 +103,7 @@ class User extends Model implements
     }
     protected function findByApiToken($token)
     {
-        $token = DB::table(USER_LOGIN_TOKEN::TABLE)
-            ->select(USER_LOGIN_TOKEN::id_user)
+        $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)
             ->where(USER_LOGIN_TOKEN::token,'=',$token)
             ->first();
         return static::getById($token->id_user);

@@ -98,6 +98,7 @@ class Cache extends Command
         {
             $cls = new ClassWriter();
             $cls->setNamespace('Tables');
+            $cls->addUse('Db');
             $cls->setClassName(strtoupper($tablename));
             $cls->addConstant("TABLE", $tablename);
 
