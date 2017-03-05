@@ -3,37 +3,45 @@
 namespace Core\Model;
 
 use Illuminate\Notifications\Notifiable;
-use Core\Model\Model;
 use Core\Model\IModel;
 use Core\Traits\Cached;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use DB;
 use Core\Traits\Role;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
-class User extends Authenticatable
+
+use Core\Database\Eloquent\Model;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+
+
+
+use Tables\USER_ROLE;
+use Tables\USER_LOGIN_TOKEN;
+use Tables\USER as TUSER;
+class User extends Model implements
+    AuthenticatableContract,
+    AuthorizableContract,
+    CanResetPasswordContract
 {
+     use Authenticatable, Authorizable, CanResetPassword;
+
     use Notifiable;
-    use Model;
     use Cached;
     use Role;
 
-
-    const TABLE_USER = "user";
-    const TABLE_USER_API_TOKEN = "user_login_token";
-    const TABLE_USER_LOG = "user_log_connection";
-    const TABLE_PASSWORD_LOST = "user_login_lost";
-    const TABLE_LOGIN = "user_login_attempt";
-    const TABLE_USER_ROLE = "user_role";
-    const TABLE_FRONT_ALERT = "user_front_alert";
-    const TABLE_REASON = "user_reason";
 
 
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
 
-    protected $table = User::TABLE_USER;
+    protected $table = TUSER::TABLE;
      protected $primaryKey = 'id_user'; 
     /**
      * The attributes that are mass assignable.
@@ -67,7 +75,7 @@ class User extends Authenticatable
     {
         parent::boot();
         static::addGlobalScope('deleted', function (Builder $builder) {
-            $builder->where('deleted', '=', 0);
+            $builder->where(TUSER::deleted, '=', 0);
         });
     }
     public function getRolesAttribute()
@@ -85,7 +93,7 @@ class User extends Authenticatable
         {
             $user->addRole($user->type);
             $user->addRole(static::$ROLE_CONNECTED);
-            $roles = DB::table(User::TABLE_USER_ROLE)->where(["id_user"=>$user->id_user])->get();
+            $roles = DB::table(USER_ROLE::TABLE)->where([USER_ROLE::id_user=>$user->id_user])->get();
             foreach($roles as $role)
             {
                 $user->addrole($role->role);
@@ -95,9 +103,9 @@ class User extends Authenticatable
     }
     protected function findByApiToken($token)
     {
-        $token = DB::table(User::TABLE_USER_API_TOKEN)
-            ->select('id_user')
-            ->where('token','=',$token)
+        $token = DB::table(USER_LOGIN_TOKEN::TABLE)
+            ->select(USER_LOGIN_TOKEN::id_user)
+            ->where(USER_LOGIN_TOKEN::token,'=',$token)
             ->first();
         return static::getById($token->id_user);
     }

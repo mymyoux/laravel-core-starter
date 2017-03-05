@@ -11,9 +11,7 @@ class DatabaseServiceProvider extends \Illuminate\Database\DatabaseServiceProvid
      *
      * @return void
      */
-    public function boot()
-    {
-    }
+
     /**
      * Called by the parent class
      */

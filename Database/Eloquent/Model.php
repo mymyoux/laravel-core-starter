@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Core\Database\Query\Builder as QueryBuilder;
 abstract class Model extends BaseModel
 {
+    const CREATED_AT = 'created_time';
+    const UPDATED_AT = 'updated_time';
+
   protected function newBaseQueryBuilder()
  {
     $connection = $this->getConnection();
