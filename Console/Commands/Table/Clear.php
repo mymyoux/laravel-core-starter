@@ -5,6 +5,7 @@ use Db;
 use Illuminate\Console\Command;
 use Core\Util\ClassWriter;
 use Schema;
+use App;
 class Clear extends Command
 {
     /**
