@@ -16,7 +16,7 @@ trait Cached
             $model = $this->_getById($id);
             Cache::forever($key, $model);
         }
-        if(method_exists($this, "prepareModel"))
+        if(isset($model) && method_exists($this, "prepareModel"))
         {
         	$model = $this->prepareModel($model);
         }

@@ -44,7 +44,7 @@ class User extends Model implements
     const UPDATED_AT = 'updated_time';
 
     protected $table = TUSER::TABLE;
-     protected $primaryKey = 'id_user'; 
+    protected $primaryKey = 'id_user'; 
     /**
      * The attributes that are mass assignable.
      *
@@ -80,6 +80,10 @@ class User extends Model implements
             $builder->where(TUSER::deleted, '=', 0);
         });
     }
+
+
+    protected $realUser;
+
     public function getRolesAttribute()
     {
         return $thi->attributes["roles"] = $this->roles;
@@ -101,13 +105,16 @@ class User extends Model implements
                 $user->addrole($role->role);
             }
         }
-        $user->addPseudoTrait($user->type);
         return $user;
     }
     protected function prepareModel($user)
     {
         $user->addPseudoTrait($user->type);
         return $user;
+    }
+    public function setRealUser($user)
+    {
+        $this->realUser = $user;
     }
     protected function findByApiToken($token)
     {
