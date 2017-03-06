@@ -8,6 +8,7 @@ class ConsoleServiceProvider extends ServiceProvider
 
     protected $commands =
     [
+         'Core\Console\Commands\Api\Replay',
          'Core\Console\Commands\Cli\ClearCache',
          'Core\Console\Commands\Cli\Update',
          'Core\Console\Commands\Phinx\Create',

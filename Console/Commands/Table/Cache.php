@@ -42,9 +42,7 @@ class Cache extends Command
      */
     public function handle()
     {
-        //TODO:replace by write new files, unwrite old files
-        //clear previous
-        
+        throw new \Exception('cc');
         $start = microtime(True);
 
         $files = [];

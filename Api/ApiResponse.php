@@ -1,6 +1,7 @@
 <?php
 namespace Core\Api;
 use Request;
+use Core\Exception\Exception as CoreException;
 class ApiResponse
 {
     public $value;
@@ -28,14 +29,16 @@ class ApiResponse
         $data = $this->exception;
         $cls = $data["type"];
         //TODO:careful with child classes
-        if($cls != static::class && method_exists($cls, "unserialize"))
+        if($cls != static::class && is_subclass_of($cls,CoreException::class))
         {
             $exception = $cls::unserialize($data);
         }else
         {
             $message = isset($data["message"])?$data["message"]:"";
             $code = isset($data["code"])?$data["code"]:NULL;
-            $exception = new $cls($message, $code);
+           /// $exception = new $cls($message, $code);
+            $exception = new CoreException($message, $code);
+           
         }
         $exception->file = $data["file"];
         $exception->line = $data["line"];

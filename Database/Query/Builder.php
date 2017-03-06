@@ -28,4 +28,12 @@ class Builder extends BaseBuilder
         }
         return parent::insert($values);
     }
+     public function insertGetId(array $values, $sequence = null)
+    {
+       if(!isset($values["created_time"]))
+		{
+			$values["created_time"] = Db::raw('NOW(3)');
+	    }
+	    return parent::insertGetId($values, $sequence);
+    }
 }

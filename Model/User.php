@@ -116,6 +116,14 @@ class User extends Model implements
     {
         $this->realUser = $user;
     }
+    public function getRealUser()
+    {
+        return isset($this->realUser)?$this->realUser:$this;
+    }
+    public function isImpersonated()
+    {
+        return isset($this->realUser);
+    }
     protected function findByApiToken($token)
     {
         $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)

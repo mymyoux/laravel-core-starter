@@ -33,6 +33,6 @@ class Impersonate
     }
     protected function isAllowed($user, $impersonate)
     {
-        return isset($user) && $user->id_user != $impersonate->id_user && $user->isAdmin() && !$impersonate->isAdmin();
+        return isset($user) && $user->getRealUser()->id_user != $impersonate->id_user && $user->getRealUser()->isAdmin() && !$impersonate->isAdmin();
     }
 }
