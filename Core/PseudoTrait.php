@@ -23,7 +23,7 @@ trait PseudoTrait
                 return call_user_func_array(array($pseudotrait, $name), $arguments);
             }
         }
-        throw new \Exception(get_class($this).": No trait implements the method '".$name."'");
+        return parent::__call($name, $arguments);//new \Exception(get_class($this).": No trait implements the method '".$name."'");
    }
    public function __isset($key)
    {
@@ -82,7 +82,7 @@ trait PseudoTrait
                 return;
             }
         }
-    }
+     }
    }
    public function addPseudoTrait($trait)
    {
