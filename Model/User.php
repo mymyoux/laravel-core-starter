@@ -20,6 +20,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
+use Core\Core\PseudoTrait;
 
 
 use Tables\USER_ROLE;
@@ -35,6 +36,7 @@ class User extends Model implements
     use Notifiable;
     use Cached;
     use Role;
+    use PseudoTrait;
 
 
 
@@ -99,6 +101,12 @@ class User extends Model implements
                 $user->addrole($role->role);
             }
         }
+        $user->addPseudoTrait($user->type);
+        return $user;
+    }
+    protected function prepareModel($user)
+    {
+        $user->addPseudoTrait($user->type);
         return $user;
     }
     protected function findByApiToken($token)

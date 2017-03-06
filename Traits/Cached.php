@@ -10,13 +10,17 @@ trait Cached
 	protected function getById($id)
 	{
 		$key = str_replace("%id", $id, static::$_cached_key);
-        $user = Cache::get($key);
-        if(!$user)
+        $model = Cache::get($key);
+        if(!$model)
         {
-            $user = $this->_getById($id);
-            Cache::forever($key, $user);
+            $model = $this->_getById($id);
+            Cache::forever($key, $model);
         }
-        return $user;
+        if(method_exists($this, "prepareModel"))
+        {
+        	$model = $this->prepareModel($model);
+        }
+        return $model;
 	}
 	protected function invalidate()
 	{
