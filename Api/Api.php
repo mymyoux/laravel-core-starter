@@ -51,7 +51,10 @@ class Api
 	{
 
 	}
-
+    public function isMainCall()
+    {
+        return count(static::$data) == 1;
+    }
     public function get($path)
     {
         $this->path = $path;

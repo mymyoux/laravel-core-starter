@@ -11,6 +11,8 @@ use Core\Listeners\CacheListener;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Stats as StatsService;
+use Core\Model\Query;
+use Api;
 class Stats
 {
     /**
@@ -27,7 +29,9 @@ class Stats
             $user = Auth::getUser();
             if(!isset($user) || !$user->isAdmin())
             {
-                return $next($request);
+                $response = $next($request);
+                $this->logQueries();
+                return $response;
             }
         }
         StatsService::addApiCall(Route::getFacadeRoot()->current());
@@ -60,16 +64,33 @@ class Stats
                 }
             }
         }
-        $data["stats"] = [
+        $data["stats"] = 
+        [
             "route"=> $route,
             "time"      =>  $time,
             "queries"   =>  DB::getQueryLog(),
             "cache"   =>  CacheListener::getQueryLog()
         ];
         $api = StatsService::getApiStats();
-        $data["stats"]["api"] = $api;//cleanObject(array_map(function($item){return array_map(function($item){return $item->toArray();},$item);},$api));
-        
+        $data["stats"]["api"] = $api;
+        $this->logQueries();
         return $data;
+    }
+    public function logQueries()
+    {
+         if(!Api::isMainCall())
+         {
+            return;
+         }
+        $queries = DB::getQueryLog();
+        $min_time = config("log.database.min_time", 0);
+        foreach($queries as $query)
+        {
+            if($query["time"] > $min_time)
+            {
+                Query::record($query);
+            }
+        }
     }
     
 }

@@ -13,4 +13,9 @@ class Application extends \Illuminate\Foundation\Application
     {
     	return env('ENV_CRON', False) == True;
     }
+    public function runningInQueue()
+    {
+        //TODO:implement
+        return False;
+    }
 }
