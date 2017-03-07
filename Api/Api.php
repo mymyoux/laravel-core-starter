@@ -8,6 +8,7 @@ use Request;
 use Auth;
 use Core\Exception\ApiException;
 use Core\Exception\Exception;
+use App;
 class Api
 {
     public static $data = [[]];
@@ -113,7 +114,13 @@ class Api
             Auth::setUser($this->api_user);
         }
         Request::replace($request->input());
-        $rawresponse = Route::dispatch($request);
+        if(App::runningInConsole())
+        {
+            $rawresponse = app()['Illuminate\Contracts\Http\Kernel']->handle($request);
+        }else
+        {
+            $rawresponse = Route::dispatch($request);
+        }
         Request::replace($temp);
         if(isset($temp_user))
         {
@@ -257,6 +264,11 @@ class Api
             }
         }
 	}
+    public function handle($params)
+    {
+        throw new \Exception('pik');
+        //dd($params);
+    }
 	 /**
      * Handle dynamic static method calls into the method.
      *
