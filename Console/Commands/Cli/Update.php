@@ -43,6 +43,8 @@ class Update extends Command
     public function handle()
     {
         $this->info("Environment:\t".env('APP_ENV'));
+        if( $this->option('verbose'))
+        $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
          $this->current_directory = base_path();
           $choices = config("update.choices");
