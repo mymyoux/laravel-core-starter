@@ -41,7 +41,8 @@ class ProjectName extends AbstractMigration
     {
         $this->table('update_git')
         ->addColumn('project','text',['limit'=>200, 'null'=>True])
-        ->addColumn('cache','integer',['limit'=>1, 'null'=>True,'default'=>0])->update();
+        ->addColumn('cache','integer',['limit'=>1, 'null'=>True,'default'=>0])
+        ->update();
     }
     public function dropTable($tablename)
     {

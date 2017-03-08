@@ -42,9 +42,24 @@ class Update extends Command
      */
     public function handle()
     {
+        $env = env('APP_ENV', NULL);
+        //verifications
+        if(!isset($env))
+        {
+            throw new \Exception('you must set APP_ENV to your .env file');
+        }
+        if(!is_writable(storage_path()))
+        {
+            throw new \Exception(storage_path()." must be writable");
+        }
+
+
+
+
+
         $this->info("Environment:\t".env('APP_ENV'));
         if( $this->option('verbose'))
-        $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
+            $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
          $this->current_directory = base_path();
           $choices = config("update.choices");
