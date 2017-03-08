@@ -17,12 +17,31 @@ class Error extends Model
 	protected $table = 'error';
 	protected $primaryKey = 'id';
 
+    protected static $muted = False;
+
+    public static function mute()
+    {
+        static::$muted = True;
+    }
+    public static function unmute()
+    {
+        static::$muted = False;
+    }
+    public static function isMuted()
+    {
+        return static::$muted;
+    }
+
 	protected static function boot()
     {
         parent::boot();
     }
     protected function record($exception)
     {
+        if(static::isMuted())
+        {
+            return;
+        }
     	$info = [];
 
 

@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputOption;
 use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
 use Db;
+use Core\Model\Error;
 
 class Update extends Command
 {
@@ -42,11 +43,12 @@ class Update extends Command
      */
     public function handle()
     {
+        Error::mute();
         $env = env('APP_ENV', NULL);
         //verifications
         if(!isset($env))
         {
-            $this->warning("APP_ENV is not set - remove cache you can try to restart the command");
+            $this->warn("APP_ENV is not set - remove cache you can try to restart the command");
             $this->call('cli:clear-cache');
             throw new \Exception('you must set APP_ENV to your .env file');
         }
