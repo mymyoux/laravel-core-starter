@@ -42,7 +42,6 @@ class Cache extends Command
      */
     public function handle()
     {
-        throw new \Exception('cc');
         $start = microtime(True);
 
         $files = [];
@@ -64,7 +63,7 @@ class Cache extends Command
         $platform->registerDoctrineTypeMapping('enum', 'string');
 
         //build new
-        
+
         $cls = new ClassWriter();
 
         $cls->setNamespace('Tables');
@@ -85,7 +84,7 @@ class Cache extends Command
         {
             $cls->addMethod(General::class, $method->name);
         }
-        
+
         $files[] = "Table.php";
         $cls->write(join_paths($folder, "Table.php"));
         $this->info('Table.php generated');
