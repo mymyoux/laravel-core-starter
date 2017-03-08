@@ -42,6 +42,7 @@ class Update extends Command
      */
     public function handle()
     {
+        $this->info("Environment:\t".env('APP_ENV'));
          //configure
          $this->current_directory = base_path();
           $choices = config("update.choices");
