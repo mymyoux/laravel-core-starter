@@ -46,6 +46,8 @@ class Update extends Command
         //verifications
         if(!isset($env))
         {
+            $this->warning("APP_ENV is not set - remove cache you can try to restart the command");
+            $this->call('cli:clear-cache');
             throw new \Exception('you must set APP_ENV to your .env file');
         }
         if(!is_writable(storage_path()))
