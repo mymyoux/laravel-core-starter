@@ -33,7 +33,7 @@ class UpdateGit extends AbstractMigration
     }
     public function rollback()
     {
-        
+
     }
     // /!\ during migrate: changing then migrate
     // /!\ during rollback: changing then rollback
@@ -50,13 +50,12 @@ class UpdateGit extends AbstractMigration
             ->addColumn('composer', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('cachefiles', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('tests', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
-            ->addColumn('cache', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('supervisor', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])
             ->addColumn('created_time', 'timestamp', ['null' => true])
             ->addColumn('updated_time', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
             ->create();
 
-      
+
 
     }
     public function dropTable($tablename)
@@ -91,7 +90,7 @@ class UpdateGit extends AbstractMigration
         }
         if(!$this->hasTable($tablename) || $this->isRollback())
         {
-            //down method 
+            //down method
             if($this->hasTable($tablename_history))
             {
                 $this->execute("DROP TRIGGER IF EXISTS after_insert_".$tablename."_".$tablename_history);
@@ -109,8 +108,8 @@ class UpdateGit extends AbstractMigration
         $db_name = $this->adapter->getOptions()["name"];
 
 
-        $existing_columns_data = $this->fetchAll("SELECT * 
-                                FROM `INFORMATION_SCHEMA`.`COLUMNS` 
+        $existing_columns_data = $this->fetchAll("SELECT *
+                                FROM `INFORMATION_SCHEMA`.`COLUMNS`
                                 WHERE `TABLE_SCHEMA`= '".$db_name."'
                                 AND `TABLE_NAME`='".$tablename."';");
 
@@ -152,7 +151,7 @@ class UpdateGit extends AbstractMigration
                     $columns_order[] = $column;
                 }
             }
-            
+
         }
         $creation[] = ' `created_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)';
         $creation[] = ' `updated_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)';

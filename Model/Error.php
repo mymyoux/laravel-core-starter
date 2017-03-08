@@ -2,7 +2,7 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Tables\ERROR as TERROR;
+// use Tables\ERROR as TERROR;
 use Auth;
 use Route;
 use Core\Services\IP;
@@ -14,9 +14,9 @@ class Error extends Model
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
 
-	protected $table = TERROR::TABLE;
+	protected $table = 'error';
 	protected $primaryKey = 'id';
-	
+
 	protected static function boot()
     {
         parent::boot();
