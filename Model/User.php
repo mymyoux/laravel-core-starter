@@ -126,9 +126,23 @@ class User extends Model implements
     }
     protected function findByApiToken($token)
     {
-        $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)
+        $key = str_replace("%token", $token, "user-token:%token");
+        $id_user = Cache::get($key);
+        if(!$id_user)
+        {
+            $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)
             ->where(USER_LOGIN_TOKEN::token,'=',$token)
             ->first();
-        return static::getById($token->id_user);
+            if(isset($token))
+            {
+                $id_user = $token->id_user;
+                Cache::forever($key, $id_user);
+            }
+        }
+        if(!isset($id_user))
+        {
+            return NULL;
+        }
+        return static::getById($id_user);
     }
 }
