@@ -78,6 +78,22 @@ class Update extends Command
                     $this->chgrpRecursive($folder, config("update.group"));
                 }
                 $this->chmodRecursive($folder, "0".$right);
+            }else
+            {
+                if(config('update.user'))
+                {
+                    $name = posix_getpwuid(fileowner($folder))["name"];
+                    if($name != config('update.user'))
+                    {
+                        $this->warn($folder.' owner updated - found: '.$name);
+                        $this->chownRecursive($folder, config("update.user"));
+                        if(config('update.group'))
+                        {
+                            $this->chgrpRecursive($folder, config("update.group"));
+                        }
+                    }
+                }
+
             }
         }
 
