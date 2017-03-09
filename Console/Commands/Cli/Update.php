@@ -338,7 +338,6 @@ class Update extends Command
         $files = get_files($path, True);
         foreach($files as $file)
         {
-            $this->info((string)$file);
             chown((string)$file, $value);
         }
     }
