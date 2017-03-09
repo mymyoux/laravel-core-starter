@@ -657,11 +657,35 @@ function smart_merge($array1, $array2)
     }
     return $array1;
 }
- function file_right($path)
+function get_files($path, $recursive = False)
+{
+    if($recursive)
+    {
+        $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
+        $files = [$path];
+        foreach($objects as $name => $object){
+            if(substr($name, -1) == ".")
+                continue;
+            $files[] = $name;
+        }
+        return $files;
+    }
+}
+ function file_right($path, $recursive = False)
 {
     if(!file_exists($path))
         return 0;
-    return (int)substr(sprintf('%o', fileperms($path)), -4);   
+    if($recursive)
+    {
+        $files = get_files($path, $recursive);
+    }else
+    {
+        $files = [$path];
+    }
+    return min(array_map(function($item)
+    {
+        return (int)substr(sprintf('%o', fileperms($item)), -4);
+    }, $files));
 }
 }
 

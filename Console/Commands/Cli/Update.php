@@ -50,23 +50,34 @@ class Update extends Command
         if(!isset($env))
         {
             $this->warn("APP_ENV is not set - remove cache you can try to restart the command");
-            //$this->call('cli:clear-cache');
-            dd($env);
+            $this->call('cli:clear-cache');
             throw new \Exception('you must set APP_ENV to your .env file');
         }
-
-        $folder_permissions = [storage_path(), public_path(),base_path('bootstrap/cache'), base_path('bootstrap/tables') ];
-        foreach($folder_permissions as $folder)
+        $folder_permissions = [
+            storage_path() =>644, 
+            public_path() => 644,
+            base_path('bootstrap/cache') => 644, 
+            base_path('bootstrap/tables') => 644
+        ];
+        foreach($folder_permissions as $folder=>$right)
         {
-            if(file_right($folder) < 755)
+            $min = file_right($folder, True);
+            if($min < $right)
             {
-                $this->warn($folder.' rights updated');
+                $this->warn($folder.' rights updated - found: '.$min);
                 if(!file_exists($folder))
                 {
-                    mkdir($folder, 0755);
+                    mkdir($folder, $right);
                 }
-                $this->chownRecursive($folder, "www-data");
-                $this->chmodRecursive($folder, "0755");
+                if(config('update.user'))
+                {
+                    $this->chownRecursive($folder, config("update.user"));
+                }
+                if(config('update.group'))
+                {
+                    $this->chgrpRecursive($folder, config("update.group"));
+                }
+                $this->chmodRecursive($folder, "0".$right);
             }
         }
 
@@ -278,10 +289,20 @@ class Update extends Command
     }
     protected function chmodRecursive($path, $value)
     {
+        if(is_string($value))
+            $value = intval($value, 8);
         $files = File::allfiles($path);
         foreach($files as $file)
         {
             chmod($file, $value);
+        }
+    }
+    protected function chgrpRecursive($path, $value)
+    {
+        $files = File::allfiles($path);
+        foreach($files as $file)
+        {
+            chgrp($file, $value);
         }
     }
     protected function chownRecursive($path, $value)
