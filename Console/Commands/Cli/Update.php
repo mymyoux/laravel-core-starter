@@ -54,11 +54,11 @@ class Update extends Command
             throw new \Exception('you must set APP_ENV to your .env file');
         }
         $this->info("Environment:\t".$env);
-        if(isset(config('update.user')))
+        if(config('update.user'))
         {
             $this->info("user:".config('update.user'));
         }
-        if(isset(config('update.group')))
+        if(config('update.group'))
         {
             $this->info("group:".config('update.group'));
         }
