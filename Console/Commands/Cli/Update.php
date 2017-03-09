@@ -65,7 +65,8 @@ class Update extends Command
                 {
                     mkdir($folder, 0755);
                 }
-                $this->chmodRecursive($folder);
+                $this->chownRecursive($folder, "www-data");
+                $this->chmodRecursive($folder, "0755");
             }
         }
 
@@ -281,6 +282,14 @@ class Update extends Command
         foreach($files as $file)
         {
             chmod($file, $value);
+        }
+    }
+    protected function chownRecursive($path, $value)
+    {
+        $files = File::allfiles($path);
+        foreach($files as $file)
+        {
+            chown($file, $value);
         }
     }
 }
