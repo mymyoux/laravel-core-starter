@@ -318,29 +318,29 @@ class Update extends Command
     {
         if(is_string($value))
             $value = intval($value, 8);
-        $files =  File::allfiles($path);
+        $files =  File::allFiles($path);
          chmod($path, $value);
         foreach($files as $file)
         {
-            chmod($file, $value);
+            chmod((string)$file, $value);
         }
     }
     protected function chgrpRecursive($path, $value)
     {
-        $files =  File::allfiles($path);
+        $files =  File::allFiles($path);
         chgrp($path, $value);
         foreach($files as $file)
         {
-            chgrp($file, $value);
+            chgrp((string)$file, $value);
         }
     }
     protected function chownRecursive($path, $value)
     {
-        $files = File::allfiles($path);
+        $files = File::allFiles($path);
         chown($path, $value);
         foreach($files as $file)
         {
-            chown($file, $value);
+            chown((string)$file, $value);
         }
     }
 }
