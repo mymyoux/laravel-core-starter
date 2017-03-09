@@ -44,12 +44,13 @@ class Update extends Command
     public function handle()
     {
         Error::mute();
-        $env = env('APP_ENV', NULL);
+        $env = config('app.env', NULL);
         //verifications
         if(!isset($env))
         {
             $this->warn("APP_ENV is not set - remove cache you can try to restart the command");
-            $this->call('cli:clear-cache');
+            //$this->call('cli:clear-cache');
+            dd($env);
             throw new \Exception('you must set APP_ENV to your .env file');
         }
         if(!is_writable(storage_path()))
@@ -61,7 +62,7 @@ class Update extends Command
 
 
 
-        $this->info("Environment:\t".env('APP_ENV'));
+        $this->info("Environment:\t".$env);
         if( $this->option('verbose'))
             $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
