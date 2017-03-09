@@ -53,6 +53,17 @@ class Update extends Command
             $this->call('cli:clear-cache');
             throw new \Exception('you must set APP_ENV to your .env file');
         }
+        $this->info("Environment:\t".$env);
+        if(isset(config('update.user')))
+        {
+            $this->info("user:".config('update.user'));
+        }
+        if(isset(config('update.group')))
+        {
+            $this->info("group:".config('update.group'));
+        }
+
+
         $folder_permissions = [
             storage_path() =>644, 
             public_path() => 644,
@@ -98,7 +109,7 @@ class Update extends Command
         }
 
 
-        $this->info("Environment:\t".$env);
+        
         if( $this->option('verbose'))
             $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
