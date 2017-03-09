@@ -318,8 +318,7 @@ class Update extends Command
     {
         if(is_string($value))
             $value = intval($value, 8);
-        $files =  File::allFiles($path);
-         chmod($path, $value);
+         $files = get_files($path);
         foreach($files as $file)
         {
             chmod((string)$file, $value);
@@ -327,8 +326,7 @@ class Update extends Command
     }
     protected function chgrpRecursive($path, $value)
     {
-        $files =  File::allFiles($path);
-        chgrp($path, $value);
+         $files = get_files($path);
         foreach($files as $file)
         {
             chgrp((string)$file, $value);
@@ -336,9 +334,7 @@ class Update extends Command
     }
     protected function chownRecursive($path, $value)
     {
-        $files = File::allFiles($path);
-        chown($path, $value);
-        $this->info((string)$path);
+        $files = get_files($path);
         foreach($files as $file)
         {
             $this->info((string)$file);
