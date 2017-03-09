@@ -57,7 +57,10 @@ class Update extends Command
         {
             throw new \Exception(storage_path()." must be writable");
         }
-
+        if(!is_writable(storage_path("logs")))
+        {
+            throw new \Exception(storage_path()." must be writable");
+        }
 
 
 
