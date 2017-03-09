@@ -338,8 +338,10 @@ class Update extends Command
     {
         $files = File::allFiles($path);
         chown($path, $value);
+        $this->info((string)$path);
         foreach($files as $file)
         {
+            $this->info((string)$file);
             chown((string)$file, $value);
         }
     }
