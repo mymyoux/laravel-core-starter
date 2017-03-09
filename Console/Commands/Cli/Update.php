@@ -7,6 +7,7 @@ use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
 use Db;
 use Core\Model\Error;
+use File;
 
 class Update extends Command
 {
@@ -53,16 +54,20 @@ class Update extends Command
             dd($env);
             throw new \Exception('you must set APP_ENV to your .env file');
         }
-        if(!is_writable(storage_path()))
-        {
-            throw new \Exception(storage_path()." must be writable");
-        }
-        if(!is_writable(storage_path("logs")))
-        {
-            throw new \Exception(storage_path()." must be writable");
-        }
 
-
+        $folder_permissions = [storage_path(), public_path(),base_path('bootstrap/cache'), base_path('bootstrap/tables') ];
+        foreach($folder_permissions as $folder)
+        {
+            if(file_right($folder) < 755)
+            {
+                $this->warn($folder.' rights updated');
+                if(!file_exists($folder))
+                {
+                    mkdir($folder, 0755);
+                }
+                $this->chmodRecursive($folder);
+            }
+        }
 
 
         $this->info("Environment:\t".$env);
@@ -269,5 +274,13 @@ class Update extends Command
     {
         $data = "<?php\nreturn ".var_export($this->cache, True).";";
         file_put_contents($this->cachefilename, $data);
+    }
+    protected function chmodRecursive($path, $value)
+    {
+        $files = File::allfiles($path);
+        foreach($files as $file)
+        {
+            chmod($file, $value);
+        }
     }
 }

@@ -657,4 +657,12 @@ function smart_merge($array1, $array2)
     }
     return $array1;
 }
+ function file_right($path)
+{
+    if(!file_exists($path))
+        return 0;
+    return (int)substr(sprintf('%o', fileperms($path)), -4);   
 }
+}
+
+
