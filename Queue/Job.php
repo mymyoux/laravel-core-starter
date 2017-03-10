@@ -29,21 +29,6 @@ class Job
         $this->data_json    = json_encode($data);
     }
 
-    // public function isConnected()
-    // {
-    //     // if (!$this->beanstalkd)
-    //     // {
-    //     //     $config             = $this->sm->get('AppConfig')->get('beanstalkd');
-
-    //     //     $this->ip           = $config['ip'];
-    //     //     $this->port         = $config['port'];
-
-    //     //     $this->beanstalkd   = new Pheanstalk($this->ip, $this->port);
-    //     // }
-
-    //     // return $this->beanstalkd->getConnection()->isServiceListening();
-    // }
-
     public function cancelAllPrevious()
     {
         $queue = 'slack';
@@ -173,8 +158,7 @@ class Job
 
             return true;
         }
-        // $id_beanstalkd = $this->beanstalkd->useTube($this->getTube())->put(json_encode($data_json), $priority, $delay);
-        // $this->sm->get('BeanstalkdLogTable')->setBeanstalkdID($id, $id_beanstalkd);
+
         $beanstalkd->id_beanstalkd = $id_beanstalkd;
         $beanstalkd->save();
 
