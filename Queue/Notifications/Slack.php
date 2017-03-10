@@ -1,12 +1,13 @@
 <?php
 
-namespace Core\Queue;
+namespace Core\Queue\Notifications;
 
 use Illuminate\Database\Eloquent\Model;
 use DB;
 
 class Slack
 {
+    const nam2e = "slack";
     public $data;
 
     public function __construct( $channel, $message, $attachments = [], $bot_name = null, $icon = null )

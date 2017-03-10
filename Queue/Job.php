@@ -10,6 +10,7 @@ use Notification;
 use DB;
 use Core\Model\Beanstalkd;
 use App\User;
+use Auth;
 
 class Job
 {
@@ -21,15 +22,87 @@ class Job
 
     use DispatchesJobs;
 
-    public function __construct( $class, $data, $id_user = null)
+    public function __construct( $class, $data)
     {
-        $this->tube         = $class;
-        $this->class        = '\App\Jobs\\' . ucfirst($class);
+        $this->tube   = $this->buildTubeName($class);
+        $this->class        = $class;
         $this->data         = $data;
-        $this->id_user      = $id_user;
-        $this->data_json    = json_encode($data);
+        $user = Auth::getUser();
+        if(isset($user))
+        {
+            $this->id_user = $user->id_user;
+        }
     }
+    public function identifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+    public function user($user)
+    {
+        if(is_numeric($user))
+        {
+            $this->id_user = $user;
+            return $this;
+        }
+        $this->id_user = $user->id_user;
+        return $this;
+    }
+    public function data($data)
+    {
+        $this->data = $data;
+        return $this;
+    }
+    public function set($name, $value)
+    {
+        if(!isset($this->_data))
+        {
+            $this->_data[] = [];
+        }
+        $this->_data[$name] = $value;
+        return $this;
+    }
+    /**
+     * Build tube name
+     * @param  [type] $class [description]
+     * @return [type]        [description]
+     */
+    protected function buildTubeName($class)
+    {
+        $tube   = defined("$class::name")?$class::name:NULL;
+        $index = strpos($class, 'Queue\\');
+        if($index !== False)
+        {
+            $index+=6;
+        }
+        $index2 = strpos($class, 'Jobs\\');
+        if($index2 !== False)
+        {
+            $index2 += 5;
+        }
+        if($index === False || ($index2 !== False && $index>$index2))
+        {
+            $index = $index2;
+        }
+        if($index === False)
+        {
+            throw new \Exception('Queue must be inside Queue or Jobs folder');
+        }
 
+        $path = substr($class, $index);
+        $paths = explode('\\', strtolower($path));
+        $last = array_pop($paths);
+        if(!isset($tube))
+        {
+            $tube = $last;
+        }
+        if(!empty($paths))
+        {
+            $prefix = join("/", $paths);
+            $tube = $prefix."/".$tube;
+        }
+        return $tube;
+    }
     public function cancelAllPrevious()
     {
         $queue = 'slack';
@@ -101,38 +174,32 @@ class Job
     public function send($delay = PheanstalkInterface::DEFAULT_DELAY, $priority = PheanstalkInterface::DEFAULT_PRIORITY, $now = false)
     {
         $beanstalkd = \Core\Model\Beanstalkd::create([
-            'json'          => $this->data_json,
+            'json'          => json_encode($this->data),
             'queue'         => $this->tube,
             'delay'         => $delay,
             'id_user'       => $this->id_user,
             'priority'      => $priority,
             'identifier'    => $this->identifier,
-            'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING)
+            'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING),
+            'cls' => $this->class
         ]);
 
         $id = $beanstalkd->id;
 
-        $this->job['_id_beanstalkd'] = $id;
 
-        if (isset($id))
-            $data_json = ['_id_beanstalkd' => $id];
-        else
-            $data_json = $this->data;
-
-        $user = isset($this->id_user) ? User::getById( $this->id_user ) : NULL;
+       $user = isset($this->id_user) ? User::getById( $this->id_user ) : NULL;
 
         try
         {
-            $class          = $this->class;
+            $class  = $this->class;
 
             if (true === $now)
             {
                 throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);
             }
-            $job = new $class( $data_json );
-
-            $job->setUser( $user );
-
+            $job = new $class();
+            $job->id = $id;
+            $job->queue = $this->tube;
             $id_beanstalkd  = $this->dispatch( $job );
         }
         catch (\Pheanstalk\Exception\ConnectionException $e)
@@ -149,7 +216,7 @@ class Job
 
 
             $job = new $class( $this->data );
-            $job->setUser( $user )->handle();
+            $job->handle();
 
             $total_time = round((microtime(True) - $start_time)*1000);
 

@@ -12,4 +12,8 @@ trait TraitJob
 
 		return $this;
 	}
+	// public function handle()
+	// {
+	// 	dd('tst');
+	// }
 }

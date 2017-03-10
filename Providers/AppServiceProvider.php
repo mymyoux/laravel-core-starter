@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton('stats', '\Core\Services\Stats');
         $this->app->singleton('api', '\Core\Api\Api');
-        $this->app->singleton('job', '\Core\Queue\FJob');
+        $this->app->singleton('job', '\Core\Services\Job');
         $this->app->singleton('notification', '\Core\Services\Notification');
         $this->app->singleton('consolelog', '\Core\Services\ConsoleLog');
     }

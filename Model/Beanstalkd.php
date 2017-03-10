@@ -31,5 +31,5 @@ class Beanstalkd extends Model
     protected $table = 'beanstalkd_log';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['id_beanstalkd', 'id_user', 'identifier', 'delay', 'json', 'state', 'tries', 'duration', 'priority', 'queue'];
+    protected $fillable = ['id_beanstalkd', 'id_user', 'identifier', 'delay', 'json', 'state', 'tries', 'duration', 'priority', 'queue','cls'];
 }
