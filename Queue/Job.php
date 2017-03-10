@@ -9,6 +9,7 @@ use Queue;
 use Notification;
 use DB;
 use Core\Model\Beanstalkd;
+use App\User;
 
 class Job
 {
@@ -112,13 +113,13 @@ class Job
         $id = $beanstalkd->id;
 
         $this->job['_id_beanstalkd'] = $id;
-        if(isset($id))
-        {
+
+        if (isset($id))
             $data_json = ['_id_beanstalkd' => $id];
-        }else
-        {
+        else
             $data_json = $this->data;
-        }
+
+        $user = isset($this->id_user) ? User::getById( $this->id_user ) : NULL;
 
         try
         {
@@ -128,8 +129,11 @@ class Job
             {
                 throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);
             }
+            $job = new $class( $data_json );
 
-            $id_beanstalkd  = $this->dispatch(new $class( $data_json ));
+            $job->setUser( $user );
+
+            $id_beanstalkd  = $this->dispatch( $job );
         }
         catch (\Pheanstalk\Exception\ConnectionException $e)
         {
@@ -143,11 +147,9 @@ class Job
             if (false === $now)
                 $this->sendAlert($now);
 
-            // $user = isset($this->id_user)?$this->sm->get('UserTable')->getUser($this->id_user):NULL;
-            // $listener->setUser($user);
 
             $job = new $class( $this->data );
-            $job->handle();
+            $job->setUser( $user )->handle();
 
             $total_time = round((microtime(True) - $start_time)*1000);
 
