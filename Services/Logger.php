@@ -2,7 +2,10 @@
 
 namespace Core\Services;
 
-class ConsoleLog
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use App;
+
+class Logger
 {
 	CONST LOG_CRITICAL  = 6;
     CONST LOG_ERROR     = 5;
@@ -12,15 +15,21 @@ class ConsoleLog
     CONST LOG_INFO      = 1;
     CONST LOG_NONE      = 0;
 
-	private $debug 		  = false;
+	private $debug          = true;
     private $metrics        = [];
     private $critical       = null;
     private $display_time   = true;
     private $config_query   = null;
+    private $output         = null;
 
     public function __construct()
     {
         $this->metrics = [];
+
+        $input  = new \Symfony\Component\Console\Input\ArgvInput();
+        $output = new \Symfony\Component\Console\Output\ConsoleOutput();
+
+        $this->output = new \Illuminate\Console\OutputStyle($input, $output);
     }
 
     public function logSqlQuery( $type, $strRequest, $start_time )
@@ -112,6 +121,12 @@ class ConsoleLog
 
     public function warn( $message )
     {
+         if (! $this->output->getFormatter()->hasStyle('warning')) {
+            $style = new OutputFormatterStyle('yellow');
+
+            $this->output->getFormatter()->setStyle('warning', $style);
+        }
+
         $this->logMetric('warn', 1);
     	$this->log($message, self::LOG_WARN);
     }
@@ -153,12 +168,18 @@ class ConsoleLog
         if (true === $this->display_time)
             $begin = '[' . date('Y-m-d H:i:s') . '] ' . $begin;
 
-        if (php_sapi_name() === 'cli')
+        if (true === App::runningInConsole())
         {
-            // if (defined('CRON') && CRON === true)
-                echo $begin . $message . $end . ($rc ? PHP_EOL : '');
-            // else
-                // $this->sm->get('console')->write($begin . $message . $end . ($rc ? PHP_EOL : ''), $color);
+            if (defined('CRON') && CRON === true)
+            {
+                echo $begin . $message . $end . PHP_EOL;
+            }
+            else
+            {
+                $message = $style ? "<$style>$begin$message$end</$style>" : ($begin . $message . $end);
+
+                $this->output->writeln($message, null);
+            }
         }
     }
 
@@ -172,48 +193,61 @@ class ConsoleLog
         if (false === $this->debug && $type < self::LOG_ERROR) return;
 
         $begin = $end = '';
+        $style = null;
 
         switch ( $type )
         {
             case self::LOG_CRITICAL :
-                $color 	= Color::RED;
+                $style = 'error';
+                // $color 	= Color::RED;
                 $begin 	= '/!\\ ';
             break;
             case self::LOG_BG_DEBUG :
-                $color = Color::BLUE;
+                $style = 'error';
+                // $color = Color::BLUE;
             break;
             case self::LOG_ERROR :
-                $color = Color::LIGHT_RED;
+                $style = 'error';
+                // $color = Color::LIGHT_RED;
             break;
             case self::LOG_WARN :
-                $color = Color::YELLOW;
+                $style = 'warning';
+                // $color = Color::YELLOW;
             break;
             case self::LOG_INFO :
-                $color = Color::GREEN;
+                $style = 'info';
+                // $color = Color::GREEN;
             break;
             case self::LOG_DEBUG :
-                $color = Color::LIGHT_BLUE;
+                $style = 'question';
+                // $color = Color::LIGHT_BLUE;
             break;
             default:
-            	$color = Color::NORMAL;
+            	// $color = Color::NORMAL;
             break;
         }
 
         if ($begin !== $end)
         {
             if (self::LOG_CRITICAL === $type)
-                $end .= ' /!\\';
+                $end .= " /!\ ";
         }
 
         if (true === $this->display_time)
             $begin = '[' . date('Y-m-d H:i:s') . '] ' . $begin;
 
-        if (php_sapi_name() === 'cli')
+        if (true === App::runningInConsole())
         {
-            // if (defined('CRON') && CRON === true)
+            if (defined('CRON') && CRON === true)
+            {
                 echo $begin . $message . $end . PHP_EOL;
-            // else
-                // $this->sm->get('console')->write($begin . $message . $end . PHP_EOL, $color);
+            }
+            else
+            {
+                $message = $style ? "<$style>$begin$message$end</$style>" : ($begin . $message . $end);
+
+                $this->output->writeln($message, null);
+            }
         }
     }
 }
