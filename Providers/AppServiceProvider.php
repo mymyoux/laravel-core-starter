@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerJob()
     {
-         $this->app->singleton('job', '\Core\Services\Job');
+        $this->app->singleton('job', '\Core\Services\Job');
     }
 
     protected function registerNoticication()
