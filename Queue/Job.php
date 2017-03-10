@@ -11,6 +11,7 @@ use DB;
 use Core\Model\Beanstalkd;
 use App\User;
 use Auth;
+use Logger;
 
 class Job
 {
@@ -132,9 +133,7 @@ class Job
                     }
                     catch(\Exception $e)
                     {
-                        if (php_sapi_name() === 'cli')
-                        echo $e->getMessage() . PHP_EOL;
-                        //beanstalkd reloaded ?
+                        Logger::error('Error delete previous' . $e->getMessage());
                     }
 
                     $log->state = Beanstalkd::STATE_CANCELLED;
@@ -206,7 +205,7 @@ class Job
         {
             if ($delay != PheanstalkInterface::DEFAULT_DELAY && php_sapi_name() === 'cli')
             {
-                // $this->sm->get('Log')->warn('waiting for ' . $delay . ' secs...');
+                Logger::warn('waiting for ' . $delay . ' secs...');
                 sleep( $delay );
             }
             // launch inline if beanstalkd down

@@ -3,10 +3,10 @@
 
 namespace Core\Facades;
 use Illuminate\Support\Facades\Facade;
-class ConsoleLog extends Facade
+class Logger extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'consolelog';
+        return 'logger';
     }
 }
