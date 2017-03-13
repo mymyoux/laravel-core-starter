@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Stats as StatsService;
 use Core\Model\Query;
 use Api;
+use Logger;
 class Stats
 {
     /**
@@ -66,10 +67,11 @@ class Stats
         }
         $data["stats"] = 
         [
+            "log"=> Logger::getOutput(),
             "route"=> $route,
             "time"      =>  $time,
             "queries"   =>  DB::getQueryLog(),
-            "cache"   =>  CacheListener::getQueryLog()
+            "cache"   =>  CacheListener::getQueryLog(),
         ];
         $api = StatsService::getApiStats();
         $data["stats"]["api"] = $api;

@@ -21,49 +21,24 @@ class Logger
     private $display_time   = true;
     private $config_query   = null;
     private $output         = null;
+    private $outputs         = null;
 
     public function __construct()
     {
         $this->metrics = [];
 
-        $input  = new \Symfony\Component\Console\Input\ArgvInput();
-        $output = new \Symfony\Component\Console\Output\ConsoleOutput();
-
-        $this->output = new \Illuminate\Console\OutputStyle($input, $output);
-    }
-
-    public function logSqlQuery( $type, $strRequest, $start_time )
-    {
-        if (null === $this->config_query)
+        if(App::runningInConsole())
         {
-            $this->config_query = $this->sm->get('AppConfig')->get('query_log');
-        }
+            $input  = new \Symfony\Component\Console\Input\ArgvInput();
+            $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 
-        if (false === in_array($type, $this->config_query['types_allow']))
-            return false;
-
-        $duration = (microtime( true ) - $start_time) * 1000;
-
-        if ($duration < $this->config_query['min_duration'])
+            $this->output = new \Illuminate\Console\OutputStyle($input, $output);
+        }else
         {
-            return false;
-        }
-
-        try
-        {
-            throw new \Exception('log_query_sql', 1);
-        }
-        catch(\Exception $e)
-        {
-            // log
-            $is_cron    = $this->sm->get('AppConfig')->isCron();
-            $is_front   = !$this->sm->get('AppConfig')->isCLI();
-            $is_queue   = $this->sm->get('AppConfig')->isQueue();
-            $stack      = $e->getTraceAsString();
-
-            $this->sm->get('QueryLogTable')->insertLog($type, $strRequest, $duration, $is_front, $is_cron, $is_queue, $stack);
+            $this->outputs = [];
         }
     }
+
 
     public function setDisplayTime( $boolean )
     {
@@ -121,10 +96,13 @@ class Logger
 
     public function warn( $message )
     {
-         if (! $this->output->getFormatter()->hasStyle('warning')) {
-            $style = new OutputFormatterStyle('yellow');
+        if (true === App::runningInConsole())
+        {
+             if (! $this->output->getFormatter()->hasStyle('warning')) {
+                $style = new OutputFormatterStyle('yellow');
 
-            $this->output->getFormatter()->setStyle('warning', $style);
+                $this->output->getFormatter()->setStyle('warning', $style);
+            }
         }
 
         $this->logMetric('warn', 1);
@@ -170,14 +148,13 @@ class Logger
 
         if (true === App::runningInConsole())
         {
-            if (defined('CRON') && CRON === true)
+            if (true === App::runningInCron())
             {
                 echo $begin . $message . $end . PHP_EOL;
             }
             else
             {
                 $message = $style ? "<$style>$begin$message$end</$style>" : ($begin . $message . $end);
-
                 $this->output->writeln($message, null);
             }
         }
@@ -191,7 +168,6 @@ class Logger
     private function log( $message, $type = self::LOG_NONE )
     {
         if (false === $this->debug && $type < self::LOG_ERROR) return;
-
         $begin = $end = '';
         $style = null;
 
@@ -238,7 +214,7 @@ class Logger
 
         if (true === App::runningInConsole())
         {
-            if (defined('CRON') && CRON === true)
+            if (App::runningInCron())
             {
                 echo $begin . $message . $end . PHP_EOL;
             }
@@ -248,6 +224,16 @@ class Logger
 
                 $this->output->writeln($message, null);
             }
+        }else
+        {
+            if(App::isLocal() ||  (Auth::check() && Auth::getUser()->isAdmin()))
+            {
+                $this->outputs[] = $message;
+            }
         }
+    }
+    public function getOutput()
+    {
+        return $this->outputs;
     }
 }
