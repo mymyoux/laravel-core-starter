@@ -12,12 +12,13 @@ use Core\Model\Beanstalkd;
 use App\User;
 use Auth;
 use Logger;
-
+use  Illuminate\Queue\Jobs\JobName;
+use Illuminate\Contracts\Bus\Dispatcher;
+use App;
 class Job
 {
-    private $data = [];
-    private $data_json = null;
-    private $class = null;
+    private $data;
+    private $class;
     private $identifier = null;
     private $id_user = null;
 
@@ -106,7 +107,6 @@ class Job
     }
     public function cancelAllPrevious()
     {
-        $queue = 'slack';
         $pheanstalk = Queue::getPheanstalk();
         $request = \Core\Model\Beanstalkd::where('queue', '=', $this->tube)
             ->whereIn("state", [Beanstalkd::STATE_CREATED, Beanstalkd::STATE_RETRYING, Beanstalkd::STATE_PENDING ]);
@@ -185,25 +185,22 @@ class Job
 
         $id = $beanstalkd->id;
 
-
-       $user = isset($this->id_user) ? User::getById( $this->id_user ) : NULL;
-
         try
         {
             $class  = $this->class;
 
+            $job = new $class();
+            $job->id = $id;
+            $job->queue = $this->tube;
             if (true === $now)
             {
                 throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);
             }
-            $job = new $class();
-            $job->id = $id;
-            $job->queue = $this->tube;
             $id_beanstalkd  = $this->dispatch( $job );
         }
         catch (\Pheanstalk\Exception\ConnectionException $e)
         {
-            if ($delay != PheanstalkInterface::DEFAULT_DELAY && php_sapi_name() === 'cli')
+            if ($delay != PheanstalkInterface::DEFAULT_DELAY && App::runningInConsole())
             {
                 Logger::warn('waiting for ' . $delay . ' secs...');
                 sleep( $delay );
@@ -213,9 +210,9 @@ class Job
             if (false === $now)
                 $this->sendAlert($now);
 
-
-            $job = new $class( $this->data );
-            $job->handle();
+            //force to be iso with queue
+            $job = unserialize(serialize($job));
+            app(Dispatcher::class)->dispatchNow($job);
 
             $total_time = round((microtime(True) - $start_time)*1000);
 
