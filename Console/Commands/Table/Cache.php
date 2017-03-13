@@ -87,6 +87,8 @@ class Cache extends Command
 
         $files[] = "Table.php";
         $cls->write(join_paths($folder, "Table.php"));
+        $this->updateOwnerShip(join_paths($folder, "Table.php"));
+
         $this->info('Table.php generated');
 
         $model = new ReflectionClass(Table::class);
@@ -124,6 +126,7 @@ class Cache extends Command
             if(!file_exists($path) || md5($export) != md5_file($path))
             {
                 $cls->write($path);
+                $this->updateOwnerShip($path);
                 $this->info(strtoupper($tablename).'.php generated');
             }
         }
@@ -135,5 +138,17 @@ class Cache extends Command
             unlink(join_paths($folder, $remove));
                $this->info($remove.' deleted');
         }
+    }
+    protected function updateOwnerShip($path)
+    {
+        if(config('update.user'))
+        {
+            chown((string)$path, config('update.user'));
+        }
+        if(config('update.group'))
+        {
+            chgrp((string)$path, config('update.group'));
+        }
+
     }
 }
