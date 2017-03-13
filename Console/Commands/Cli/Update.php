@@ -93,7 +93,7 @@ class Update extends Command
             {
                 if(config('update.user'))
                 {
-                    $name = posix_getpwuid(fileowner($folder))["name"];
+                    $name = $this->getUserRecursive($folder);//posix_getpwuid(fileowner($folder))["name"];
                     if($name != config('update.user'))
                     {
                         $this->warn($folder.' owner updated - found: '.$name);
@@ -313,6 +313,24 @@ class Update extends Command
     {
         $data = "<?php\nreturn ".var_export($this->cache, True).";";
         file_put_contents($this->cachefilename, $data);
+    }
+    protected function getUserRecursive($path)
+    {
+        $files = get_files($path, True);
+
+        $name = NULL;
+        foreach($files as $file)
+        {
+            $temp = posix_getpwuid(fileowner($file))["name"];
+            if($name != $temp && isset($name))
+            {
+                $name = "various";
+            }else
+            {
+                $name = $temp;;
+            }
+        }
+        return $name;
     }
     protected function chmodRecursive($path, $value)
     {
