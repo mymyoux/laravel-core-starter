@@ -19,15 +19,16 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d}';
 
-    protected $defaultChoices = 
+    protected $defaultChoices =
     [
-        "pull"=>1,
-        "composer"=>1,
-        "migrate"=>1,
-        "cache"=>1,
-        "supervisor"=>1,
+        "pull"              => 1,
+        "composer"          => 1,
+        "migrate"           => 1,
+        "cache"             => 1,
+        "supervisor"        => 1,
+        'cron'              => 0
     ];
     /**
      * The console command description.
@@ -37,7 +38,7 @@ class Update extends Command
     protected $description = 'Update project';
 
     /**
-     * 
+     *
      * Execute the console command.
      *
      * @return mixed
@@ -65,9 +66,9 @@ class Update extends Command
 
 
         $folder_permissions = [
-            storage_path() =>644, 
+            storage_path() =>644,
             public_path() => 644,
-            base_path('bootstrap/cache') => 644, 
+            base_path('bootstrap/cache') => 644,
             base_path('bootstrap/tables') => 644
         ];
         foreach($folder_permissions as $folder=>$right)
@@ -109,7 +110,7 @@ class Update extends Command
         }
 
 
-        
+
         if( $this->option('verbose'))
             $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
@@ -146,7 +147,7 @@ class Update extends Command
             }
             return $previous;
         }, []);
-        
+
         $this->start($choices);
 
 
@@ -177,7 +178,7 @@ class Update extends Command
         $bar->setMessage("Exiting\n");
         $bar->advance();
     }
-     
+
     protected function runPull()
     {
         $folders = config("update.pull");
@@ -229,6 +230,10 @@ class Update extends Command
     protected function runMigrate()
     {
         $this->call('phinx:migrate');
+    }
+    protected function runCron()
+    {
+        $this->call('cli:generate-cron');
     }
     protected function runCache()
     {
