@@ -35,24 +35,45 @@ function emojiFront($string)
         return pack('H*', $r[1]);
     }, $string);
 }
+class DD extends \Exception
+{
 
+}
 /**
  * Display data as var_dump and kill the application
  * @param $data
  */
-function dd($data)
+function dd(...$data)
 {
-    if (php_sapi_name() !== 'cli')
-        echo '<pre>';
-
     $stack = debug_backtrace();
     $line = $stack[0];
     echo $line["file"].":".$line["line"]."\n";
     $line = $stack[1];
-    echo (array_key_exists("class", $line)?$line["class"]."::":"").$line["function"];
+    echo (array_key_exists("class", $line)?$line["class"]."::":"").$line["function"]."\n";
 
     if (php_sapi_name() !== 'cli')
+    {
+        echo '<pre>';
+         debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS   ,15);
         echo '</pre>';
+    }else
+    {
+        global $argv;
+        $verbose = ["-v","-vv","-vvv","--verbose"];
+        $has_verbose = !empty(array_intersect($argv, $verbose));
+        if($has_verbose)
+        {
+             $console = new \Symfony\Component\Console\Output\ConsoleOutput();
+            $console->setVerbosity(\Symfony\Component\Console\Output\ConsoleOutput::VERBOSITY_DEBUG);
+            (new \Symfony\Component\Console\Application())->renderException(new DD(), $console);
+         //   debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS   ,15);
+        }
+    }
+
+      array_map(function ($x) {
+            (new Illuminate\Support\Debug\Dumper)->dump($x);
+        }, func_get_args());
+      exit();
 
     if (function_exists("xdebug_get_code_coverage"))
     {
@@ -63,6 +84,7 @@ function dd($data)
     {
         if (php_sapi_name() !== 'cli')
         {
+
             echo '<pre>';
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS   ,15);
             echo '</pre>';
