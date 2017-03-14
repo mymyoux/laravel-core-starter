@@ -50,7 +50,6 @@ class Slack extends JobHandler
     }
     public function handle()
     {
-        Logger::info(Auth::id());
         $slack  = config('services.slack');
         if(isset($slack))
         {
@@ -100,7 +99,6 @@ class Slack extends JobHandler
 
             }
         }
-         throw new \Exception('tetet');
         return $result;
     }
 }

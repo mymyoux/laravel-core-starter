@@ -224,36 +224,55 @@ class Job
             }
             // launch inline if beanstalkd down
             $start_time = microtime(True);
-            if (false === $now)
-                $this->sendAlert($now);
 
             //force to be iso with queue
             $job = unserialize(serialize($job));
+            if (false === $now && !($job instanceof \Core\Jobs\Slack))
+            {
+                //check if slack infinite loop otherwise
+                $this->sendAlert($now);
+            }
             $fakejob = new FakeBeanstalkdJob($job);
+            $fakejob->setIsExecutedNow($now);
+            $has_error = True;
+            while($has_error && !$fakejob->hasFailed())
+            {
+                $has_error = True;
+                try {
+                    Logger::info('trying');
+                    // First we will raise the before job event and determine if the job has already ran
+                    // over the its maximum attempt limit, which could primarily happen if the job is
+                    // continually timing out and not actually throwing any exceptions from itself.
+                    $fakejob->tries();
+                    if($fakejob->attempts()>1 && $now === true)
+                    {
+                        $delay = $fakejob->getDelayRetry();
+                        if($delay)
+                        {
+                            Logger::info('delay:'.$delay);
+                            sleep($delay);
+                        }
+                    }
 
-            try {
-                Logger::info('trying');
-                // First we will raise the before job event and determine if the job has already ran
-                // over the its maximum attempt limit, which could primarily happen if the job is
-                // continually timing out and not actually throwing any exceptions from itself.
-                $fakejob->tries();
-                $this->raiseBeforeJobEvent($fakejob);
+                    $this->raiseBeforeJobEvent($fakejob);
 
-                $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
-                    $fakejob
-                );
-                // Here we will fire off the job and let it process. We will catch any exceptions so
-                // they can be reported to the developers logs, etc. Once the job is finished the
-                // proper events will be fired to let any listeners know this job has finished.
-                app(Dispatcher::class)->dispatchNow($job);
+                    $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
+                        $fakejob
+                    );
+                    // Here we will fire off the job and let it process. We will catch any exceptions so
+                    // they can be reported to the developers logs, etc. Once the job is finished the
+                    // proper events will be fired to let any listeners know this job has finished.
+                    app(Dispatcher::class)->dispatchNow($job);
 
-                $this->raiseAfterJobEvent($fakejob);
-            } catch (Exception $e) {
-                $this->handleJobException($fakejob, $e);
-            } catch (Throwable $e) {
-                $this->handleJobException(
-                   $fakejob, new FatalThrowableError($e)
-                );
+                    $this->raiseAfterJobEvent($fakejob);
+                    $has_error = False;
+                } catch (Exception $e) {
+                    $this->handleJobException($fakejob, $e);
+                } catch (Throwable $e) {
+                    $this->handleJobException(
+                       $fakejob, new FatalThrowableError($e)
+                    );
+                }
             }
 
             
@@ -275,7 +294,7 @@ class Job
     }
     protected function raiseBeforeJobEvent($job)
     {
-        Logger::info('processing');
+        Logger::debug('processing');
         event(new JobProcessing(
             "beanstalkd", $job
         ));
@@ -302,6 +321,7 @@ class Job
         if ($maxTries === 0 || $job->attempts() <= $maxTries) {
             return;
         }
+        $job->markAsFailed();
         Logger::warn('already max tries');
         new JobFailed(
                 "beanstalkd", $job, $e = new MaxAttemptsExceededException(
@@ -312,10 +332,10 @@ class Job
     }
     protected function markJobAsFailedIfWillExceedMaxAttempts($job, $e)
     {
-        Logger::warn('max tries');
         $maxTries = $job->maxTries();
 
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
+            $job->markAsFailed();
              new JobFailed(
                     "beanstalkd", $job, $e);
         }

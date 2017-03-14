@@ -6,6 +6,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 
 use Core\Model\Beanstalkd;
+use Core\Queue\Jobs\FakeBeanstalkdJob;
 use Db;
 use App;
 use Auth;
@@ -102,8 +103,20 @@ class QueueListener
     {
         $job = $this->getJob($event);
         Logger::info("processed:".$job->id);
+
+        $state = Beanstalkd::STATE_EXECUTED;
+        if(!App::runningInConsole() && static::$event->job instanceof FakeBeanstalkdJob)
+        {
+            if(static::$event->job->isExecutedNow())
+            {
+                $state = Beanstalkd::STATE_EXECUTED_NOW;
+            }else
+            {
+                $state = Beanstalkd::STATE_EXECUTED_FRONT;
+            }
+        }
         Beanstalkd::where('id', '=', $job->id)
-        ->update(["state"=>Beanstalkd::STATE_EXECUTED, "duration"=>$this->getDuration()]);
+        ->update(["state"=>$state, "duration"=>$this->getDuration()]);
     }
     public function handleFailed($event)
     {

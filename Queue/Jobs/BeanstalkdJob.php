@@ -12,11 +12,17 @@ class BeanstalkdJob extends BaseBeanstalkdJob
 {
     public function release($delay = 0)
     {
+    	$delay = $delay || $this->getDelayRetry();
+        return parent::release($delay);
+    }
+    public function getDelayRetry()
+    {
+    	$delay = 0;
     	$cls = $this->payload()["data"]["commandName"];
     	if(method_exists($cls, "getDelayRetry"))
     	{
     		$delay = $cls::getDelayRetry();
     	}
-        return parent::release($delay);
+    	return $delay;
     }
 }

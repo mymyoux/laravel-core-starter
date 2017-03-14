@@ -7,6 +7,7 @@ use DB;
 
 use Core\Listeners\QueueListener;
 use Event;
+use Logger;
 class AppServiceProvider extends ServiceProvider
 {
     /**
