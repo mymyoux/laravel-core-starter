@@ -232,6 +232,8 @@ class Job
                 //check if slack infinite loop otherwise
                 $this->sendAlert($now);
             }
+            $previous_user = Auth::user();
+
             $fakejob = new FakeBeanstalkdJob($job);
             $fakejob->setIsExecutedNow($now);
             $has_error = True;
@@ -276,13 +278,8 @@ class Job
             }
 
             
-
-            // $total_time = round((microtime(True) - $start_time)*1000);
-
-            // $beanstalkd->state      = $now ? Beanstalkd::STATE_EXECUTED_NOW : Beanstalkd::STATE_EXECUTED_FRONT;
-            // $beanstalkd->duration   = $total_time;
-            // $beanstalkd->tries      = 1;
-            // $beanstalkd->save();
+            if(isset($previous_user))
+                Auth::setUser($previous_user);
 
             return true;
         }

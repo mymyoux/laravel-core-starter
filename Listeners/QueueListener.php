@@ -105,6 +105,7 @@ class QueueListener
         Logger::info("processed:".$job->id);
 
         $state = Beanstalkd::STATE_EXECUTED;
+        //fakejob => front
         if(!App::runningInConsole() && static::$event->job instanceof FakeBeanstalkdJob)
         {
             if(static::$event->job->isExecutedNow())

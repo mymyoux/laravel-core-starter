@@ -34,11 +34,15 @@ trait Job
     public function __wakeup()
     {
     	$dbData = Beanstalkd::find($this->id);
-    	$this->data  = json_decode($dbData->json, False);
+    	$this->loadDbData($dbData);
+    }
+    public function loadDbData($dbData)
+    {
+        $this->data  = json_decode($dbData->json, False);
         $this->id_user = $dbData->id_user;
         $this->current_tries = $dbData->tries;
-    	//unserialization
-    	$this->unserializeData($this->data);
+        //unserialization
+        $this->unserializeData($this->data);
     }
     protected function unserializeData($data)
     {
