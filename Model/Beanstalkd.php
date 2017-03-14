@@ -15,6 +15,7 @@ class Beanstalkd extends Model
     const STATE_EXECUTED_FRONT = "executed_front";
     const STATE_EXECUTED_NOW = "executed_now";
     const STATE_FAILED = "failed";
+    const STATE_FAILED_PENDING_RETRY = "failed_pending_retry";
     const STATE_PENDING = "pending";
     const STATE_RETRYING = "retrying";
     const STATE_CANCELLED = "cancelled";

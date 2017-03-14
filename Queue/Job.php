@@ -15,6 +15,18 @@ use Logger;
 use  Illuminate\Queue\Jobs\JobName;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\ManuallyFailedException;
+use Core\Queue\Jobs\FakeBeanstalkdJob;
+
+use Exception;
+use Throwable;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 class Job
 {
     private $data;
@@ -103,13 +115,18 @@ class Job
             $prefix = join("/", $paths);
             $tube = $prefix."/".$tube;
         }
+        //prefix
+        if(config('queue.prefix'))
+        {
+            $tube = config('queue.prefix').$tube;   
+        }
         return $tube;
     }
     public function cancelAllPrevious()
     {
         $pheanstalk = Queue::getPheanstalk();
         $request = \Core\Model\Beanstalkd::where('queue', '=', $this->tube)
-            ->whereIn("state", [Beanstalkd::STATE_CREATED, Beanstalkd::STATE_RETRYING, Beanstalkd::STATE_PENDING ]);
+            ->whereIn("state", [Beanstalkd::STATE_CREATED, Beanstalkd::STATE_RETRYING, Beanstalkd::STATE_PENDING, Beanstalkd::STATE_FAILED_PENDING_RETRY ]);
 
         if (isset($this->id_user))
             $request->where('id_user', '=', $this->id_user);
@@ -212,14 +229,41 @@ class Job
 
             //force to be iso with queue
             $job = unserialize(serialize($job));
-            app(Dispatcher::class)->dispatchNow($job);
+            $fakejob = new FakeBeanstalkdJob($job);
 
-            $total_time = round((microtime(True) - $start_time)*1000);
+            try {
+                Logger::info('trying');
+                // First we will raise the before job event and determine if the job has already ran
+                // over the its maximum attempt limit, which could primarily happen if the job is
+                // continually timing out and not actually throwing any exceptions from itself.
+                $fakejob->tries();
+                $this->raiseBeforeJobEvent($fakejob);
 
-            $beanstalkd->state      = $now ? Beanstalkd::STATE_EXECUTED_NOW : Beanstalkd::STATE_EXECUTED_FRONT;
-            $beanstalkd->duration   = $total_time;
-            $beanstalkd->tries      = 1;
-            $beanstalkd->save();
+                $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
+                    $fakejob
+                );
+                // Here we will fire off the job and let it process. We will catch any exceptions so
+                // they can be reported to the developers logs, etc. Once the job is finished the
+                // proper events will be fired to let any listeners know this job has finished.
+                app(Dispatcher::class)->dispatchNow($job);
+
+                $this->raiseAfterJobEvent($fakejob);
+            } catch (Exception $e) {
+                $this->handleJobException($fakejob, $e);
+            } catch (Throwable $e) {
+                $this->handleJobException(
+                   $fakejob, new FatalThrowableError($e)
+                );
+            }
+
+            
+
+            // $total_time = round((microtime(True) - $start_time)*1000);
+
+            // $beanstalkd->state      = $now ? Beanstalkd::STATE_EXECUTED_NOW : Beanstalkd::STATE_EXECUTED_FRONT;
+            // $beanstalkd->duration   = $total_time;
+            // $beanstalkd->tries      = 1;
+            // $beanstalkd->save();
 
             return true;
         }
@@ -229,4 +273,76 @@ class Job
 
         return $id_beanstalkd;
     }
+    protected function raiseBeforeJobEvent($job)
+    {
+        Logger::info('processing');
+        event(new JobProcessing(
+            "beanstalkd", $job
+        ));
+    }
+    protected function raiseAfterJobEvent($job)
+    {
+        Logger::info('processed');
+        event(new JobProcessed(
+            "beanstalkd", $job
+        ));
+    }
+    protected function raiseExceptionOccurredJobEvent($job, $e)
+    {
+        Logger::warn('exception');
+        event(new JobExceptionOccurred(
+            "beanstalkd", $job, $e
+        ));
+    }
+    protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($job)
+    {
+        
+        $maxTries = $job->maxTries();
+
+        if ($maxTries === 0 || $job->attempts() <= $maxTries) {
+            return;
+        }
+        Logger::warn('already max tries');
+        new JobFailed(
+                "beanstalkd", $job, $e = new MaxAttemptsExceededException(
+            'A queued job has been attempted too many times. The job may have previously timed out.'
+        ) );
+
+        throw $e;
+    }
+    protected function markJobAsFailedIfWillExceedMaxAttempts($job, $e)
+    {
+        Logger::warn('max tries');
+        $maxTries = $job->maxTries();
+
+        if ($maxTries > 0 && $job->attempts() >= $maxTries) {
+             new JobFailed(
+                    "beanstalkd", $job, $e);
+        }
+    }
+     protected function handleJobException($job, $e)
+    {
+        Logger::warn('job exception');
+        try {
+            // First, we will go ahead and mark the job as failed if it will exceed the maximum
+            // attempts it is allowed to run the next time we process it. If so we will just
+            // go ahead and mark it as failed now so we do not have to release this again.
+            $this->markJobAsFailedIfWillExceedMaxAttempts(
+                 $job, $e
+            );
+
+            $this->raiseExceptionOccurredJobEvent(
+                $job, $e
+            );
+        } finally {
+            // // If we catch an exception, we will attempt to release the job back onto the queue
+            // // so it is not lost entirely. This'll let the job be retried at a later time by
+            // // another listener (or this same one). We will re-throw this exception after.
+            // if (! $job->isDeleted()) {
+            //     $job->release($options->delay);
+            // }
+        }
+    }
+
+      
 }

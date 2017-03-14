@@ -3,6 +3,8 @@
 namespace Core\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
+use Core\Listeners\QueueListener;
+use Event;
 class ConsoleServiceProvider extends ServiceProvider
 {
 
@@ -29,5 +31,15 @@ class ConsoleServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands($this->commands);
+    }
+    public function boot()
+    {
+        //in appservice 
+        //parent::boot();
+        // Event::listen('Illuminate\Queue\Events\JobProcessing', QueueListener::class);
+        // Event::listen('Illuminate\Queue\Events\JobProcessed', QueueListener::class);
+        // //not needed=> jobException gives failed info
+        // //Event::listen('Illuminate\Queue\Events\JobFailed', QueueListener::class);
+        // Event::listen('Illuminate\Queue\Events\JobExceptionOccurred', QueueListener::class);
     }
 }

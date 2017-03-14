@@ -93,6 +93,7 @@ class Error extends Model
             /**
              * @var \Core\Service\Identity $identity
              */
+            if(method_exists(Auth::class, "getUser"))
             $user = Auth::getUser();
             if(isset($user))
             {

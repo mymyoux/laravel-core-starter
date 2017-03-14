@@ -5,6 +5,8 @@ namespace Core\Providers;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider as BaseArtisanServiceProvider;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use Core\Queue\Console\ListenCommand as QueueListenCommand;
+use Core\Queue\Console\WorkCommand as QueueWorkCommand;
 class ArtisanServiceProvider extends BaseArtisanServiceProvider
 {
 	 protected $commands = [
@@ -123,5 +125,17 @@ class ArtisanServiceProvider extends BaseArtisanServiceProvider
      */
     protected function registerMigrateStatusCommand()
     {
+    }
+    protected function registerQueueListenCommand()
+    {
+        $this->app->singleton('command.queue.listen', function ($app) {
+            return new QueueListenCommand($app['queue.listener']);
+        });
+    }
+    protected function registerQueueWorkCommand()
+    {
+        $this->app->singleton('command.queue.work', function ($app) {
+            return new QueueWorkCommand($app['queue.worker']);
+        });
     }
 }

@@ -6,12 +6,13 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Core\Traits\Job;
+use Core\Queue\JobHandler;
 use App;
 use Notification;
-class Slack implements ShouldQueue
+use Logger;
+use Auth;
+class Slack extends JobHandler
 {
-    use Job;
-    
     /**
      * Create a new job instance.
      *
@@ -19,6 +20,10 @@ class Slack implements ShouldQueue
      */
     public function __construct()
     {
+    }
+     public static function getDelayRetry()
+    {
+        return 0;
     }
     /**
      * Execute the job.
@@ -45,6 +50,7 @@ class Slack implements ShouldQueue
     }
     public function handle()
     {
+        Logger::info(Auth::id());
         $slack  = config('services.slack');
         if(isset($slack))
         {
@@ -94,7 +100,7 @@ class Slack implements ShouldQueue
 
             }
         }
-
+         throw new \Exception('tetet');
         return $result;
     }
 }

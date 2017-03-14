@@ -12,12 +12,20 @@ trait Job
 	public $queue;
 	public $id;
 	public $data;
+    public $id_user;
+    public $current_tries;
 
 	public function __sleep()
     {
         return ["id"];
     }
-
+    /**
+     * Retry delay after a fail
+     */
+    public static function getDelayRetry()
+    {
+        return 5;
+    }
     /**
      * Restore the model after serialization.
      *
@@ -27,7 +35,8 @@ trait Job
     {
     	$dbData = Beanstalkd::find($this->id);
     	$this->data  = json_decode($dbData->json, False);
-
+        $this->id_user = $dbData->id_user;
+        $this->current_tries = $dbData->tries;
     	//unserialization
     	$this->unserializeData($this->data);
     }

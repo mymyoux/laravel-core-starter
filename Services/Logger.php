@@ -228,7 +228,7 @@ class Logger
         {
             if(App::isLocal() ||  (Auth::check() && Auth::getUser()->isAdmin()))
             {
-                $this->outputs[] = $message;
+                $this->outputs[] = $style.": ".$message;
             }
         }
     }

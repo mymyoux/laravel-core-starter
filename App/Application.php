@@ -16,6 +16,6 @@ class Application extends \Illuminate\Foundation\Application
     public function runningInQueue()
     {
         //TODO:implement
-        return False;
+        return env('ENV_QUEUE', False) == True;
     }
 }

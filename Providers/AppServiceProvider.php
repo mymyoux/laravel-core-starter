@@ -4,6 +4,9 @@ namespace Core\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use DB;
+
+use Core\Listeners\QueueListener;
+use Event;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -13,6 +16,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+       Event::listen('Illuminate\Queue\Events\JobProcessing', QueueListener::class);
+        Event::listen('Illuminate\Queue\Events\JobProcessed', QueueListener::class);
+        //not needed=> jobException gives failed info
+        //Event::listen('Illuminate\Queue\Events\JobFailed', QueueListener::class);
+        Event::listen('Illuminate\Queue\Events\JobExceptionOccurred', QueueListener::class);
+
+
         $this->bootQuery();
     }
 
