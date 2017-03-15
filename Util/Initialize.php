@@ -709,6 +709,15 @@ function get_files($path, $recursive = False)
         return (int)substr(sprintf('%o', fileperms($item)), -4);
     }, $files));
 }
+
+function clean_array($data)
+{
+    return array_filter($data, function($item)
+    {
+        return $item !== NULL;
+    });
+}
+
 }
 
 

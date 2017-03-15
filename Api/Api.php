@@ -9,6 +9,8 @@ use Auth;
 use Core\Exception\ApiException;
 use Core\Exception\Exception;
 use App;
+use Job;
+use Core\Jobs\Api as ApiJob;
 class Api
 {
     public static $data = [[]];
@@ -62,10 +64,21 @@ class Api
         $this->method = "GET";
         return $this;
     }
+    public function path($path)
+    {
+        $this->path = $path;
+        $this->method = "GET";
+        return $this;
+    }
     public function post($path)
     {
         $this->path = $path;
         $this->method = "POST";
+        return $this;
+    }
+    public function method($method)
+    {
+        $this->method = $method;
         return $this;
     }
     public function params($params)
@@ -84,6 +97,7 @@ class Api
     }
     public function user($user)
     {
+
         $this->api_user = $user;
         return $this;
     }
@@ -111,7 +125,13 @@ class Api
         if(isset($this->api_user))
         {
             $temp_user = Auth::getUser();
-            Auth::setUser($this->api_user);
+            if(is_numeric($this->api_user))
+            {
+                Auth::loginUsingId($this->api_user);
+            }else
+            {
+                Auth::setUser($this->api_user);
+            }
         }
         Request::replace($request->input());
         if(App::runningInConsole())
@@ -154,7 +174,20 @@ class Api
         }
         return $response->value;
     }
-
+    public function queue($params = NULL)
+    {
+        $data = [];
+        foreach($this as $key=>$value)
+        {
+            $data[$key] = $value;
+        }
+        if(isset($data["api_user"]) && !is_numeric($data["api_user"]))
+        {
+            $data["api_user"] = $this->api_user->id_user;
+        }
+        $data["add_params"] = $params;
+        return Job::create(ApiJob::class, clean_array($data))->send();
+    }
 
     public function unserialize($data)
     {
