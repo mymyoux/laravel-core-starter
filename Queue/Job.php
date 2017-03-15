@@ -241,7 +241,6 @@ class Job
             {
                 $has_error = True;
                 try {
-                    Logger::info('trying');
                     // First we will raise the before job event and determine if the job has already ran
                     // over the its maximum attempt limit, which could primarily happen if the job is
                     // continually timing out and not actually throwing any exceptions from itself.
@@ -251,7 +250,6 @@ class Job
                         $delay = $fakejob->getDelayRetry();
                         if($delay)
                         {
-                            Logger::info('delay:'.$delay);
                             sleep($delay);
                         }
                     }
@@ -291,21 +289,18 @@ class Job
     }
     protected function raiseBeforeJobEvent($job)
     {
-        Logger::debug('processing');
         event(new JobProcessing(
             "beanstalkd", $job
         ));
     }
     protected function raiseAfterJobEvent($job)
     {
-        Logger::info('processed');
         event(new JobProcessed(
             "beanstalkd", $job
         ));
     }
     protected function raiseExceptionOccurredJobEvent($job, $e)
     {
-        Logger::warn('exception');
         event(new JobExceptionOccurred(
             "beanstalkd", $job, $e
         ));
@@ -319,7 +314,6 @@ class Job
             return;
         }
         $job->markAsFailed();
-        Logger::warn('already max tries');
         new JobFailed(
                 "beanstalkd", $job, $e = new MaxAttemptsExceededException(
             'A queued job has been attempted too many times. The job may have previously timed out.'
@@ -339,7 +333,6 @@ class Job
     }
      protected function handleJobException($job, $e)
     {
-        Logger::warn('job exception');
         try {
             // First, we will go ahead and mark the job as failed if it will exceed the maximum
             // attempts it is allowed to run the next time we process it. If so we will just
