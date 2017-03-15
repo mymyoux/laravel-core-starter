@@ -50,7 +50,6 @@ class Slack extends JobHandler
     }
     public function handle()
     {
-        Logger::info("id_user:".Auth::id());
         $slack  = config('services.slack');
         if(isset($slack))
         {

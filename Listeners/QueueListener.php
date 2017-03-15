@@ -10,7 +10,6 @@ use Core\Queue\Jobs\FakeBeanstalkdJob;
 use Db;
 use App;
 use Auth;
-use Logger;
 class QueueListener
 {
 
@@ -33,7 +32,6 @@ class QueueListener
             static::$event = $event;
             return static::$job;
         }
-        Logger::warn('reset time');
         static::$start = microtime(True);
         static::$event = $event;
         $job = $event->job;
@@ -94,7 +92,6 @@ class QueueListener
         {
             Auth::logout();
         }
-        Logger::info("processing:".$job->id_user." ".App::runningInQueue());
         Beanstalkd::where('id', '=', $job->id)
         ->update(["state"=>Beanstalkd::STATE_EXECUTING, "tries"=>Db::raw('tries + 1')]);
     }
@@ -102,7 +99,6 @@ class QueueListener
     public function handleProcessed($event)
     {
         $job = $this->getJob($event);
-        Logger::info("processed:".$job->id);
 
         $state = Beanstalkd::STATE_EXECUTED;
         //fakejob => front
@@ -126,14 +122,12 @@ class QueueListener
             return $this->handleFinalFailed($event);            
         }
         $job = $this->getJob($event);
-        Logger::warn("failed:".$job->id);
         Beanstalkd::where('id', '=', $job->id)
         ->update(["state"=>Beanstalkd::STATE_FAILED_PENDING_RETRY, "duration"=>$this->getDuration()]);
     }
     public function handleFinalFailed($event)
     {
         $job = $this->getJob($event);
-        Logger::error("final failed:".$job->id);
         Beanstalkd::where('id', '=', $job->id)
         ->update(["state"=>Beanstalkd::STATE_FAILED, "duration"=>$this->getDuration()]);
     }

@@ -13,15 +13,16 @@ class Api extends JobHandler
     protected $params;
     protected $method;
     protected $path;
+    public $tries = 1;
     /**
      * Create a new job instance.
      *
      * @return void
      */
     public function __construct()
-    {
+    { 
     }
-     public static function getDelayRetry()
+    public static function getDelayRetry()
     {
         return 0;
     }
@@ -32,18 +33,11 @@ class Api extends JobHandler
      */
     public function handle()
     {
-        if(Auth::check())
-        {
-            Logger::warn('queue user:'.Auth::id());
-        }
+
+        demldeml();
         $result = ApiService::path($this->path)->method($this->method)->params($this->params)->user($this->api_user)->send($this->add_params);
 
-        if(!isset($result))
-        {
-            Logger::warn("no user");
-        }else
-        {
-            Logger::info("User: ".$result->id_user);
-        }
+        // if(isset($result) && $this->output->isVerbose())
+        //     var_dump($result);
     }
 }

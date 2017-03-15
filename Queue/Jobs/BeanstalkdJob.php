@@ -23,6 +23,10 @@ class BeanstalkdJob extends BaseBeanstalkdJob
     	{
     		$delay = $cls::getDelayRetry();
     	}
+        if($delay == 0)
+        {
+            return 1;
+        }
     	return $delay;
     }
 }

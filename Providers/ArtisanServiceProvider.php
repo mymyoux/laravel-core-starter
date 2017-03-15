@@ -7,6 +7,7 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Core\Queue\Console\ListenCommand as QueueListenCommand;
 use Core\Queue\Console\WorkCommand as QueueWorkCommand;
+use Core\Queue\Console\ListFailedCommand;
 class ArtisanServiceProvider extends BaseArtisanServiceProvider
 {
 	 protected $commands = [
@@ -136,6 +137,17 @@ class ArtisanServiceProvider extends BaseArtisanServiceProvider
     {
         $this->app->singleton('command.queue.work', function ($app) {
             return new QueueWorkCommand($app['queue.worker']);
+        });
+    }
+     /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueFailedCommand()
+    {
+        $this->app->singleton('command.queue.failed', function () {
+            return new ListFailedCommand;
         });
     }
 }

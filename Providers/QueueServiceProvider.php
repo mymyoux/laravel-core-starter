@@ -10,11 +10,10 @@ use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
-use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Core\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\QueueManager;
 //use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Core\Queue\Connectors\BeanstalkdConnector;
-
 use Core\Queue\Worker;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\QueueServiceProvider as BaseQueueServiceProvider;
@@ -41,4 +40,17 @@ class QueueServiceProvider extends BaseQueueServiceProvider
             );
         });
     }
+     /**
+     * Create a new database failed job provider.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
+     */
+    protected function databaseFailedJobProvider($config)
+    {
+        return new DatabaseFailedJobProvider(
+            $this->app['db'], $config['database'], $config['table']
+        );
+    }
+
 }
