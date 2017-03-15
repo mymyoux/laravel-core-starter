@@ -8,6 +8,8 @@ use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Core\Queue\Console\ListenCommand as QueueListenCommand;
 use Core\Queue\Console\WorkCommand as QueueWorkCommand;
 use Core\Queue\Console\ListFailedCommand;
+use Core\Queue\Console\Replay;
+use Logger;
 class ArtisanServiceProvider extends BaseArtisanServiceProvider
 {
 	 protected $commands = [
@@ -27,6 +29,7 @@ class ArtisanServiceProvider extends BaseArtisanServiceProvider
         'QueueListen' => 'command.queue.listen',
         'QueueRestart' => 'command.queue.restart',
         'QueueRetry' => 'command.queue.retry',
+        'QueueReplay' => 'command.queue.replay',
         'QueueWork' => 'command.queue.work',
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
@@ -148,6 +151,17 @@ class ArtisanServiceProvider extends BaseArtisanServiceProvider
     {
         $this->app->singleton('command.queue.failed', function () {
             return new ListFailedCommand;
+        });
+    }
+     /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueReplayCommand()
+    {
+        $this->app->singleton('command.queue.replay', function () {
+            return new Replay;
         });
     }
 }
