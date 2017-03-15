@@ -36,7 +36,7 @@ class Job
 
     use DispatchesJobs;
 
-    public function __construct( $class, $data)
+    public function __construct( $class, $data = NULL)
     {
         $this->tube   = $this->buildTubeName($class);
         $this->class        = $class;
@@ -46,6 +46,18 @@ class Job
         {
             $this->id_user = $user->id_user;
         }
+    }
+    public function getTube()
+    {
+        return $this->tube;
+    }
+    public function getUnprefixedTube()
+    {
+        if(config('queue.prefix'))
+        {
+            return substr($this->tube, strlen(config('queue.prefix')));
+        }
+        return $this->tube;
     }
     public function identifier($identifier)
     {

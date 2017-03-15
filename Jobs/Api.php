@@ -14,6 +14,9 @@ class Api extends JobHandler
     protected $method;
     protected $path;
     public $tries = 1;
+    public $supervisor = [
+        "numprocs"=>8
+    ];
     /**
      * Create a new job instance.
      *
@@ -34,7 +37,6 @@ class Api extends JobHandler
     public function handle()
     {
 
-        demldeml();
         $result = ApiService::path($this->path)->method($this->method)->params($this->params)->user($this->api_user)->send($this->add_params);
 
         // if(isset($result) && $this->output->isVerbose())

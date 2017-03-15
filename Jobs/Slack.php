@@ -11,16 +11,9 @@ use App;
 use Notification;
 use Logger;
 use Auth;
+use Illuminate\Foundation\Application;
 class Slack extends JobHandler
 {
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
      public static function getDelayRetry()
     {
         return 0;

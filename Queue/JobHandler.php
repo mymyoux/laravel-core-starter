@@ -13,6 +13,7 @@ class JobHandler implements ShouldQueue
     use Job;
     public $tries = 3;
     public $timeout = 0;
+    public $supervisor;
     /**
      * Create a new job instance.
      *

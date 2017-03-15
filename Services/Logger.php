@@ -4,7 +4,7 @@ namespace Core\Services;
 
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use App;
-
+use Illuminate\Support\Debug\Dumper;
 class Logger
 {
 	CONST LOG_CRITICAL  = 6;
@@ -216,13 +216,33 @@ class Logger
         {
             if (App::runningInCron())
             {
-                echo $begin . $message . $end . PHP_EOL;
+                echo $begin;
+                if(is_object($message) || is_array($message))
+                {
+                     (new Dumper)->dump($message);
+                }else
+                {
+                    echo $message;
+                }
+
+                 echo $end . PHP_EOL;
             }
             else
             {
-                $message = $style ? "<$style>$begin$message$end</$style>" : ($begin . $message . $end);
-
-                $this->output->writeln($message, null);
+                if(is_object($message) || is_array($message))
+                {
+                    echo $begin;
+                     (new Dumper)->dump($message);
+                     echo $end;
+                }else
+                {
+                    $message = "$begin$message$end";
+                    if($style)
+                    {
+                        $message = "<$style>$message</$style>";
+                    }
+                     $this->output->writeln($message, null);
+                }
             }
         }else
         {

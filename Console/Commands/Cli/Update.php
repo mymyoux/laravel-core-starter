@@ -270,8 +270,8 @@ class Update extends Command
 
     public function runSupervisor()
     {
-        $env = App::environment();
-        $result = $this->cmd("supervisorctl", ["restart",config('update.supervisor.prefix', '').$env.":*"]);
+        $this->call('supervisor:config');
+        $this->call('supervisor:restart');
     }
     protected function cmd($command, $params = NULL, $execute = True)
     {

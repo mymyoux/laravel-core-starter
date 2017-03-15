@@ -17,7 +17,6 @@ use Core\Queue\Connectors\BeanstalkdConnector;
 use Core\Queue\Worker;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\QueueServiceProvider as BaseQueueServiceProvider;
-use Core\Queue\Console\Replay;
 use Logger;
 class QueueServiceProvider extends BaseQueueServiceProvider
 {

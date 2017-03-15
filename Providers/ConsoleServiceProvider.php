@@ -12,15 +12,19 @@ class ConsoleServiceProvider extends ServiceProvider
     [
         'Core\Console\Commands\Api\Replay',
         'Core\Console\Commands\Cli\ClearCache',
+        'Core\Console\Commands\Cli\GenerateCron',
         'Core\Console\Commands\Cli\Update',
         'Core\Console\Commands\Phinx\Create',
         'Core\Console\Commands\Phinx\Migrate',
         'Core\Console\Commands\Phinx\Rollback',
         'Core\Console\Commands\Phinx\Status',
+        'Core\Console\Commands\Supervisor\Config',
+        'Core\Console\Commands\Supervisor\Reread',
+        'Core\Console\Commands\Supervisor\Restart',
+        'Core\Console\Commands\Supervisor\Update',
         'Core\Console\Commands\Redis\Clear',
         'Core\Console\Commands\Table\Cache',
         'Core\Console\Commands\Table\Clear',
-        'Core\Console\Commands\Cli\GenerateCron',
     ];
 
     /**

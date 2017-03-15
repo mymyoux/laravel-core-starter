@@ -2,7 +2,7 @@
 
 namespace Core\Queue\Console;
 
-use Illuminate\Console\Command;
+use Core\Console\Commands\CoreCommand;
 use Symfony\Component\Console\Input\InputOption;
 use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
@@ -20,7 +20,7 @@ use Core\Model\Beanstalkd;
  * Normal => should always be an user instance on the app
  */
 use App\User;
-class Replay extends Command
+class ReplayCommand extends CoreCommand
 {
     protected $current_directory;
     protected $cache;
