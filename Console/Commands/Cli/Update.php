@@ -8,6 +8,8 @@ use Illuminate\Foundation\Providers\ArtisanServiceProvider;
 use Db;
 use Core\Model\Error;
 use File;
+use Logger;
+use Illuminate\Console\Application;
 
 class Update extends Command
 {
@@ -19,7 +21,7 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d} {--execute-only}';
 
     protected $defaultChoices =
     [
@@ -46,6 +48,9 @@ class Update extends Command
     public function handle()
     {
         Error::mute();
+        $this->current_directory = base_path();
+
+        chdir(base_path());
         $env = config('app.env', NULL);
         //verifications
         if(!isset($env))
@@ -53,6 +58,10 @@ class Update extends Command
             $this->warn("APP_ENV is not set - remove cache you can try to restart the command");
             $this->call('cli:clear-cache');
             throw new \Exception('you must set APP_ENV to your .env file');
+        }
+        if($this->option('execute-only', False))
+        {
+            return $this->handleOption();
         }
         $this->info("Environment:\t".$env);
         if(config('update.user'))
@@ -114,18 +123,13 @@ class Update extends Command
         if( $this->option('verbose'))
             $this->info(json_encode(config('database'),\JSON_PRETTY_PRINT));
          //configure
-         $this->current_directory = base_path();
+         
           $choices = config("update.choices");
           foreach($choices as $key=>$value)
           {
             $this->defaultChoices[$key] = $value;
           }
-          $this->cachefilename = base_path(config("update.cache", "bootstrap/cache/update.php"));
-          if(file_exists($this->cachefilename))
-          {
-            $this->cache = require $this->cachefilename;
-          }else
-            $this->cache = [];
+          
 
 
         //execute choices
@@ -150,7 +154,7 @@ class Update extends Command
 
         $this->start($choices);
 
-
+        $this->loadCacheFile();
         $this->cache["last_execution"] = date("Y-m-d H:i:s");
         $this->writeCache();
 
@@ -163,17 +167,47 @@ class Update extends Command
         $insert["project"] = config('update.project');
         Db::table(config('update.table'))->insert($insert);
     }
+    protected function loadCacheFile()
+    {
+        $this->cachefilename = base_path(config("update.cache", "bootstrap/cache/update.php"));
+          if(file_exists($this->cachefilename))
+          {
+            $this->cache = require $this->cachefilename;
+          }else
+            $this->cache = [];
+    }
+    protected function handleOption()
+    {
+        $keys = array_keys($this->defaultChoices);
+        foreach($keys as $key)
+        {
+            if($this->option($key, False) == "1")
+            {
+                return call_user_func([$this, "run".ucfirst($key)]);
+            }
+        }
+    }
     protected function start($choices)
     {
         $steps = count($choices)+1;
         $bar = $this->output->createProgressBar($steps);
-        $bar->setFormatDefinition('custom', '%bar% %current%/%max% -- %message%');
+        $bar->setFormatDefinition('custom', '<fg=cyan>%bar% %current%/%max%</><fg=yellow> -- %message%</>');
         $bar->setFormat('custom');
         foreach($choices as $choice)
         {
             $bar->setMessage('Running '.$choice."\n");
             $bar->advance();
-            call_user_func([$this, "run".ucfirst($choice)]);
+            $result = $this->cmd(Application::phpBinary(), [Application::artisanBinary(), "cli:update", "--".$choice."=1","--execute-only"]);
+            if(!$result["success"])
+            {
+                if(!$this->confirm('<error>An error has occurred, do you want to continue anyway?</error>'))
+                {
+                    Logger::error('aborted');
+                    exit(1);
+                    break;
+                }
+            }
+            //call_user_func([$this, "run".ucfirst($choice)]);
         }
         $bar->setMessage("Exiting\n");
         $bar->advance();
@@ -186,6 +220,14 @@ class Update extends Command
         {
             $folders = ["."];
         }
+        $folders = array_map(function($item)
+        {
+            if($item == ".")
+            {
+                return base_path();
+            }
+            return base_path($item);
+        }, $folders);
         foreach($folders as $folder)
         {
             $this->pullGit($folder);
@@ -193,6 +235,8 @@ class Update extends Command
     }
     protected function runComposer()
     {
+
+        $this->loadCacheFile();
         $composer = base_path("composer.lock");
         $update = False;
         if(!file_exists($composer))
@@ -256,7 +300,7 @@ class Update extends Command
             $directory = $this->current_directory;
         }else
         {
-            $directory = join_paths($this->current_directory, $directory);
+            //$directory = join_paths($this->current_directory, $directory);
         }
         $this->line("git pull: ".$this->getRelativePath($directory));
         chdir($directory);
