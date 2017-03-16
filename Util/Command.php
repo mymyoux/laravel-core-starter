@@ -8,13 +8,14 @@ use ReflectionMethod;
 use Logger;
 class Command
 {
-	public static function execute($command, $params = NULL, $execute = True)
+	public static function execute($command, $params = NULL, $execute = True, $silent = False)
     {
         if(isset($params))
         {
             $command.= " ".implode(" ", $params);
         }
-        Logger::info("execute: ".$command);
+        if(!$silent)
+            Logger::info("execute: ".$command);
         $command.=" 2>&1";
         $output = [];
         $returnValue = NULL;
@@ -29,7 +30,8 @@ class Command
             $process = proc_open($command, $descriptorspec, $pipes);
             if (is_resource($process)) {
                 while ($s = fgets($pipes[1])) {
-                   echo $s;
+                   if(!$silent)
+                    echo $s;
                    $output[] = $s;
                 }
                 fclose($pipes[0]);
