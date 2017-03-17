@@ -73,8 +73,8 @@ class Generate extends CoreCommand
                 }
             }
             $doc->title($route->uri, 2/*count($parts)*/);      
-            $doc->code('php', "Api::path('".$route->uri."')->send()");                      
-            $doc->code('php', ClassHelper::getMethodBody($route->action["uses"], True));                      
+            $doc->code('php', "<?\nApi::path('".$route->uri."')->send()");                      
+            $doc->code('php', "<?\n".ClassHelper::getMethodBody($route->action["uses"], True));                      
             $doc->lightcode($route->action["uses"]);     
             if(count($route->action["middleware"])>1)                 
             $doc->table(["middlewares"=>array_map(function($item)
