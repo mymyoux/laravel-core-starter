@@ -21,7 +21,7 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d} {--execute-only}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
 
     protected $defaultChoices =
     [
@@ -30,7 +30,8 @@ class Update extends Command
         "migrate"           => 1,
         "cache"             => 1,
         "supervisor"        => 1,
-        'cron'              => 0
+        'cron'              => 0,
+        'doc'              => 1
     ];
     /**
      * The console command description.
@@ -348,6 +349,11 @@ class Update extends Command
             }
         }
         return ["output"=>$output, "returnValue"=>$returnValue, "success"=>$returnValue==0];
+    }
+    protected function runDoc()
+    {
+        //generate doc
+         $this->call('doc:generate');
     }
     protected function getRelativePath($path)
     {
