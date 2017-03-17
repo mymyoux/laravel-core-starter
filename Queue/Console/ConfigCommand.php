@@ -40,7 +40,6 @@ class ConfigCommand extends CoreCommand
         $paths = array_column($modules, "path");
 
         //looking for all files under jobs folders
-        $folders = File::directories($paths[0]);
         foreach($paths as $path)
         {
             $this->searchJobsFolder($path);

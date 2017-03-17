@@ -11,6 +11,8 @@ use Core\Exception\Exception;
 use App;
 use Job;
 use Core\Jobs\Api as ApiJob;
+use Logger;
+use Core\Util\ClassHelper;
 class Api
 {
     public static $data = [[]];
@@ -202,6 +204,23 @@ class Api
         }
         return $object;
     }
+    protected function searchControllersFolder($path)
+    {
+        $folders = File::directories($path);
+        $good = [];
+        foreach($folders as $folder)
+        {
+            $parts = explode("/", $folder);
+            if(array_last($parts) == "Controllers")
+            {
+                $good[] = $folder;
+            }else
+            {
+                $good = array_merge($good, $this->searchControllersFolder($folder));
+            }
+        }
+        return $good;
+    }
 	protected function generateRoutes()
 	{
 		$folder = __DIR__.'/Annotations';
@@ -214,85 +233,110 @@ class Api
 
         $annotationReader = new AnnotationReader();
 
-        $namespace = '\App\Http\Controllers\\';
+
+        $paths = config('api.modules');
+        $folders = [];
+         foreach($paths as $path)
+        {
+            $folders = array_merge($folders, $this->searchControllersFolder($path));
+        }
 
         $root = base_path();
-        $folder = join_paths($root, "app/Http/Controllers");
-        $files = File::allFiles($folder);
-       
+        $paths = [];
 
-        foreach ($files as $file)
+        foreach($folders as $folder)
         {
-            $infos = pathinfo($file);
-            if($infos["extension"] != "php")
-                continue;
-            
-            $methodAnnotations = [];
-            $classAnnotations  = [];
 
-            $current_folder = substr($infos["dirname"], strlen($folder)+1);
+            // $folder = join_paths($root, "app/Http/Controllers");
+            $files = File::allFiles($folder);
+           
 
-            $current_namespace = $namespace;
-
-            $prefix_class = str_replace('/','\\', $current_folder);
-            if(strlen($prefix_class))
+            foreach ($files as $file)
             {
-                $prefix_class.='\\';
-            }
+                $infos = pathinfo($file);
+                if($infos["extension"] != "php")
+                    continue;
+                
 
-            $class = $current_namespace.$prefix_class.$infos["filename"];
-            $className = $prefix_class.$infos["filename"];
-           // var_dump("dir:".$current_namespace.$className);
-            $reflectedClass = new \ReflectionClass($current_namespace.$className);
-            $classAnnotations = $annotationReader->getClassAnnotations($reflectedClass);
+                $class_data = ClassHelper::getInformations($file);
 
-            $methods = $reflectedClass->getMethods(\ReflectionMethod::IS_PUBLIC);
-            foreach($methods as $method)
-            {
-                $reflectedMethod = new \ReflectionMethod($class, $method->name);
-                $annotations = $annotationReader->getMethodAnnotations($reflectedMethod);
-                if(!empty($annotations))
+
+                $methodAnnotations = [];
+                $classAnnotations  = [];
+
+                $current_folder = substr($infos["dirname"], strlen($folder)+1);
+
+                // $current_namespace = $namespace;
+
+                // $prefix_class = str_replace('/','\\', $current_folder);
+                // if(strlen($prefix_class))
+                // {
+                //     $prefix_class.='\\';
+                // }
+
+                $class = '\\'.$class_data->fullname;//$current_namespace.$prefix_class.$infos["filename"];
+                $index = strpos($class, 'Controllers');
+                // $className = $prefix_class.$infos["filename"];
+                //keep only namespace after Controllers
+                $className = substr($class, $index+12);
+                $current_namespace = substr($class,0, $index+12);
+               // var_dump("dir:".$current_namespace.$className);
+                $reflectedClass = new \ReflectionClass($current_namespace.$className);
+                $classAnnotations = $annotationReader->getClassAnnotations($reflectedClass);
+                $methods = $reflectedClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+                foreach($methods as $method)
                 {
-                    $methodAnnotations[$method->name] = $annotations;
+                    $reflectedMethod = new \ReflectionMethod($class, $method->name);
+                    $annotations = $annotationReader->getMethodAnnotations($reflectedMethod);
+                    if(!empty($annotations))
+                    {
+                        $methodAnnotations[$method->name] = $annotations;
+                    }
                 }
-            }
-            if(!empty($classAnnotations) || !empty($methodAnnotations))
-            {
-                $path = strtolower(str_ireplace('\\','/',str_ireplace("controller", "", $className)))."/";
-                $middlewares = [];
 
-
-                //prepare class annotations
-                foreach($classAnnotations as $annotation)
+                if(!empty($classAnnotations) || !empty($methodAnnotations))
                 {
-                    $annotation->setIsFromClass(true);
-                    $annotation->boot();
-                }
+                    $path = strtolower(str_ireplace('\\','/',str_ireplace("controller", "", $className)))."/";
+                    $middlewares = [];
 
-                foreach($methodAnnotations as $methodName=>$annotations)
-                {
+
+                    //prepare class annotations
                     foreach($classAnnotations as $annotation)
                     {
-                       $annotation->handleAnnotations($annotations);
-                    } 
-                    $config = new \StdClass();
-                    $config->middlewares = [];
-                    $config->path = $path.uncamel($methodName);
-                    $config->route = $className.'@'.$methodName;
-
-                    //method annotations
-                    foreach($annotations as $annotation)
-                    {
-                       $annotation->boot();
-                       $annotation->handle($config);
-                    } 
-
-                    $route = Route::get($config->path, $config->route);
-                    foreach($config->middlewares as $middleware)
-                    {
-                        $route->middleware($middleware);
+                        $annotation->setIsFromClass(true);
+                        $annotation->boot();
                     }
 
+                    foreach($methodAnnotations as $methodName=>$annotations)
+                    {
+                        foreach($classAnnotations as $annotation)
+                        {
+                           $annotation->handleAnnotations($annotations);
+                        } 
+                        $config = new \StdClass();
+                        $config->middlewares = [];
+                        $config->path = $path.uncamel($methodName);
+                        $config->route = $className.'@'.$methodName;
+
+                        //method annotations
+                        foreach($annotations as $annotation)
+                        {
+                           $annotation->boot();
+                           $annotation->handle($config);
+                        } 
+                        if(in_array($config->path, $paths))
+                        {
+                            Logger::warn('ignore '.$config->path.' from '.$className.'@'.$methodName);
+                            break;
+                        }
+                        $route = Route::get($config->path, $current_namespace.$config->route);
+                        $paths[] = $config->path;
+                        foreach($config->middlewares as $middleware)
+                        {
+                            $route->middleware($middleware);
+                        }
+
+                    }
                 }
             }
         }
