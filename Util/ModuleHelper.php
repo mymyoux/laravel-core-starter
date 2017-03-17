@@ -25,4 +25,17 @@ class ModuleHelper
 		}
 		return $modules;
 	}
+	public static function getModulePath($name)
+	{
+		$modules = static::getModulesFromComposer();
+		$name = strtolower($name)."\\";
+		foreach($modules as $key=>$value)
+		{
+			if(strtolower($value["module"]) == $name)
+			{
+				return base_path($value["path"]);
+			}
+		}
+		return NULL;
+	}
 }

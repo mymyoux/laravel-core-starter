@@ -221,15 +221,20 @@ class Api
         }
         return $good;
     }
+    public function registerAnnotations()
+    {
+        $folder = __DIR__.'/Annotations';
+
+        $files = File::allFiles($folder);
+        foreach ($files as $file)
+        {
+            AnnotationRegistry::registerFile($file->getPathname());
+        }
+
+    }
 	protected function generateRoutes()
 	{
-		$folder = __DIR__.'/Annotations';
-
-		$files = File::allFiles($folder);
-		foreach ($files as $file)
-		{
-       		AnnotationRegistry::registerFile($file->getPathname());
-		}
+		$this->registerAnnotations();
 
         $annotationReader = new AnnotationReader();
 

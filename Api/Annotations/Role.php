@@ -34,6 +34,14 @@ class Role extends CoreAnnotation
     		$annotation->roles = array_unique( array_merge( $this->roles, $annotation->roles ) );
     	}
     }
+    public function getNeeded()
+    {
+        return $this->needed??[];
+    }
+    public function getForbidden()
+    {
+        return $this->forbidden??[];
+    }
     public function isAllowed($user)
     {
     	if(!isset($user))

@@ -17,6 +17,14 @@ use Core\Util\MarkdownWriter;
 use Core\Util\Command as ExecCommand;
 use Core\Util\ClassHelper;
 use Tables\STATS_API_CALL;
+use stdClass;
+use Api;
+use Core\Api\Annotations\Paginate;
+use Core\Api\Annotations\Param;
+use Core\Api\Annotations\Role;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Core\Util\ModuleHelper;
 class Generate extends CoreCommand
 {
     /**
@@ -55,6 +63,8 @@ class Generate extends CoreCommand
         {
             return $a->uri <=> $b->uri;
         });
+
+
         $path = config('doc.path');
         $doc = new MarkdownWriter();
         $doc->data("title", "API usage");
@@ -81,9 +91,16 @@ class Generate extends CoreCommand
 
 
 
-            //$doc->title($route->uri, 2/*count($parts)*/);      
-            $doc->code('php', "<?\nApi::path('".$route->uri."')->send()");                      
-            $doc->code('php', "<?\n".preg_replace("/^    /m", "", ClassHelper::getMethodBody($route->action["uses"], True)));                      
+           
+
+
+            $stats = STATS_API_CALL::where('path','=',$route->uri)
+            ->select(Db::raw('COUNT(*) as count, COUNT(DISTINCT id_user) as id_user'))
+            ->first();
+
+            $doc->annotation_right('Called **'.$stats->count.'** time'.($stats->count!=1?'s':'')." by **".$stats->id_user."** loggued user".($stats->id_user!=1?'s':''));
+
+             //get exemple of call & result 
             $exemple = STATS_API_CALL::where('path','=',$route->uri)
             ->where('value','not like','{"data":null%')
             ->orderBy('created_time','desc')->first();
@@ -93,13 +110,165 @@ class Generate extends CoreCommand
                 $json = json_decode($json);
                 $json = $json->data;
                 $doc->code('json', $json);  
-            }
-            $doc->aside($route->action["uses"]);     
-            if(count($route->action["middleware"])>1)                 
-            $doc->table(["middlewares"=>array_map(function($item)
+                $params = json_decode($exemple->params??"[]", True);
+                if(isset($params["api_token"]))
                 {
-                    return explode(":", $item)[0];
-                },array_values(array_filter($route->action["middleware"], function($item){return $item!="api";})))]);                      
+                    unset($params["api_token"]);
+                }
+                if(empty($params))
+                {
+                    $doc->code('php', "<?\nApi::path('".$route->uri."')->send();");    
+                }else
+                {
+                    $doc->code('php', "<?\nApi::path('".$route->uri."')->send(".var_export($params, True).");");    
+                }
+            }else
+            {
+                $doc->code('php', "<?\nApi::path('".$route->uri."')->send();");                      
+            }
+            $doc->code('php', "<?\n".preg_replace("/^    /m", "", ClassHelper::getMethodBody($route->action["uses"], True)));                      
+
+            $doc->aside($route->action["uses"]);     
+            //comments
+            $docData = $this->getDocData($route->action["uses"]);
+            if(isset($docData->text))
+            {
+                $doc->title("Description", 3);
+                $doc->text(str_replace("\n","\n\n",$docData->text));
+            }
+              //middlewares
+             if(count($route->action["middleware"])>1)
+             {
+                $middlewares = array_map(function($item)
+                    {
+                        list($class, $param) = explode(":", $item);
+                        $middleware = new stdClass();
+                        $middleware->class = $class;
+                        if(isset($param))
+                            $instance = Api::unserialize($param); 
+                        $middleware->instance = $instance;
+                        return $middleware;
+                    }, array_values(array_filter($route->action["middleware"], function($item){return $item!="api";})));
+                
+                //show middlewares
+                $doc->title("Middlewares", 3);
+                $doc->table(["class"=>array_map(function($item)
+                    {
+                        return $item->class;
+                    },$middlewares)]);      
+
+
+                $params = array_values(array_filter($middlewares, function($item)
+                {
+                    return isset($item->instance) && $item->instance instanceof Param;
+                }));
+                $paginate = array_values(array_filter($middlewares, function($item)
+                {
+                    return isset($item->instance) && $item->instance instanceof Paginate;
+                }));
+                $roles = array_values(array_filter($middlewares, function($item)
+                {
+                    return isset($item->instance) && $item->instance instanceof Role;
+                }));
+                if(!empty($roles))
+                {
+                    $role = $roles[0]->instance;
+                    $doc->title("Roles", 3);
+                    $doc->table(
+                    [
+                        "base"=>$role->roles,
+                        "needed"=>$role->getNeeded(),
+                        "forbidden"=>$role->getForbidden()
+
+                    ]);    
+                }     
+
+                if(!empty($paginate))
+                {
+                    $param = new stdClass();
+                    $param->name = "paginate";
+                    $param->requirements = "api syntax";
+                    $param->default = $paginate[0]->instance->keys[0];
+                    $param->required = "false";
+                    $param->array = "true";
+                    $param->type = "-";
+
+                    $temp = new stdClass();
+                    $temp->instance = $param;
+                    $params[] = $temp;
+                }
+
+
+                //show params list
+                if(!empty($params))
+                {
+                    $doc->title("Parameters", 3);
+                    $doc->table(["name"=>array_map(function($item)
+                    {
+                        return "**`".$item->instance->name."`**";
+                    },$params),
+                    "requirements" => array_map(function($item)
+                    {
+                        return $item->instance->requirements;
+                    },$params),
+                     "type" => array_map(function($item)
+                    {
+                        return $item->instance->type;
+                    },$params),
+                    "default" => array_map(function($item)
+                    {
+                        return $item->instance->default;
+                    },$params),
+                    "required" => array_map(function($item)
+                    {
+                        return $item->instance->required == "true" || $item->instance->required === true?'**true**':$item->instance->required;
+                    },$params),
+                    "array" => array_map(function($item)
+                    {
+                        return $item->instance->array;
+                    },$params)
+
+                    ]);    
+                }      
+
+               
+                if(!empty($paginate))
+                {
+                    $paginate = $paginate[0]->instance;
+                    $doc->title("Paginate", 3);
+                    $doc->table(
+                    [
+                        "allowed"=>$paginate->allowed,
+                        "default"=>array_map(function($item) use($paginate)
+                        {
+                            return in_array($item, $paginate->keys)?(count($paginate->keys)==1?'✔':array_search($item, $paginate->keys)+1):' ';
+
+                        }, $paginate->allowed),
+                        "directions"=>array_map(function($item) use($paginate)
+                        {
+
+                            if(count($paginate->directions)>$item)
+                            {
+                                $direction = $paginate->directions[$item];
+                            }else
+                            {
+                                $direction = $paginate->directions[count($paginate->directions)-1];
+                            }
+                            if($direction == 1)
+                            {
+                                return "ASC";
+                            }
+                            return "DESC";
+                        }, array_keys($paginate->allowed))
+
+                    ]);    
+                }          
+             }
+            if(isset($docData->return))
+            {
+                $doc->title("Return", 3);
+                $doc->lightcode($docData->return);
+            }
         }
         $path = join_paths($path, "index.html.md");
         $old = file_get_contents($path);
@@ -115,6 +284,44 @@ class Generate extends CoreCommand
         {
             Logger::info('Documentation: no change');
         }
+    }
+    protected function getDocData($path)
+    {
+        list($classname, $methodname) = explode("@", $path);
 
+        //doc
+        $reflectedMethod = new \ReflectionMethod($classname, $methodname);
+        $docs = $reflectedMethod->getDocComment();
+        $docs = str_replace("/**", "", $docs);
+        $docs = str_replace("*/", "", $docs);
+        $docs = preg_replace("/^( |\t)*\*/m", "", $docs);
+        $docs = array_values(array_filter(array_map(function($item){return trim($item);},explode("\n", trim($docs))), function($item){
+
+            if(!strlen($item))
+                return False;
+            if(mb_substr($item, 0, 1) == "@")
+            {
+                if(mb_substr($item, 0, 8) == "@return ")
+                    return true;
+                return false;
+            }
+            return true;
+        }));
+        $text = "";
+        $return = NULL;
+        foreach($docs as $doc)
+        {
+            if(mb_substr($doc, 0, 1) != "@")
+            {
+                $text.= $doc."\n";
+            }else
+            {
+                $return = trim(mb_substr($doc, 8));
+            }
+        }
+        $result = new stdClass();
+        $result->text = mb_strlen($text)?$text:NULL;
+        $result->return = $return??NULL;
+        return $result;
     }
 }

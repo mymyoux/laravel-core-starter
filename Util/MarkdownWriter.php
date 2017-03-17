@@ -55,7 +55,7 @@ class MarkdownWriter
 		
 		$this->tokens[] = $token;
 	}
-	public function annotation($content)
+	public function annotation_right($content)
 	{
 		$token = new stdClass();
 		$token->type = MarkdownWriter::TYPE_ANNOTATION;
@@ -156,6 +156,14 @@ class MarkdownWriter
 				{
 					$text.="`".$token->value."`\n\n";
 				}else
+				if($token->type == MarkdownWriter::TYPE_ANNOTATION)
+				{
+					$text.="> ".$token->value."`\n\n";
+				}else
+				if($token->type == MarkdownWriter::TYPE_TEXT)
+				{
+					$text.=$token->value."\n\n";
+				}else
 				if($token->type == MarkdownWriter::TYPE_ASIDE)
 				{
 					$text.="<aside class=\"".$token->level."\">\n".$token->value."\n</aside>\n\n";
@@ -232,7 +240,7 @@ class MarkdownWriter
 								$text.= $column;
 							}else
 							{
-								$text.= json_encode($content, \JSON_PRETTY_PRINT);
+								$text.= json_encode($column, \JSON_PRETTY_PRINT);
 							}
 							$first_column = False;
 						}
