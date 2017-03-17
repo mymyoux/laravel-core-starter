@@ -54,39 +54,37 @@ class ClassHelper
 	{
 		return $this->getInformations($path)->class;
 	}
-	public static function getF2ullClassName($path)
+	public static function getMethodBody($path, $withHeaders = False)
 	{
-		$fp = fopen($path, 'r');
-		$class = $buffer = '';
-		$i = 0;
-		$namespace = "";
-		while (!$class) {
-		    if (feof($fp)) break;
+		list($cls, $function) = explode("@", $path);
+		$func = new ReflectionMethod($cls, $function);
+		$filename = $func->getFileName();
+		$start = $func->getStartLine();
+		$end = $func->getEndLine();
 
-		    $buffer .= fread($fp, 512);
-		    $tokens = @token_get_all($buffer);
+		$length = $end - $start;
 
-		    if (strpos($buffer, '{') === false) continue;
-
-		    for (;$i<count($tokens);$i++) {
-		        if ($tokens[$i][0] === \T_CLASS) {
-		            for ($j=$i+1;$j<count($tokens);$j++) {
-		                if ($tokens[$j] === '{') {
-		                    $class = $tokens[$i+2][1];
-		                    break 2;
-		                }
-		            }
-		        }else
-		        if ($tokens[$i][0] === \T_NAMESPACE) {
-		            for ($j=$i+1;$j<count($tokens);$j++) {
-		                if ($tokens[$j] === ';') {
-		                    $namespace = join("", array_map(function($item){return $item[1];},array_slice($tokens, $i+2,$j-$i-2)));//$tokens[$i+2][1];
-		                    break;
-		                }
-		            }
-		        }
-		    }
+		$source = file($filename);
+		$head = $source[$start-1];
+		$matches = [];
+		preg_match("/([a-z]+) +(static)? *function +([^\( ]+)\(([^)]*)\)/i", $head, $matches);
+		if(!isset($visibility))
+		{
+			$visibility = $matches[1];
 		}
-		return ($namespace??"")."\\".$class;
+		if(!isset($static))
+		{
+			$static = strlen($matches[2])>0;
+		}
+		if(!isset($name))
+		{
+			$name = $matches[3];
+		}
+		if(!isset($params))
+		{
+			$params = $matches[4];
+		}
+		$body = implode("", array_slice($source, $start, $length));
+		return ($withHeaders?$head:"").$body;
 	}
 }

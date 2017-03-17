@@ -717,7 +717,9 @@ function clean_array($data)
         return $item !== NULL;
     });
 }
-
+function array_transpose($array) {
+    return array_map(null, ...$array);
+}
 }
 
 
