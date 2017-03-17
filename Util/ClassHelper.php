@@ -48,11 +48,11 @@ class ClassHelper
 	}
 	public static function getNamespace($path)
 	{
-		return $this->getInformations($path)->namespace;
+		return static::getInformations($path)->namespace;
 	}
 	public static function getFullClassName($path)
 	{
-		return $this->getInformations($path)->class;
+		return static::getInformations($path)->class;
 	}
 	public static function getMethodBody($path, $withHeaders = False)
 	{
