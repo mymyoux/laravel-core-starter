@@ -7,6 +7,7 @@ use Core\Exception\Exception;
 class CoreAnnotation
 {
     protected $classAnnotation;
+    protected $handled;
     public function setIsFromClass($value)
     {
         $this->classAnnotation = $value;
@@ -19,6 +20,10 @@ class CoreAnnotation
         
         return 'Core\Http\Middleware\Api\\'.$name;
     }
+    public function hasBeenHandled()
+    {
+        return $this->handled;
+    }
     public function toMiddleWareParams()
     {
         $serialized = ["cls"=>static::class, "data"=>$this->serialize()];
@@ -26,7 +31,7 @@ class CoreAnnotation
     }
     public function handleAnnotations($annotations)
     {
-
+        $this->handled = True;
     }
     public function handle($config)
     {

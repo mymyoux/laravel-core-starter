@@ -22,10 +22,12 @@ use Apiz;
 class CrawlController extends Controller
 {
 	/**
-   * @ghost\Api
+	 * Update a crawl record
+     * @ghost\Api
+     * @notice To be implemented
 	 */
-    public function test(Request $request)
+    public function update(Request $request)
     {
-      return 4;
+     	//TODO
     } 
 }

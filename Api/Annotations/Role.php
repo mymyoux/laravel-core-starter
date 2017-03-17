@@ -15,6 +15,7 @@ class Role extends CoreAnnotation
     public $roles;
     protected $needed;
     protected $forbidden;
+    protected $handled;
     public static function getMiddleware()
     {
         return 'Core\Http\Middleware\Api\Acl';
@@ -27,6 +28,7 @@ class Role extends CoreAnnotation
     		{
     			continue;
     		}
+            $this->handled = True;
     		if(!isset($annotation->roles))
     		{
     			$annotation->roles = [];
@@ -104,6 +106,8 @@ class Role extends CoreAnnotation
     	{
     		$this->roles = array_merge($this->roles, array_map("trim", explode(",", $this->rawroles)));
     	}
+        //unload for serializing
+        $this->rawroles = NULL;
     	if($this->classAnnotation)
     	{
     		return;
@@ -154,8 +158,7 @@ class Role extends CoreAnnotation
     		}
     	}
 
-    	//unload for serializing
-    	$this->rawroles = NULL;
+
     	if(empty($this->forbidden))
     	{
     		$this->forbidden = NULL;

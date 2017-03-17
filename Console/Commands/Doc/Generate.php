@@ -136,6 +136,27 @@ class Generate extends CoreCommand
                 $doc->title("Description", 3);
                 $doc->text(str_replace("\n","\n\n",$docData->text));
             }
+            if(!empty($docData->success))
+            {
+                foreach($docData->success as $text)
+                {
+                    $doc->aside($text, "success");
+                }
+            }
+            if(!empty($docData->notice))
+            {
+                foreach($docData->notice as $text)
+                {
+                    $doc->aside($text, "notice");
+                }
+            }
+            if(!empty($docData->warning))
+            {
+                foreach($docData->warning as $text)
+                {
+                    $doc->aside($text, "warning");
+                }
+            }
               //middlewares
              if(count($route->action["middleware"])>1)
              {
@@ -295,20 +316,28 @@ class Generate extends CoreCommand
         $docs = str_replace("/**", "", $docs);
         $docs = str_replace("*/", "", $docs);
         $docs = preg_replace("/^( |\t)*\*/m", "", $docs);
-        $docs = array_values(array_filter(array_map(function($item){return trim($item);},explode("\n", trim($docs))), function($item){
+
+        $authorized = ["return", "notice","success","warning"];
+
+        $docs = array_values(array_filter(array_map(function($item){return trim($item);},explode("\n", trim($docs))), function($item) use($authorized){
 
             if(!strlen($item))
                 return False;
             if(mb_substr($item, 0, 1) == "@")
             {
-                if(mb_substr($item, 0, 8) == "@return ")
+                $name = explode(" ",$item)[0];
+                $name = mb_substr($name, 1);
+                if(in_array($name, $authorized))
                     return true;
                 return false;
             }
             return true;
         }));
         $text = "";
-        $return = NULL;
+        $return = [];
+        $notice = [];
+        $success = [];
+        $warning = [];
         foreach($docs as $doc)
         {
             if(mb_substr($doc, 0, 1) != "@")
@@ -316,12 +345,17 @@ class Generate extends CoreCommand
                 $text.= $doc."\n";
             }else
             {
-                $return = trim(mb_substr($doc, 8));
+                $name = explode(" ",$doc)[0];
+                $name = mb_substr($name, 1);
+                $$name[] = trim(mb_substr($doc, mb_strlen($name)+2));
             }
         }
         $result = new stdClass();
         $result->text = mb_strlen($text)?$text:NULL;
-        $result->return = $return??NULL;
+        $result->return = isset($return)?join(" ",$return):NULL;
+        $result->notice = $notice??NULL;
+        $result->warning = $warning??NULL;
+        $result->success = $success??NULL;
         return $result;
     }
 }

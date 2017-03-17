@@ -237,6 +237,9 @@ class Api
 		$this->registerAnnotations();
 
         $annotationReader = new AnnotationReader();
+        $annotationReader::addGlobalIgnoredName('notice');
+        $annotationReader::addGlobalIgnoredName('warning');
+        $annotationReader::addGlobalIgnoredName('success');
 
 
         $paths = config('api.modules');
@@ -318,11 +321,17 @@ class Api
                         {
                            $annotation->handleAnnotations($annotations);
                         } 
+                        foreach($classAnnotations as $annotation)
+                        {
+                           if(!$annotation->hasBeenHandled())
+                           {
+                                $annotations[] = $annotation;
+                           }
+                        } 
                         $config = new \StdClass();
                         $config->middlewares = [];
                         $config->path = $path.uncamel($methodName);
                         $config->route = $className.'@'.$methodName;
-
                         //method annotations
                         foreach($annotations as $annotation)
                         {
