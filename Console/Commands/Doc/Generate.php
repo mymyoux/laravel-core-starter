@@ -16,6 +16,7 @@ use Route;
 use Core\Util\MarkdownWriter;
 use Core\Util\Command as ExecCommand;
 use Core\Util\ClassHelper;
+use Tables\STATS_API_CALL;
 class Generate extends CoreCommand
 {
     /**
@@ -57,7 +58,7 @@ class Generate extends CoreCommand
         $path = config('doc.path');
         $doc = new MarkdownWriter();
         $doc->data("title", "API usage");
-        $doc->data("language_tabs",["php"]);
+        $doc->data("language_tabs",["php","json"]);
         $doc->data("search",true);
         //$doc->data("language_tabs","php");
         $done = [];
@@ -77,9 +78,22 @@ class Generate extends CoreCommand
                     $done[] = $part;
                 }
             }
+
+
+
             //$doc->title($route->uri, 2/*count($parts)*/);      
             $doc->code('php', "<?\nApi::path('".$route->uri."')->send()");                      
-            $doc->code('php', "<?\n".ClassHelper::getMethodBody($route->action["uses"], True));                      
+            $doc->code('php', "<?\n".preg_replace("/^    /m", "", ClassHelper::getMethodBody($route->action["uses"], True)));                      
+            $exemple = STATS_API_CALL::where('path','=',$route->uri)
+            ->where('value','not like','{"data":null%')
+            ->orderBy('created_time','desc')->first();
+            if(isset($exemple))
+            {
+                $json = $exemple->value;
+                $json = json_decode($json);
+                $json = $json->data;
+                $doc->code('json', $json);  
+            }
             $doc->aside($route->action["uses"]);     
             if(count($route->action["middleware"])>1)                 
             $doc->table(["middlewares"=>array_map(function($item)
