@@ -58,6 +58,7 @@ class Generate extends CoreCommand
         $doc = new MarkdownWriter();
         $doc->data("title", "API usage");
         $doc->data("language_tabs",["php"]);
+        $doc->data("search",true);
         //$doc->data("language_tabs","php");
         $done = [];
         foreach($routes as $route)
@@ -66,26 +67,40 @@ class Generate extends CoreCommand
             foreach($parts as $key=>$part)
             {
                 $part = join("/",array_slice($parts, 0, $key+1));
+                if($key && $key+1 < count($parts))
+                {
+                    continue;
+                }
                 if(!in_array($part, $done))
                 {
-                    $doc->title($part, $key+1);
+                    $doc->title($part, $key?2:1/*$key+1*/);
                     $done[] = $part;
                 }
             }
-            $doc->title($route->uri, 2/*count($parts)*/);      
+            //$doc->title($route->uri, 2/*count($parts)*/);      
             $doc->code('php', "<?\nApi::path('".$route->uri."')->send()");                      
             $doc->code('php', "<?\n".ClassHelper::getMethodBody($route->action["uses"], True));                      
-            $doc->lightcode($route->action["uses"]);     
+            $doc->aside($route->action["uses"]);     
             if(count($route->action["middleware"])>1)                 
             $doc->table(["middlewares"=>array_map(function($item)
                 {
                     return explode(":", $item)[0];
                 },array_values(array_filter($route->action["middleware"], function($item){return $item!="api";})))]);                      
         }
-        $doc->write(join_paths($path, "index.html.md"));
-        chdir(base_path('docs'));
-        ExecCommand::execute('bundle', ["exec", "middleman", "build", "--clean"]);
-        chdir(base_path());
+        $path = join_paths($path, "index.html.md");
+        $old = file_get_contents($path);
+        $new = $doc->getOutput();
+        if($old != $new)
+        {
+            Logger::info('Documentation: update needed');
+            file_put_contents($path, $new);
+            chdir(base_path('docs'));
+            ExecCommand::execute('bundle', ["exec", "middleman", "build", "--clean"]);
+            chdir(base_path());
+        }else
+        {
+            Logger::info('Documentation: no change');
+        }
 
     }
 }

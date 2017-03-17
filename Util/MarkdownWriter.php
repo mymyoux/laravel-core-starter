@@ -16,6 +16,7 @@ class MarkdownWriter
 	const TYPE_LIGHT_CODE = "light_code";
 	const TYPE_TABLE = "table";
 	const TYPE_DATA = "data";
+	const TYPE_ASIDE = "aside";
 
 	protected $tokens;
 	protected $data;
@@ -29,6 +30,10 @@ class MarkdownWriter
 		$token = new stdClass();
 		$token->type = MarkdownWriter::TYPE_DATA;
 		$token->title = $name;
+		if(is_bool($data))
+		{
+			$data = $data?"true":"false";
+		}
 		$token->value = $data;
 
 		$this->data[] = $token;
@@ -83,15 +88,33 @@ class MarkdownWriter
 		
 		$this->tokens[] = $token;
 	}
+	public function aside($content, $type = "notice")
+	{
+		$token = new stdClass();
+		$token->type = MarkdownWriter::TYPE_ASIDE;
+		$token->value = $content;
+		$token->level = $type;
+		
+		$this->tokens[] = $token;
+	}
 	public function table($array)
 	{
 		$token = new stdClass();
 		$token->type = MarkdownWriter::TYPE_TABLE;
+		if(count($array) == 1)
+		{
+			$array[""] = [];
+		}
 		$token->value = $array;
 		
 		$this->tokens[] = $token;
 	}
 	public function write($path)
+	{
+		$text = $this->getOutput();
+		file_put_contents($path, $text);
+	}
+	public function getOutput()
 	{
 		$text = "";
 		if(!empty($this->data))
@@ -133,13 +156,16 @@ class MarkdownWriter
 				{
 					$text.="`".$token->value."`\n\n";
 				}else
+				if($token->type == MarkdownWriter::TYPE_ASIDE)
+				{
+					$text.="<aside class=\"".$token->level."\">\n".$token->value."\n</aside>\n\n";
+				}else
 				if($token->type == MarkdownWriter::TYPE_TABLE)
 				{
 					$first_row = True;
-					Logger::info($token->value);
 					$data = [];
 					$max = 0;
-					foreach($token->value as $key=>&$row)
+					foreach($token->value as $key=>$row)
 					{
 						if(!$first_row)
 						{
@@ -158,7 +184,7 @@ class MarkdownWriter
 					}
 					$text.="\n";
 					$first_row = True;
-					foreach($token->value as $key=>&$row)
+					foreach($token->value as $key=>$row)
 					{
 						if(!$first_row)
 						{
@@ -183,7 +209,7 @@ class MarkdownWriter
 								$data[$i][] = $row[$i];
 							}else
 							{
-								$data[$i][] = "";
+								$data[$i][] = " ";
 							}
 						}
 					}
@@ -218,7 +244,7 @@ class MarkdownWriter
 			}
 		}
 
-		echo $text;
-		file_put_contents($path, $text);
+		return $text;
+
 	}
 }
