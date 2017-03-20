@@ -343,7 +343,7 @@ class Api
                             Logger::warn('ignore '.$config->path.' from '.$className.'@'.$methodName);
                             break;
                         }
-                        $route = Route::get($config->path, $current_namespace.$config->route);
+                        $route = Route::match(['get', 'post'], $config->path, $current_namespace.$config->route);
                         $paths[] = $config->path;
                         foreach($config->middlewares as $middleware)
                         {

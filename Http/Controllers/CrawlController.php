@@ -19,15 +19,43 @@ use Job;
 use Core\Jobs\Test;
 use Logger;
 use Apiz;
+
+use Core\Model\Crawl;
+use Core\Model\CrawlAttempt;
 class CrawlController extends Controller
 {
 	/**
 	 * Update a crawl record
-     * @ghost\Api
+     * @ghost\Param(name="id_crawl",requirements="\d+",required=true)
+     * @ghost\Param(name="version",requirements="\d+",required=true)
+     * @ghost\Param(name="success",requirements="boolean", required=true)
+     * @ghost\Param(name="login",required=true)
+     * @ghost\Param(name="value",required=true)
+     * @ghost\Param(name="uuid",required=true)
      * @notice To be implemented
 	 */
     public function update(Request $request)
     {
-     	//TODO
+    	$crawl = Crawl::find($request->input("id_crawl"));
+    	if(!$crawl)
+    	{
+    		throw new ApiException('bad_id_crawl');
+    	}
+    	$success = $request->input('success');
+
+    	$attempt = new CrawlAttempt;
+    	$attempt->id_crawl = $crawl->id_crawl;
+    	$attempt->ip = App::ip();
+    	$attempt->type = $crawl->type;
+    	$attempt->login = $request->input('login');
+    	$attempt->uuid = $request->input('uuid');
+    	$attempt->state = $success?Crawl::STATE_DONE:Crawl::STATE_CRAWL_NEEDS_LOGIN_FAILED;
+
+    	$attempt->save();
+    	$crawl->increment('tries');
+    	$result = $crawl->update(["value"=>$request->input('value'),"state"=>$attempt->state]);
+
+    	$data = $success?[]:["state"=>"failed"];
+    	Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$crawl->id_crawl]))->send();
     } 
 }
