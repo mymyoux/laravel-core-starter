@@ -115,6 +115,22 @@ class Generate extends CoreCommand
                 {
                     unset($params["api_token"]);
                 }
+                if(isset($params["_id"]))
+                {
+                    unset($params["_id"]);
+                }
+                if(isset($params["_instance"]))
+                {
+                    unset($params["_instance"]);
+                }
+                if(isset($params["_timestamp"]))
+                {
+                    unset($params["_timestamp"]);
+                }
+                if(isset($params["_"]))
+                {
+                    unset($params["_"]);
+                }
                 if(empty($params))
                 {
                     $doc->code('php', "<?\nApi::path('".$route->uri."')->send();");    
