@@ -292,7 +292,7 @@ class Generate extends CoreCommand
             }
         }
         $path = join_paths($path, "index.html.md");
-        $old = file_get_contents($path);
+        $old = file_exists($path)?file_get_contents($path):NULL;
         $new = $doc->getOutput();
         if($old != $new)
         {
