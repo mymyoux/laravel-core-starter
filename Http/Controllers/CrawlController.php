@@ -42,6 +42,11 @@ class CrawlController extends Controller
     	{
     		throw new ApiException('bad_id_crawl');
     	}
+    	if($crawl->state == Crawl::STATE_PARSED)
+    	{
+    		//we don't reparse already parsed crawl
+    		return;
+    	}
     	$success = $request->input('success');
 
     	$attempt = new CrawlAttempt;
@@ -61,7 +66,7 @@ class CrawlController extends Controller
     } 
     /**
      * Get some stats from crawl server
-     * @ghost\Api
+     * @ghost\Role("admin")
      */
     public function serverStats(Request $request)
     {
