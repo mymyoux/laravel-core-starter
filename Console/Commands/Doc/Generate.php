@@ -131,6 +131,10 @@ class Generate extends CoreCommand
                 {
                     unset($params["_"]);
                 }
+                if(isset($params["callback"]))
+                {
+                    unset($params["callback"]);
+                }
                 if(empty($params))
                 {
                     $doc->code('php', "<?\nApi::path('".$route->uri."')->send();");    
