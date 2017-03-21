@@ -234,7 +234,7 @@ class Generate extends CoreCommand
                     $param->default = $paginate[0]->instance->keys[0];
                     $param->required = "false";
                     $param->array = "true";
-                    $param->type = "-";
+                    $param->type = "";
 
                     $temp = new stdClass();
                     $temp->instance = $param;
@@ -252,15 +252,15 @@ class Generate extends CoreCommand
                     },$params),
                     "requirements" => array_map(function($item)
                     {
-                        return $item->instance->requirements;
+                        return $item->instance->requirements??"";
                     },$params),
                      "type" => array_map(function($item)
                     {
-                        return $item->instance->type;
+                        return $item->instance->type??"";
                     },$params),
                     "default" => array_map(function($item)
                     {
-                        return $item->instance->default;
+                        return $item->instance->default??"";
                     },$params),
                     "required" => array_map(function($item)
                     {

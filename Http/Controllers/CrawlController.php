@@ -33,7 +33,7 @@ class CrawlController extends Controller
      * @ghost\Param(name="login",required=true)
      * @ghost\Param(name="value",required=true)
      * @ghost\Param(name="uuid",required=true)
-     * @notice To be implemented
+     * @warning If crawl has state parsed - This call will do nothing
 	 */
     public function update(Request $request)
     {
