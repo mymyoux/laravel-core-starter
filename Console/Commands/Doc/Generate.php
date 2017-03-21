@@ -103,6 +103,8 @@ class Generate extends CoreCommand
              //get exemple of call & result 
             $exemple = STATS_API_CALL::where('path','=',$route->uri)
             ->where('value','not like','{"data":null%')
+            ->where('value','not like','{"exception":%')
+            ->whereNotNull('value')
             ->orderBy('created_time','desc')->first();
             if(isset($exemple))
             {
@@ -305,7 +307,7 @@ class Generate extends CoreCommand
                     ]);    
                 }          
              }
-            if(isset($docData->return))
+            if(isset($docData->return) && mb_strlen($docData->return))
             {
                 $doc->title("Return", 3);
                 $doc->lightcode($docData->return);
