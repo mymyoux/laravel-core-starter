@@ -22,6 +22,7 @@ use Apiz;
 
 use Core\Model\Crawl;
 use Core\Model\CrawlAttempt;
+use Illuminate\Support\Facades\Redis;
 class CrawlController extends Controller
 {
 	/**
@@ -58,4 +59,12 @@ class CrawlController extends Controller
     	$data = $success?[]:["state"=>"failed"];
     	Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$crawl->id_crawl]))->send();
     } 
+    /**
+     * Get some stats from crawl server
+     * @ghost\Api
+     */
+    public function serverStats(Request $request)
+    {
+    	return ["users"=>(int)Redis::get('server:nodejs:users'),'jobs'=>(int)Redis::get('server:nodejs:jobs')];
+    }
 }
