@@ -39,7 +39,10 @@ class UpdateGit extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-
+      if($this->hasTable('update_git'))
+      {
+        $this->dropTable('update_git');
+      }
           $this->table('update_git', ['id' => false, 'primary_key' => ['id_update_git']])
             ->addColumn('id_update_git', 'integer', ['limit' => 11, 'null' => false, 'signed' => false,'identity'=>True])
             ->addColumn('checkerrors', 'integer', ['limit' => 1, 'null' => false, 'signed' => false])

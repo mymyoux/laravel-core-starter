@@ -83,6 +83,10 @@ class Update extends Command
         ];
         foreach($folder_permissions as $folder=>$right)
         {
+            if(!file_exists($folder))
+            {
+                mkdir($folder, $right, True);
+            }
             $min = file_right($folder, True);
             if($min < $right)
             {

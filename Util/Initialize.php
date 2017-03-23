@@ -683,7 +683,14 @@ function get_files($path, $recursive = False)
 {
     if($recursive)
     {
-        $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
+    	try
+    	{
+        	$objects = new 	\RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
+    		
+    	}catch(\Exception $e)
+    	{
+    		$objects = [];
+    	}
         $files = [$path];
         foreach($objects as $name => $object){
             if(substr($name, -1) == ".")

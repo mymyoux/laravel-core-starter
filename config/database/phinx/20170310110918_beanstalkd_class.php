@@ -39,6 +39,13 @@ class BeanstalkdClass extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
+      if($this->hasTable('beanstalkd_log'))
+      {
+        if($this->table('beanstalkd_log')->hasColumn('cls'))
+        {
+          return;
+        }
+      }
       $this->table('beanstalkd_log')
       ->addColumn('cls','text',['limit'=>1000, 'null'=>True])
       ->update();

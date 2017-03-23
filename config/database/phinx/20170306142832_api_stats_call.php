@@ -39,6 +39,13 @@ class ApiStatsCall extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
+      if($this->hasTable('stats_api_call'))
+      {
+        if($this->table('stats_api_call')->hasColumn('path'))
+        {
+          return;
+        }
+      }
         $this->table('stats_api_call')
         ->addColumn('path','text', ['limit'=>200, 'null'=>True])
         ->addColumn('api','text', ['limit'=>200, 'null'=>True])
