@@ -14,8 +14,8 @@ class Command
         {
             $command.= " ".implode(" ", $params);
         }
-        if(!$silent)
-            Logger::info("execute: ".$command);
+        // if(!$silent)
+        //     Logger::info("execute: ".$command);
         $command.=" 2>&1";
         $output = [];
         $returnValue = NULL;
