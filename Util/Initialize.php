@@ -48,9 +48,12 @@ function dd(...$data)
     $stack = debug_backtrace();
     $line = $stack[0];
     echo $line["file"].":".$line["line"]."\n";
-    $line = $stack[1];
-    echo (array_key_exists("class", $line)?$line["class"]."::":"").$line["function"]."\n";
-
+    //if call at root
+    if(count($stack)>1)
+    {
+	    $line = $stack[1];
+	    echo (array_key_exists("class", $line)?$line["class"]."::":"").$line["function"]."\n";
+	}
     if (php_sapi_name() !== 'cli')
     {
         echo '<pre>';
