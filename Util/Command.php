@@ -8,6 +8,18 @@ use ReflectionMethod;
 use Logger;
 class Command
 {
+    public static function executeRaw($command, $params = NULL)
+    {
+        if(isset($params))
+        {
+            $command.=" ".join(" ",$params);
+        }
+        $process = proc_open($command,  [], $pipes);
+        if (is_resource($process)) {
+            return proc_close($process);
+        }
+        return 1;
+    }
 	public static function execute($command, $params = NULL, $execute = True, $silent = False)
     {
         if(isset($params))
