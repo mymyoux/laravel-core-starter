@@ -13,6 +13,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Api\Replay',
         'Core\Console\Commands\Cli\ClearCache',
         'Core\Console\Commands\Cli\GenerateCron',
+        'Core\Console\Commands\Cli\Project',
         'Core\Console\Commands\Cli\Update',
         'Core\Console\Commands\Db\Clean',
         'Core\Console\Commands\Doc\Generate',
