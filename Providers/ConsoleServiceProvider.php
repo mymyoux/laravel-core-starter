@@ -17,6 +17,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Cli\Update',
         'Core\Console\Commands\Db\Clean',
         'Core\Console\Commands\Doc\Generate',
+        'Core\Console\Commands\Notifications\Send',
         'Core\Console\Commands\Phinx\Create',
         'Core\Console\Commands\Phinx\Migrate',
         'Core\Console\Commands\Phinx\Rollback',
