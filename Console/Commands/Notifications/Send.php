@@ -40,7 +40,7 @@ class Send extends CoreCommand
      *
      * @var string
      */
-    protected $description = 'Generate doc slate';
+    protected $description = 'Send notification message';
 
     /**
      * Create a new command instance.
