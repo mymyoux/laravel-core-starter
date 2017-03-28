@@ -102,7 +102,7 @@ class ViewController extends Controller
             ->where('type', '=', $folder)
             ->where('path', '=', $path);
         }
-        // $global = DB::from()
+        
         $union = $requests[0];
         for($i=1; $i<count($requests); $i++)
         {
