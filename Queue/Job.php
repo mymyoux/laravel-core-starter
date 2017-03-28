@@ -90,8 +90,8 @@ class Job
     }
     /**
      * Build tube name
-     * @param  [type] $class [description]
-     * @return [type]        [description]
+     * @param  string $class Tube's name
+     * @return string Tube's name  with prefix 
      */
     protected function buildTubeName($class)
     {
