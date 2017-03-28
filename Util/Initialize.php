@@ -219,7 +219,7 @@ function toArray($array, $underscore = False)
 }
 /**
  * Test if an array is associative (not only number indexed)
- * @param  [type]  $array [description]
+ * @param  array  $array [description]
  * @return boolean        [description]
  */
 function is_assoc($array) {
@@ -231,7 +231,7 @@ function is_assoc($array) {
 }
 /**
  * Test if an array is fully number indexed
- * @param  [type]  $array [description]
+ * @param  array  $array [description]
  * @return boolean        [description]
  */
 function is_numeric_array($array) {
@@ -477,10 +477,10 @@ function to_array($object, $init = NULL)
 }
 /**
  * Copy a folder to another recursively
- * @param  [type] $src      source folder
- * @param  [type] $dst      target folder
+ * @param  string $src      source folder
+ * @param  string $dst      target folder
  * @param  array  $exclude  exclude file/folder or extensions (*.ext)
- * @param  [type] $src_root [internal]
+ * @param  string $src_root [internal]
  * @return void
  */
 function recurse_copy($src,$dst, $exclude = array(), $src_root = NULL) {
@@ -515,9 +515,9 @@ function recurse_copy($src,$dst, $exclude = array(), $src_root = NULL) {
     }
     /**
      * Used by recursive_copy
-     * @param  [type] $file    [description]
-     * @param  [type] $exclude [description]
-     * @return [type]          [description]
+     * @param  string $file    [description]
+     * @param  array $exclude [description]
+     * @return boolean         [description]
      */
 function __match($file, $exclude)
 {
@@ -599,8 +599,8 @@ function array_orderby()
 }
 /**
  * Extract version of a keyword
- * @param  [type] $name [description]
- * @return [type]       [description]
+ * @param  string $name [description]
+ * @return array|boolean       [description]
  */
 function split_version($name)
 {
