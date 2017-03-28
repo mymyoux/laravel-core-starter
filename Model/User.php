@@ -145,4 +145,8 @@ class User extends Model implements
         }
         return static::getById($id_user);
     }
+    protected function getAvailableTypes()
+    {
+        return USER::select('type')->distinct()->get()->pluck('type')->all();
+    }
 }

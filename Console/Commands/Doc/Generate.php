@@ -74,6 +74,11 @@ class Generate extends CoreCommand
         $done = [];
         foreach($routes as $route)
         {
+             if(!is_string($route->action["uses"]))
+            {
+                Logger::warn('ignore '.$route->uri );
+                continue;   
+            }
             $parts = explode("/",$route->uri);
             foreach($parts as $key=>$part)
             {
@@ -148,6 +153,7 @@ class Generate extends CoreCommand
             {
                 $doc->code('php', "<?\nApi::path('".$route->uri."')->send();");                      
             }
+           
             $doc->code('php', "<?\n".preg_replace("/^    /m", "", ClassHelper::getMethodBody($route->action["uses"], True)));                      
 
             $doc->aside($route->action["uses"]);     

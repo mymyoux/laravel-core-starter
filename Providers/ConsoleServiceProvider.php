@@ -29,6 +29,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Redis\Clear',
         'Core\Console\Commands\Table\Cache',
         'Core\Console\Commands\Table\Clear',
+        'Core\Console\Commands\Template\Calcul'
     ];
 
     /**
