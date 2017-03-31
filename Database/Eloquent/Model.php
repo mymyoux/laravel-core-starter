@@ -17,4 +17,8 @@ abstract class Model extends BaseModel
         $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
     );
  }
+    public function toRawSQL()
+    {
+        return $this->query->toRawSql();
+    }
 }

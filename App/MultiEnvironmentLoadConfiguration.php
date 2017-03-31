@@ -5,6 +5,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Symfony\Component\Finder\Finder;
+use Core\Util\ModuleHelper;
 class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 {
 
@@ -102,21 +103,38 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
         $files = [];
 
         $configPath = realpath($app->configPath());
+
+		$paths = 
+		array_filter(array_map(function($module)
+		{
+			return base_path(join_paths($module["path"], "config"));
+		}, ModuleHelper::getModulesFromComposer()),
+		function($path)
+		{	
+			return file_exists($path);
+		});
+		$paths = array_reverse($paths);
+		
+		$paths[] = $configPath;
         $env = env('APP_ENV', "").".";
 
         $second = [];
-        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
-            $directory = $this->getNestedDirectory($file, $configPath);
-            if(strlen($directory))
-            {
-            	if(substr($directory, 0, strlen($env)) == $env)
-            	{
-	            	 $second[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
-            	}
-	            continue;
-            }
-            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
-        }
+		foreach($paths as $path)
+		{
+			foreach(Finder::create()->files()->name('*.php')->in($path) as $file) {
+				$directory = $this->getNestedDirectory($file, $configPath);
+				if(strlen($directory))
+				{
+					if(substr($directory, 0, strlen($env)) == $env)
+					{
+						$second[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+					}
+					continue;
+				}
+				$files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+			}
+
+		}
         return $files + $second;
     }
 

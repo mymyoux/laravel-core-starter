@@ -29,6 +29,7 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 class Job
 {
+    const DEFAULT_TTR = 429496729;
     private $data;
     private $class;
     private $identifier = null;
