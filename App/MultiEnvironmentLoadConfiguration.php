@@ -10,7 +10,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 {
 
 
-    protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
+    public function loadConfigurationFiles(Application $app, RepositoryContract $repository = NULL)
     {
     	$env = env('APP_ENV', "").".";
 
@@ -29,10 +29,12 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 			}
 			$data[$key] = require $path;
 		}
+		if(isset($repository))
         foreach($data as $key => $value)
         {
         	$repository->set($key, $value);	
         }
+		return $data;
     }
     protected function configurationMerge($config1, $config2)
     {
