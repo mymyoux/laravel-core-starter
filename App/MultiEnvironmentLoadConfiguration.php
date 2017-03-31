@@ -15,21 +15,20 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
     	$env = env('APP_ENV', "").".";
 
     	$files = $this->getConfigurationFiles($app);
-
     	$data = [];
 
-        foreach ($files as $key => $path) {
-        	if(substr($key, 0, strlen($env)) == $env)
-            {
-            	 $key = substr($key, strlen($env));
-            	 if(isset($data[$key]))
-            	 {
-            	 	$data[$key] = $this->configurationMerge($data[$key], require $path);
-            	 	continue;
-            	 }
-            }
-            $data[$key] = require $path;
-        }
+		foreach ($files as $path => $key) {
+			if(substr($key, 0, strlen($env)) == $env)
+			{
+				$key = substr($key, strlen($env));
+				if(isset($data[$key]))
+				{
+					$data[$key] = $this->configurationMerge($data[$key], require $path);
+					continue;
+				}
+			}
+			$data[$key] = require $path;
+		}
         foreach($data as $key => $value)
         {
         	$repository->set($key, $value);	
@@ -100,7 +99,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
     }
 	protected function getConfigurationFiles(Application $app)
     {
-        $files = [];
+      
 
         $configPath = realpath($app->configPath());
 
@@ -118,24 +117,27 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 		$paths[] = $configPath;
         $env = env('APP_ENV', "").".";
 
+
         $second = [];
+		$files = [];
 		foreach($paths as $path)
 		{
 			foreach(Finder::create()->files()->name('*.php')->in($path) as $file) {
-				$directory = $this->getNestedDirectory($file, $configPath);
+				$directory = $this->getNestedDirectory($file, $path);
 				if(strlen($directory))
 				{
+					
 					if(substr($directory, 0, strlen($env)) == $env)
 					{
-						$second[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+						$second[$file->getRealPath()] = $directory.basename($file->getRealPath(), '.php');
 					}
 					continue;
 				}
-				$files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+				$files[$file->getRealPath()] = $directory.basename($file->getRealPath(), '.php');
 			}
 
 		}
-        return $files + $second;
+		return $files + $second;
     }
 
 }

@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Cli\GenerateCron',
         'Core\Console\Commands\Cli\Project',
         'Core\Console\Commands\Cli\Update',
+        'Core\Console\Commands\Config',
         'Core\Console\Commands\Db\Clean',
         'Core\Console\Commands\Doc\Generate',
         'Core\Console\Commands\Notifications\Send',
