@@ -13,6 +13,7 @@ use Job;
 use Core\Jobs\Api as ApiJob;
 use Logger;
 use Core\Util\ClassHelper;
+use Illuminate\Http\JsonResponse
 class Api
 {
     public static $data = [[]];
@@ -156,6 +157,10 @@ class Api
         $rawresponse = $this->dispatching($params);
         $api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();
+        if($rawresponse instanceof JsonResponse)
+        {
+            $rawresponse = $rawresponse->getData(True);
+        }
         $response = new ApiResponse();
         if(isset($rawresponse["data"]))
             $response->value = $rawresponse["data"];
