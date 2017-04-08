@@ -63,15 +63,12 @@ trait PseudoTrait
    }
    protected function _setAttribute($name, $value)
    {
-    if(property_exists($this, $name))
+    if(method_exists($this, "setAttribute"))
     {
-      if(method_exists($this, "setAttribute"))
-        {
-            $this->setAttribute($name, $value);
-        }else
-        {
-            $this->$name = $value;
-        }
+        $this->setAttribute($name, $value);
+    }elseif(property_exists($this, $name))
+    {
+        $this->$name = $value;
     }else
     {
        foreach($this->_traits as $key=>$pseudotrait)

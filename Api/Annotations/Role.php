@@ -46,6 +46,10 @@ class Role extends CoreAnnotation
     }
     public function isAllowed($user)
     {
+		if(!isset($this->roles))
+        {
+        	$this->roles = [];
+        }
     	if(!isset($user))
     	{
     		if(!empty($this->needed) && (count($this->needed) > 1 || $this->needed[0] != RoleTrait::$ROLE_DISCONNECTED))

@@ -1,1 +1,4 @@
-ok me
+<ul>
+    <li>login: {{user.login}}</li>
+    <li>api token: {{user.token}}</li>
+</ul>

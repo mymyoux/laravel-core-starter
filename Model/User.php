@@ -51,7 +51,7 @@ class User extends Model implements
      * @var array
      */
     protected $fillable = [
-        'first_name','last_name', 'email',
+        'first_name','last_name', 'type','email','login','picture','num_connection','temp',
     ];
     protected $casts = [
         'deleted' => 'boolean',
@@ -64,7 +64,7 @@ class User extends Model implements
      * @var array
      */
     protected $hidden = [
-        'deleted','temp','cgu_accepted'
+        'deleted','temp','cgu_accepted','remember_token'
     ];
     protected $appends = ["roles"];
 
