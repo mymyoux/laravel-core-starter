@@ -13,7 +13,7 @@ use Job;
 use Core\Jobs\Api as ApiJob;
 use Logger;
 use Core\Util\ClassHelper;
-use Illuminate\Http\JsonResponse
+use Illuminate\Http\JsonResponse;
 class Api
 {
     public static $data = [[]];
