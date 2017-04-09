@@ -244,7 +244,8 @@ class ViewController extends Controller
     }
     protected function _translate($content, $path, $line)
     {
-        dd($content);
+        //TODO:handle
+        return $content;
     }
     protected function _helpers($content, $path, $line)
     {
