@@ -15,6 +15,9 @@ trait Role
 	}
 	public function hasRole($role)
 	{
+		if($role == static::$ROLE_CONNECTED && isset($this->id_user))
+			return True;
+			dd($role);
 		return in_array($role, $this->roles) || ($role != static::$ROLE_DISCONNECTED && in_array(static::$ROLE_ADMIN, $this->roles));
 	}
 	public function removeRole($role)
@@ -28,6 +31,5 @@ trait Role
 	}
 	public static function bootRole()
 	{
-		
 	}
 }

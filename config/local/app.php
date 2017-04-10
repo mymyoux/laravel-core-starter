@@ -24,7 +24,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://battle.myno.local'),
+  
 
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
