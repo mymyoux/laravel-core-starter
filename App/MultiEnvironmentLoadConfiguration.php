@@ -16,7 +16,6 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 
     	$files = $this->getConfigurationFiles($app);
     	$data = [];
-
 		foreach ($files as $path => $key) {
 			if(substr($key, 0, strlen($env)) == $env)
 			{
@@ -27,7 +26,13 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 					continue;
 				}
 			}
-			$data[$key] = require $path;
+			if(isset($data[$key]))
+			{
+				$data[$key] = $this->configurationMerge($data[$key], require $path);
+			}else
+			{
+				$data[$key] = require $path;
+			}
 		}
 		if(isset($repository))
         foreach($data as $key => $value)

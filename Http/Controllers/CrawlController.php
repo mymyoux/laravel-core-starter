@@ -64,6 +64,35 @@ class CrawlController extends Controller
     	$data = $success?[]:["state"=>"failed"];
     	Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$crawl->id_crawl]))->send();
     } 
+	/**
+	 * @ghost\Param(name="type",required=true)
+	 * @ghost\Param(name="url",required=true)
+	 * @ghost\Param(name="curl",required=false)
+	 * @ghost\Param(name="state",required=false,default="crawl_needs_login")
+	 * @ghost\Param(name="uuid",required=false)
+	 * @ghost\Param(name="data",required=false)
+	 * @ghost\Param(name="binary",requirements="boolean", required=false)
+	 * @ghost\Param(name="id_crawl_login",requirements="\d+",required=false)
+	 * Adds a new crawl
+	 */
+	public function add(Request $request)
+	{
+		$crawl = new Crawl;
+		$crawl->url = $request->input('url');
+		if(strpos($crawl->url,"://") === False && strpos($crawl->url,"data:")!==0)
+		{
+			$crawl->url = "https://".$crawl->url;
+		}
+		$crawl->type = $request->input('type');
+		$crawl->state = $request->input('state');
+		$crawl->uuid = $request->input('uuid');
+		$crawl->data = $request->input('data');
+		$crawl->binary = $request->input('binary');
+		$crawl->id_crawl_login = $request->input('id_crawl_login');
+		dd($crawl);
+
+ 
+	}
     /**
      * Get some stats from crawl server
      * @ghost\Role("admin")
