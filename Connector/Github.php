@@ -1,19 +1,20 @@
 <?php
 
 namespace Core\Connector;
-
-class Facebook extends ConnectorCore
+use Illuminate\Http\Response;
+use GrahamCampbell\GitHub\Facades\GitHub as  GithubAPI;
+class Github extends ConnectorCore
 {
 	protected $token;
 	protected $expiresIn;
 
-	public $id;
+	public $id; 
 	public $name;
 	public $nickname;
 	public $email;
 	public $avatar;
-	public $verified;
 	public $gender;
+
 
 	public function readExternal( $data )
 	{
@@ -23,11 +24,12 @@ class Facebook extends ConnectorCore
 			{
 				$this->{ $key } = $value;
 			}
-
 			unset($data->user);
 		}
 
 		parent::readExternal( $data );
+		if(!isset($this->nickname))
+			$this->nickname = $this->name;
 	}
 
 	public function getAccessToken()
@@ -39,17 +41,19 @@ class Facebook extends ConnectorCore
 	{
 		return null;
 	}
-
+	public function setScopes($scopes)
+    {
+        $this->scopes = $scopes;
+		if(isset($this->token))
+		{
+			//GithubAPI::setUserToken($this->token);
+		}
+    }
 	public function getExpiresIn()
 	{
 		return $this->expiresIn;
 	}
 
-
-	public function isSocial()
-    {
-        return true;
-    }
 
 	// REGISTER USER
 	public function getUsername()

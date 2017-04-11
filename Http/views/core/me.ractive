@@ -3,3 +3,27 @@
     <li>login: {{user.login}}</li>
     <li>api token: {{user.token}}</li>
 </ul>
+<ul>
+    <li><label>Google</label>
+     {{#if connectors.google.id_user}}
+        connected as {{connectors.google.email}}
+    {{else}}
+        <a href="/login/google?hash=main/profile">connect</a>
+    {{/if}}
+    </li>
+    <li><label>Github</label>
+     {{#if connectors.github.id_user}}
+        connected as {{connectors.github.email}}
+    {{else}}
+        <a href="/login/github?hash=main/profile">connect</a>
+    {{/if}}
+    </li>
+    <li><label>Github Repositories</label>
+    {{#if connectors.github.scopes && connectors.github.scopes.indexOf('repo')!=-1}}
+        connected <a href="/revoke-scopes/github?scopes=user:email,public_repo,repo,read:org&hash=main/profile">revoke</a>
+    {{else}}
+        <a href="/login/github?scopes=user:email,public_repo,repo,read:org&hash=main/profile">connect</a>
+    {{/if}}
+    </li>
+</ul>
+<a href="/logout">Logout</a>

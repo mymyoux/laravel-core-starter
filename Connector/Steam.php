@@ -51,11 +51,6 @@ class Steam extends ConnectorCore
 		return null;
 	}
 
-	public function getScopes()
-	{
-		return null;
-	}
-
 	// REGISTER USER
 	public function getUsername()
     {

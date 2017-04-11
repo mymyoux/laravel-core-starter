@@ -33,9 +33,4 @@ class Battlenet extends ConnectorCore
 	{
 		return $this->expiresIn;
 	}
-
-	public function getScopes()
-	{
-		return null;
-	}
 }

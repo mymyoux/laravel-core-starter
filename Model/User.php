@@ -149,4 +149,11 @@ class User extends Model implements
     {
         return USER::select('type')->distinct()->get()->pluck('type')->all();
     }
+    protected function getByEmail($email)
+    {
+        $id_user = UserConnector::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
+        if($id_user === NULL)
+            return NULL;
+        return $this->getById($id_user);
+    }
 }

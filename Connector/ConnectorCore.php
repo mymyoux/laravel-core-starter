@@ -1,10 +1,11 @@
 <?php
 
 namespace Core\Connector;
-
+use Illuminate\Http\Response;
 abstract class ConnectorCore
 {
 	protected $connector = null;
+	protected $scopes = null;
 
 	public function __construct( $data = [] )
 	{
@@ -70,12 +71,19 @@ abstract class ConnectorCore
     {
         return null;
     }
+    public function setScopes($scopes)
+    {
+        $this->scopes = $scopes;
+    }
     // END REGISTER USER FUNCTION
 
 	abstract public function getAccessToken();
 	abstract public function getRefreshToken();
 	abstract public function getExpiresIn();
-	abstract public function getScopes();
+	public function getScopes()
+    {
+        return $this->scopes;
+    }
 }
 
 function to_array($object, $init = NULL)

@@ -46,10 +46,6 @@ class Google extends ConnectorCore
 		return $this->expiresIn;
 	}
 
-	public function getScopes()
-	{
-		return null;
-	}
 
 	// REGISTER USER
 	public function getUsername()

@@ -76,10 +76,10 @@ class Update extends Command
 
 
         $folder_permissions = [
-            storage_path() =>644,
-            public_path() => 644,
-            base_path('bootstrap/cache') => 644,
-            base_path('bootstrap/tables') => 644
+            storage_path() =>0644,
+            public_path() =>0644,
+            base_path('bootstrap/cache') => 0644,
+            base_path('bootstrap/tables') => 0644
         ];
         foreach($folder_permissions as $folder=>$right)
         {

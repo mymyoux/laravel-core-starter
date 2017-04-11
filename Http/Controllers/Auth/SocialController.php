@@ -4,6 +4,7 @@ namespace Core\Http\Controllers\Auth;
 
 use Socialite;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Core\Connector\Manager;
 use Core\Model\UserConnector;
 use Auth;
@@ -12,9 +13,12 @@ use App\User;
 use Core\Models\Social;
 use Core\Http\Controllers\Controller;
 use Tables\USER_LOGIN_TOKEN;
-
+use URL;
+use Core\Events\SocialAddededEvent;
+use Core\Events\SocialScopeChangedEvent;
 class SocialController extends Controller
 {
+    //user:email,public_repo,repo,read:org
     /**
      * Redirect the user to the GitHub authentication page.
      *
@@ -22,8 +26,73 @@ class SocialController extends Controller
      */
     public function redirectToProvider(Request $request, $api)
     {
-        Auth::logout();
-        return Socialite::driver($api)->redirect();
+        $redirect = $request->input('hash');
+        if(isset($redirect))
+        {
+             $request->session()->put('hash', $redirect);
+        }
+        $driver = Socialite::driver($api);
+        //given scopes
+        if($request->input('scopes'))
+        {
+            $scopes = array_map('trim', explode(',', $request->input('scopes')));
+        }else
+        {
+            //default scopes
+            $connector = Db::table('connector')->where(['name'=>$api])->first();
+            if(isset($connector->scopes))
+            {
+                $scopes = array_map('trim', explode(',', $connector->scopes));
+            }
+        }
+        if(!empty($scopes))
+        {
+            $driver = $driver->scopes($scopes);
+        }else
+        {
+            $scopes = NULL;
+        }
+        $request->session()->put('scopes', $scopes);
+        return $driver->redirect();
+    }
+    public function revokeScopes(Request $request, $api)
+    {
+        $redirect = $request->input('hash');
+        if(isset($redirect))
+        {
+            $redirect = URL::route('/', ["#".$redirect]);
+        }else
+        {
+            $redirect = "/";
+        }
+        $scopes = $request->input('scopes');
+        if(!isset($scopes))
+        {
+            return redirect($redirect);
+        }
+        $scopes = explode(",", $scopes);
+        $connector = UserConnector::leftJoin('connector','connector.id_connector','=','user_connector.id_connector')->where('id_user', '=', Auth::id())->where('connector.name', '=', $api)->first();
+        if(!$connector)
+        {
+            return redirect($redirect);    
+        }
+        $current_scopes = isset($connector->scopes)?explode(',',$connector->scopes):[];
+        
+        $newscopes = array_diff($current_scopes, $scopes);
+        if(empty($newscopes))
+        {
+            $connector->scopes = '';
+        }else
+        {
+            $connector->scopes  = implode(",", $newscopes);
+        }
+        $connector->save();
+        if($newscopes != $scopes)
+        {
+            event(new SocialScopeChangedEvent($connector, [], array_diff($current_scopes, $newscopes)));
+        }
+
+        return redirect($redirect);
     }
     public function logout(Request $request)
     {
@@ -35,7 +104,7 @@ class SocialController extends Controller
      *
      * @return Response
      */
-    public function handleProviderCallback(Request $request, $api)
+    public function handleProviderCallback(Request $request, Response $response, $api)
     {
         
         $user       = Socialite::driver($api)->user();
@@ -43,8 +112,16 @@ class SocialController extends Controller
         $manager = new Manager();
 
         $connector  = $manager->get($api, $user);
+        $connector->setScopes($request->session()->pull('scopes'));
+        //$request->session()->forget('scopes');
         $class      = '\Core\Model\Connector\\' . ucfirst($api);
 
+        $url_redirect = "/";
+        if($request->session()->has('hash'))
+        {
+            $url_redirect = URL::route('/', ["#".$request->session()->get('hash')]);
+            $request->session()->forget('hash');
+        }
         // echo '<pre>';
         // var_dump($connector);
         // var_dump($user);
@@ -52,15 +129,22 @@ class SocialController extends Controller
         $exist = $class::where('id', $user->id)->first();
         if ($exist && Auth::check())
         {
-            if ($exist->id_user != Auth::user()->id)
+            if ($exist->id_user != Auth::id())
             {
                 // cant
-                return redirect('/');
+                return redirect($url_redirect);
             }
         }
 
         if ($connector->getConnector()->isPrimary() && !Auth::check())
         {
+            $email = $connector->getEmail();
+            if(isset($email) && !isset($exist))
+            {
+                $exist = UserConnector::where(['email'=>$email])->first();
+            }
+
+
             if (is_null($exist))
             {
                 $auth_user = $this->createUser($connector);
@@ -76,7 +160,6 @@ class SocialController extends Controller
             $this->success($request, $auth_user);
         }
         $exist = UserConnector::where('id_user', '=', Auth::id())->where('id_connector', '=', $connector->getConnector()->id_connector)->first();
-
         if (null === $exist)
         {
             
@@ -86,17 +169,24 @@ class SocialController extends Controller
                 'access_token'  => $connector->getAccessToken(),
                 'refresh_token' => $connector->getRefreshToken(),
                 'expires_in'    => $connector->getExpiresIn(),
-                'scopes'        => $connector->getScopes(),
+                'scopes'        => $connector->getScopes()!=NULL?implode(",", $connector->getScopes()):NULL,
+                'email'=> $connector->getEmail()
             ]);
+            event(new SocialAddededEvent($exist));
         }
         else
         {
             
+            $last_scope = $exist->getScopes();
             $exist->access_token    = $connector->getAccessToken();
             $exist->refresh_token   = $connector->getRefreshToken();
             $exist->expires_in      = $connector->getExpiresIn();
-            $exist->scopes          = $connector->getScopes();
+            $exist->setScopes(array_merge($last_scope, $connector->getScopes()!=NULL? $connector->getScopes():[]));
+            $exist->email          = $connector->getEmail();
             $exist->save();
+            $new_scopes = $exist->getScopes();
+            if($last_scope != $new_scopes)
+                event(new SocialScopeChangedEvent($exist, array_diff($new_scopes, $last_scope), array_diff($last_scope, $new_scopes)));
         }
 
         $informations   = $class::where('id_user', '=', Auth::id())->first();
@@ -117,7 +207,8 @@ class SocialController extends Controller
 
             $informations->save();
         }
-        return redirect('/');
+        
+        return redirect($url_redirect);
     }
     protected function createUser($connector)
     {

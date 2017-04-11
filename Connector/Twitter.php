@@ -65,9 +65,4 @@ class Twitter extends ConnectorCore
 	{
 		return null;
 	}
-
-	public function getScopes()
-	{
-		return null;
-	}
 }

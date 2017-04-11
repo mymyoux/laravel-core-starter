@@ -6,6 +6,7 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Symfony\Component\Finder\Finder;
 use Core\Util\ModuleHelper;
+use Illuminate\Support\Arr;
 class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 {
 
@@ -34,13 +35,36 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 				$data[$key] = require $path;
 			}
 		}
+		$data = $this->searchForCopy($data, $data);
 		if(isset($repository))
-        foreach($data as $key => $value)
-        {
-        	$repository->set($key, $value);	
-        }
+			foreach($data as $key => $value)
+			{
+				$repository->set($key, $value);	
+			}
 		return $data;
     }
+	public function searchForCopy(&$data, &$root)
+	{
+		foreach($data as $key=>$value)
+		{
+			if(is_array($value))
+			{
+				$data[$key] = $this->searchForCopy($value, $root);
+			}else
+			{
+				if(is_string($value) && starts_with($value, '$copy:'))
+				{
+					$ref = substr($value, 6);
+					$data[$key] = Arr::get($root, $ref);
+					if($data[$key] === NULL)
+					{
+						throw new \Exception('use $copy for config value to a reference that doesn\'t exist: '.$key.'=>'.$ref);
+					}
+				}
+			}
+		}
+		return $data;
+	}
     protected function configurationMerge($config1, $config2)
     {
     	foreach($config2 as $key=>$value)
