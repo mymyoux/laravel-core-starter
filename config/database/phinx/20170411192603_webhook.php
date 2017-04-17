@@ -45,6 +45,7 @@ class Webhook extends AbstractMigration
             ->addColumn('id_str', 'string', ['limit' => 256, 'null' => false])
             ->addColumn('url', 'string', ['limit' => 2000, 'null' => false])
             ->addColumn('config', 'string', ['limit' => MysqlAdapter::TEXT_LONG, 'null' => true])
+            ->addColumn('return_content', 'string', ['limit' => MysqlAdapter::TEXT_LONG, 'null' => true])
             ->addColumn('external_type', 'string', ['limit' => 50, 'null' => false])
             ->addColumn('external_id', 'integer', ['limit' => 11, 'null' => true,'signed'=>False])
             ->addColumn('created_time', 'timestamp', ['null' => true])

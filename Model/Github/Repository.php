@@ -25,15 +25,15 @@ class Repository extends Model
     }
     public function createWebhook($url, $events = ["push"])
     {
-        $githubWebhook = GithubApi::createRepositoryHook($this->owner, $this->name,$url);
+        $githubWebhook = GithubApi::createRepositoryHook($this->owner, $this->name,$url, $events);
         $webhook = new Webhook;
         $webhook->external()->associate($this);
         $webhook->url = $url;
         $webhook->config = implode(",",$events);
         $webhook->id = $githubWebhook["id"];
         $webhook->id_str = $githubWebhook["id"];
+        $webhook->return_content = json_encode($githubWebhook);
         $webhook->save();
-        var_dump($githubWebhook);
     }
      public function removeWebhook()
     {

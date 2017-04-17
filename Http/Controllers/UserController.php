@@ -19,6 +19,7 @@ class UserController extends Controller
 	/**
    * Get current user info
    * @ghost\Role("visitor")
+   * @ghost\Middleware("\Illuminate\Session\Middleware\AuthenticateSession")
    * @return User current user
 	 */
     public function me(Request $request)

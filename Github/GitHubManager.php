@@ -91,7 +91,7 @@ class GitHubManager extends ParentGitHubManager
             [
                 "content_type"=>"form",
                 "url"=>$url,
-                "insecure_ssl"=>"0"
+                "insecure_ssl"=>"1"
             ]
         ];
         return $this->repo()->hooks()->create($username, $repository, $params);
