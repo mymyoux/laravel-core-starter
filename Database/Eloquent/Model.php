@@ -21,4 +21,11 @@ abstract class Model extends BaseModel
     {
         return $this->query->toRawSql();
     }
+    public function toArray()
+    {
+        $data = parent::toArray();
+        if(isset($this->primaryKey) && isset($data[$this->primaryKey]))
+            $data["id"] = $data[$this->primaryKey];
+        return $data;
+    }
 }
