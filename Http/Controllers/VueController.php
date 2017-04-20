@@ -52,9 +52,11 @@ class VueController extends Controller
         $this->folders = $folders;
         $requestedPath = $request->input('path');
 
+        list($template, $components) = $this->load($requestedPath);
         return 
         [
-            "template"=>$this->load($requestedPath),
+            "template"=>$template,
+            "components"=>$components,
             "version"=>$this->getVersion($request)
         ];
     } 
@@ -170,6 +172,14 @@ class VueController extends Controller
     }
     protected function load($requestedPath, $folders = NULL, $paths = NULL)
     {
+        $this->components = [];
+        $content = $this->_load($requestedPath, $folders = NULL, $paths = NULL);
+        $components = $this->components;
+        $this->components = null;
+        return [$content, $components];
+    }
+    protected function _load($requestedPath, $folders = NULL, $paths = NULL)
+    {
         if(!isset($folders))
         {
             $folders = $this->folders;
@@ -217,49 +227,40 @@ class VueController extends Controller
     }
     protected function parse($content, $path)
     {
-        $index = 0;
-        $end_index = 0;
-        $start_index = 0;
-        while($start_index !== False && $end_index !== False)
+        $content = preg_replace_callback("/\(\(([^\)]+)\)\)/", function($matches) use($path, $content)
         {
-            $start_index = strpos($content, '((', $index);
-            if($start_index !== False)
+            $line = $matches[1];
+           if(starts_with($line,"#"))
             {
-                $end_index = strpos($content, '))', $start_index);
-                if($end_index !== False)
-                {
-                    $end_index += 2;
-                    $line = substr_count($content, "\n", 0, $start_index)+1;
-                    if(substr($content, $start_index+2, 1) == "#")
-                    {
-                        //php function helpers
-                        $replacement = $this->_helpers(substr($content, $start_index+2, $end_index-$start_index-4), $path, $line);
-                    }else
-                    {
-                        $replacement = $this->_translate(substr($content, $start_index+2, $end_index-$start_index-4), $path, $line);
-                    }
-                    $content = substr_replace($content, $replacement, $start_index, $end_index - $start_index);
-                    $index = $start_index+sizeof($replacement);
-                }else
-                {
-                    //no more variables
-                }
+                $replacement = $this->_helpers(substr($line, 1), $path);
             }else
             {
-                //no more variables
+                $replacement = $this->_translate($line, $path);
+            }
+            return $replacement;
+        }, $content);
+        $count = preg_match_all("/<component-([^> ]+)/", $content, $matches);
+        if($count)
+        {
+            foreach($matches[1] as $match)
+            {
+                if(!in_array($match, $this->components))
+                {
+                    $this->components[] = $match;
+                }
             }
         }
         return $content;
     }
-    protected function _translate($content, $path, $line)
+    protected function _translate($content, $path, $line = 0)
     {
         //TODO:handle
         return $content;
     }
-    protected function _helpers($content, $path, $line)
+    protected function _helpers($content, $path, $line = 0)
     {
         $parts = explode(" ", $content);
-        $key = substr($parts[0], 1);
+        $key = $parts[0];
         if($this->skiphelpers && !in_array($key, ["parent", "include"]))
         {
             //skip helpers (skip random data)
@@ -280,7 +281,7 @@ class VueController extends Controller
         {
             throw new Exception("((#include)) can't be specified without url");
         }
-        $subcontent = $this->load($content);
+        $subcontent = $this->_load($content);
         if(!isset($subcontent))
         {
             throw new Exception('((#include '.$content.')) file not found: '.$path->requestedPath);
@@ -295,7 +296,7 @@ class VueController extends Controller
             throw new Exception("((#parent)) can't be used on bottom level folder: ".$path->requestedPath);
         }
         $index++;
-        $subcontent = $this->load($path->requestedPath, $this->folders[$index]);
+        $subcontent = $this->_load($path->requestedPath, $this->folders[$index]);
         if(!isset($subcontent))
         {
             throw new Exception('((#parent)) file not found: '.$path->requestedPath);
