@@ -39,7 +39,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 		if(isset($repository))
 			foreach($data as $key => $value)
 			{
-				$repository->set($key, $value);	
+				$repository->set($key, $value);
 			}
 		return $data;
     }
@@ -56,7 +56,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 				{
 					$ref = substr($value, 6);
 					$data[$key] = Arr::get($root, $ref);
-					if($data[$key] === NULL)
+					if(!array_key_exists($key, $data))
 					{
 						throw new \Exception('use $copy for config value to a reference that doesn\'t exist: '.$key.'=>'.$ref);
 					}
@@ -90,7 +90,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
     					}
     					if(is_array($v) && is_array($config1[$key][$kclean]))
     					{
-    						
+
     						$config1[$key] = $this->configurationMerge($config1[$key], $value);
     					}else
     					{
@@ -130,21 +130,21 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
     }
 	protected function getConfigurationFiles(Application $app)
     {
-      
+
 
         $configPath = realpath($app->configPath());
 
-		$paths = 
+		$paths =
 		array_filter(array_map(function($module)
 		{
 			return base_path(join_paths($module["path"], "config"));
 		}, ModuleHelper::getModulesFromComposer()),
 		function($path)
-		{	
+		{
 			return file_exists($path);
 		});
 		$paths = array_reverse($paths);
-		
+
 		$paths[] = $configPath;
         $env = env('APP_ENV', "").".";
 
@@ -157,7 +157,7 @@ class MultiEnvironmentLoadConfiguration extends LoadConfiguration
 				$directory = $this->getNestedDirectory($file, $path);
 				if(strlen($directory))
 				{
-					
+
 					if(substr($directory, 0, strlen($env)) == $env)
 					{
 						$second[$file->getRealPath()] = $directory.basename($file->getRealPath(), '.php');
