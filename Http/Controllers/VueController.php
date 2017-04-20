@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Redis;
 use stdClass;
 use File;
 use Tables\TEMPLATE;
+use View;
+use \Illuminate\View\Compilers\BladeCompiler;
 class VueController extends Controller
 {
     const DEFAULT_EXTENSION = "vue";
@@ -196,6 +198,13 @@ class VueController extends Controller
                     $foundPath->folder = $folder;
                     $foundPath->requestedPath = $requestedPath;
                     $content = file_get_contents($full_path);
+                    // ob_start();
+                    // echo App::make(BladeCompiler::class)->compileString($content)->render();
+                    // $content = ob_get_contents();
+                    // ob_end_clean();
+                    // dd($content);
+                    //TODO:use .vue as .blade && compile php files into another directory
+                    //@see PhpEngine::evaluatePath
                     break 2;
                 }
             }
