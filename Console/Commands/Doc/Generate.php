@@ -190,12 +190,19 @@ class Generate extends CoreCommand
              {
                 $middlewares = array_map(function($item)
                     {
-                        list($class, $param) = explode(":", $item);
+                        if(strpos($item, ":")!==false)
+                            list($class, $param) = explode(":", $item);
+                        else{
+                            $class = $item;
+                            $param = NULL;
+                        }
                         $middleware = new stdClass();
                         $middleware->class = $class;
                         if(isset($param))
+                        {
                             $instance = Api::unserialize($param); 
-                        $middleware->instance = $instance;
+                            $middleware->instance = $instance;
+                        }
                         return $middleware;
                     }, array_values(array_filter($route->action["middleware"], function($item){return $item!="api";})));
                 
