@@ -21,13 +21,15 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--sass=d} {--tsc=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
 
     protected $defaultChoices =
     [
         "pull"              => 1,
         "composer"          => 1,
         "migrate"           => 1,
+        "sass"           => 0,
+        "tsc"           => 0,
         "cache"             => 1,
         "supervisor"        => 1,
         'cron'              => 0,
@@ -275,6 +277,14 @@ class Update extends Command
         {
             $this->line("no need for update");
         }
+    }
+    protected function runSass()
+    {
+        $this->call('sass:compile');
+    }
+    protected function runTsc()
+    {
+        $this->call('tsc:compile');
     }
     protected function runMigrate()
     {
