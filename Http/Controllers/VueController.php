@@ -33,6 +33,10 @@ class VueController extends Controller
     protected $paths;
     protected $extension;
     protected $skiphelpers = False;
+    public function index()
+    {
+        return view('index');
+    }
 	/**
 	 * Get template for a view
      * @ghost\Param(name="path",required=true)
