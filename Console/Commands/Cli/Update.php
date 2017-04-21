@@ -222,11 +222,23 @@ class Update extends Command
 
     protected function runPull()
     {
-        $folders = config("update.pull");
-        if(empty($folders))
+        $config_path = base_path(".gitmodules");
+        $folders = ["."];
+        if(file_exists($config_path))
         {
-            $folders = ["."];
-        }
+            $content = file_get_contents($config_path);
+            $count = preg_match_all("/path *= *([^\n ]+)/", $content, $matches);
+             if($count)
+            {
+                foreach($matches[1] as $match)
+                {
+                    $match = str_replace('"','',$match);
+                    $folders[] = $match;
+                }
+            }
+        }else
+            Logger::warn('no submodules to pull');
+
         $folders = array_map(function($item)
         {
             if($item == ".")
