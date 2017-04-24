@@ -163,10 +163,11 @@ class VueController extends Controller
     protected function getPaths()
     {
         $modules = ModuleHelper::getModulesFromComposer();;
-        $paths = [];
+        $paths = [resource_path('views')];
         foreach($modules as $module)
         {
             $path = base_path(join_paths($module["path"], "Http", "views"));
+            //$path = resource_path("views");
             if(file_exists($path))
             {
                 $paths[] = $path;
