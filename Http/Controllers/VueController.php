@@ -97,7 +97,7 @@ class VueController extends Controller
     public function getVersion(Request $request)
     {
         $path = $request->input('path');
-        $type = $request->input('type', Auth::check()?Auth::user()->type:NULL);
+        $type = $request->input('type')??(Auth::check()?Auth::user()->type:"app");
         $folders = ["app", "core"];
         if(isset($type))
             array_unshift($folders, $type);
