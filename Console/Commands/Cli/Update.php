@@ -21,13 +21,15 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--sass=d} {--tsc=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
 
     protected $defaultChoices =
     [
         "pull"              => 1,
         "composer"          => 1,
         "migrate"           => 1,
+        "sass"           => 0,
+        "tsc"           => 0,
         "cache"             => 1,
         "supervisor"        => 1,
         'cron'              => 0,
@@ -220,11 +222,23 @@ class Update extends Command
 
     protected function runPull()
     {
-        $folders = config("update.pull");
-        if(empty($folders))
+        $config_path = base_path(".gitmodules");
+        $folders = ["."];
+        if(file_exists($config_path))
         {
-            $folders = ["."];
-        }
+            $content = file_get_contents($config_path);
+            $count = preg_match_all("/path *= *([^\n ]+)/", $content, $matches);
+             if($count)
+            {
+                foreach($matches[1] as $match)
+                {
+                    $match = str_replace('"','',$match);
+                    $folders[] = $match;
+                }
+            }
+        }else
+            Logger::warn('no submodules to pull');
+
         $folders = array_map(function($item)
         {
             if($item == ".")
@@ -275,6 +289,14 @@ class Update extends Command
         {
             $this->line("no need for update");
         }
+    }
+    protected function runSass()
+    {
+        $this->call('sass:compile');
+    }
+    protected function runTsc()
+    {
+        $this->call('tsc:compile');
     }
     protected function runMigrate()
     {

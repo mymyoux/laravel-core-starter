@@ -153,7 +153,14 @@ class User extends Model implements
     {
         $id_user = UserConnector::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
         if($id_user === NULL)
+        {
+            $new_email = clean_email($email);
+            if($new_email != $email)
+            {
+                return $this->getByEmail($new_email);
+            }
             return NULL;
+        }
         return $this->getById($id_user);
     }
 }

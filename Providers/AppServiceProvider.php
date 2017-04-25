@@ -44,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerJob();
         $this->registerNotification();
         $this->registerLogger();
+        $this->registerMail();
     }
 
     protected function registerStats()
@@ -60,7 +61,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton('job', '\Core\Services\Job');
     }
-
+    protected function registerMail()
+    {
+        $this->app->singleton('mail', '\Core\Services\Mail');
+    }
     protected function registerNotification()
     {
         $this->app->singleton('notification', '\Core\Services\Notification');

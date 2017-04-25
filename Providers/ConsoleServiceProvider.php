@@ -24,6 +24,8 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Phinx\Migrate',
         'Core\Console\Commands\Phinx\Rollback',
         'Core\Console\Commands\Phinx\Status',
+        'Core\Console\Commands\Sass\Compile',
+        'Core\Console\Commands\Sass\Watch',
         'Core\Console\Commands\Supervisor\Config',
         'Core\Console\Commands\Supervisor\Reread',
         'Core\Console\Commands\Supervisor\Restart',
@@ -31,6 +33,8 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Redis\Clear',
         'Core\Console\Commands\Table\Cache',
         'Core\Console\Commands\Table\Clear',
+        'Core\Console\Commands\Tsc\Compile',
+        'Core\Console\Commands\Tsc\Watch',
         'Core\Console\Commands\Template\Calcul'
     ];
 

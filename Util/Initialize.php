@@ -543,6 +543,18 @@ function is_email($email){
     return filter_var($email, \FILTER_VALIDATE_EMAIL);
 }
 
+function clean_email($email)
+{
+    if(($index=strpos($email, "+")) !== False)
+    {
+        $index2 = strpos($email, "@");
+        if($index2 !== False)
+        {
+            $email = substr($email, 0, $index).substr($email, $index2);
+        }
+    }
+    return $email;
+}
 function slug($str, $replace=array(), $delimiter='-') {
     if(empty($str))
     {
