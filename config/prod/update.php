@@ -10,5 +10,6 @@ return [
     'doc'=>true, 
     "cache"=>True,
     "supervisor"=>True,
+    "template"=>true
   ],
 ];

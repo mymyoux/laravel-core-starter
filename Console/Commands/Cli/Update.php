@@ -21,7 +21,7 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--sass=d} {--tsc=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--sass=d} {--tsc=d} {--template=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
 
     protected $defaultChoices =
     [
@@ -30,6 +30,7 @@ class Update extends Command
         "migrate"           => 1,
         "sass"           => 0,
         "tsc"           => 0,
+        "template"           => 0,
         "cache"             => 1,
         "supervisor"        => 1,
         'cron'              => 0,
@@ -297,6 +298,10 @@ class Update extends Command
     protected function runTsc()
     {
         $this->call('tsc:compile');
+    }
+    protected function runTemplate()
+    {
+        $this->call('template:calcul');
     }
     protected function runMigrate()
     {
