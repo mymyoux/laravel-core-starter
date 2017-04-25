@@ -43,13 +43,13 @@ class Calcul extends Command
      */
     public function handle()
     {
-       $templates = API::get('view/get-all')->send();
+       $templates = API::get('vue/get-all')->send();
        $types = array_merge(["app", "core"], User::getAvailableTypes());
        foreach($types as $type)
        {
            foreach($templates as $template)
            {
-               $result = API::get('view/get')->send(['type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
+               $result = API::get('vue/get')->send(['type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
                 $rawTemplate = 
                 [
                     "path"=>$template,

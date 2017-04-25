@@ -77,12 +77,12 @@ class VueController extends Controller
             $files = File::allfiles($path);
             foreach($files as $file)
             {
-                if($file->getExtension() !== ViewController::DEFAULT_EXTENSION)
+                if($file->getExtension() !== static::DEFAULT_EXTENSION)
                 {
                     continue;
                 }
                 $subpath = substr($file->getPathname(), strlen($path)+1);
-                $paths[] = substr(join("/", array_slice(explode("/", $subpath), 1)), 0, -strlen(ViewController::DEFAULT_EXTENSION)-1);
+                $paths[] = substr(join("/", array_slice(explode("/", $subpath), 1)), 0, -strlen(static::DEFAULT_EXTENSION)-1);
 
             }
         }
