@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Cli\GenerateCron',
         'Core\Console\Commands\Cli\Project',
         'Core\Console\Commands\Cli\Update',
+        'Core\Console\Commands\Cli\Certificate',
         'Core\Console\Commands\Config',
         'Core\Console\Commands\Db\Clean',
         'Core\Console\Commands\Doc\Generate',
@@ -48,7 +49,7 @@ class ConsoleServiceProvider extends ServiceProvider
     }
     public function boot()
     {
-        //in appservice 
+        //in appservice
         //parent::boot();
         // Event::listen('Illuminate\Queue\Events\JobProcessing', QueueListener::class);
         // Event::listen('Illuminate\Queue\Events\JobProcessed', QueueListener::class);
