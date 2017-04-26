@@ -50,12 +50,22 @@ class VueController extends Controller
         $this->extension = static::DEFAULT_EXTENSION;
         $this->paths = $this->getPaths();
         $folders = ["app", "core"];
-        $type = $request->input('type', Auth::check()?Auth::user()->type:NULL);
+        $type = $request->input('type')??(Auth::check()?Auth::user()->type:NULL);
         if(isset($type))
             array_unshift($folders, $type);
+
+
+        
         $this->folders = $folders;
         $requestedPath = $request->input('path');
-
+        if(!$this->skiphelpers)
+        {
+            $template = $this->getFromCache($requestedPath);
+            if(isset($template))
+            {
+                return $template;
+            }
+        }    
         list($template, $components) = $this->load($requestedPath);
         return 
         [
@@ -64,6 +74,13 @@ class VueController extends Controller
             "version"=>$this->getVersion($request)
         ];
     } 
+    public function getFromCache($path)
+    {
+        $data = @include storage_path('framework/cache/views/'.$path.'.php');
+        if($data === False)
+            return NULL;
+        return $data;
+    }
     /**
      * @ghost\Api
      * @return list of all existing template paths

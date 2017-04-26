@@ -35,7 +35,8 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Table\Clear',
         'Core\Console\Commands\Tsc\Compile',
         'Core\Console\Commands\Tsc\Watch',
-        'Core\Console\Commands\Template\Calcul'
+        'Core\Console\Commands\Template\Calcul',
+        'Core\Console\Commands\Template\Clear'
     ];
 
     /**

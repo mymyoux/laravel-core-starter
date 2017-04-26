@@ -17,7 +17,7 @@ class Calcul extends Command
      *
      * @var string
      */
-    protected $signature = 'template:calcul';
+    protected $signature = 'template:calcul {--increment-all=0}';
 
     /**
      * The console command description.
@@ -43,6 +43,7 @@ class Calcul extends Command
      */
     public function handle()
     {
+        
        $templates = API::get('vue/get-all')->send();
        $types = array_merge(["app", "core"], User::getAvailableTypes());
        foreach($types as $type)
@@ -62,6 +63,7 @@ class Calcul extends Command
                     Logger::info('create '.$template.' ['.$type.']');
                     $rawTemplate["version"] = 1; 
                     $id = TEMPLATE::insertGetId($rawTemplate);
+                    $this->cache($template, $type);
                     continue;
                 }else
                 {
@@ -74,7 +76,27 @@ class Calcul extends Command
                 Logger::warn('update '.$template.' ['.$type.']');
                 TEMPLATE::where(["path"=>$template,"type"=>$type])->update(['md5'=>$rawTemplate["md5"]]);
                 TEMPLATE::select('id_template','md5')->where(["path"=>$template,"type"=>$type])->increment('version');
+
+                $this->cache($template, $type);
            }
        }
+       $increment_all = $this->option('increment-all');
+       if($increment_all != 0)
+       {
+           Logger::warn('increment all version by 1');
+            TEMPLATE::update(["version"=>Db::raw('version + 1')]);
+       }
     }
+    private function cache($name, $type)
+    {
+        $filepath = storage_path('framework/cache/views/'.$name.'.php');
+        $dirpath = dirname($filepath);
+        if(!file_exists($dirpath))
+        {
+            mkdir($dirpath, 0777, True);
+        }
+        $result = API::get('vue/get')->send(['type'=>$type, "path"=>$name, "skiphelpers"=>False]);
+        file_put_contents($filepath, "<?php\nreturn ".var_export($result, True).";");
+    }
+
 }
