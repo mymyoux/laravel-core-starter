@@ -60,9 +60,10 @@ class VueController extends Controller
         $requestedPath = $request->input('path');
         if(!$this->skiphelpers)
         {
-            $template = $this->getFromCache($requestedPath);
+            $template = $this->getFromCache($requestedPath, $folders[0]);
             if(isset($template))
             {
+                $template["cache"] = True;
                 return $template;
             }
         }    
@@ -74,9 +75,9 @@ class VueController extends Controller
             "version"=>$this->getVersion($request)
         ];
     } 
-    public function getFromCache($path)
+    public function getFromCache($path, $type)
     {
-        $data = @include storage_path('framework/cache/views/'.$path.'.php');
+        $data = @include storage_path('framework/cache/views/'.$type.'/'.$path.'.php');
         if($data === False)
             return NULL;
         return $data;

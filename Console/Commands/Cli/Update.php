@@ -301,7 +301,7 @@ class Update extends Command
     }
     protected function runTemplate()
     {
-        $this->call('template:calcul');
+        $this->call('template:cache');
     }
     protected function runMigrate()
     {

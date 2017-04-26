@@ -10,21 +10,21 @@ use Api;
 use App\User;
 use Tables\TEMPLATE;
 use Logger;
-class Calcul extends Command
+class Cache extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'template:calcul {--increment-all=0}';
+    protected $signature = 'template:cache {--increment-all=0}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Calcul templates';
+    protected $description = 'Cache templates';
 
     /**
      * Create a new command instance.
@@ -89,7 +89,7 @@ class Calcul extends Command
     }
     private function cache($name, $type)
     {
-        $filepath = storage_path('framework/cache/views/'.$name.'.php');
+        $filepath = storage_path('framework/cache/views/'.$type.'/'.$name.'.php');
         $dirpath = dirname($filepath);
         if(!file_exists($dirpath))
         {
