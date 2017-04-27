@@ -294,6 +294,7 @@ class Update extends Command
     protected function runSass()
     {
         $this->call('sass:compile');
+        $this->call('sass:cache');
     }
     protected function runTsc()
     {
@@ -308,6 +309,7 @@ class Update extends Command
         {
             $this->call('tsc:compile', ["path"=>$tsconfig]);
         }
+        $this->call('tsc:cache');
     }
     protected function runTemplate()
     {
