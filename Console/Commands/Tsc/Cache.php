@@ -94,7 +94,7 @@ class Cache extends BaseCommand
                     $md5 = md5(file_get_contents($realpath));
                     if($md5 == $cache[$jsfile]["md5"])
                     {
-                        Logger::warn("ignoring ".$jsfile);
+                      // Logger::warn("ignoring ".$jsfile);
                         continue;
                     }
                 }
