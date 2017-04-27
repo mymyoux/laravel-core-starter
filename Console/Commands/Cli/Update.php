@@ -297,7 +297,17 @@ class Update extends Command
     }
     protected function runTsc()
     {
-        $this->call('tsc:compile');
+        $env = config('app.env');
+        $env = "prod";
+        $tsconfig_files = File::glob(resource_path('assets/ts/').'tsconfig.'.$env.'.*.json');
+        if(empty($tsconfig_files))
+        {
+            $tsconfig_files = File::glob(resource_path('assets/ts/').'tsconfig.json');
+        }
+        foreach($tsconfig_files as $tsconfig)
+        {
+            $this->call('tsc:compile', ["path"=>$tsconfig]);
+        }
     }
     protected function runTemplate()
     {
@@ -324,6 +334,8 @@ class Update extends Command
          $this->call('config:cache');
          $this->call('route:cache');
          $this->call('optimize');
+         
+         $this->call('tsc:cache');
     }
     protected function pullGit($directory = NULL)
     {

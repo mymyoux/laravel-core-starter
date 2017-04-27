@@ -3,6 +3,7 @@
 namespace Core\Console\Commands\Tsc;
 use Illuminate\Console\Command as BaseCommand;
 use Core\Util\Command;
+use Logger;
 class Compile extends BaseCommand
 {
     /**
@@ -10,7 +11,7 @@ class Compile extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'tsc:compile';
+    protected $signature = 'tsc:compile {path?}';
 
     /**
      * The console command description.
@@ -38,6 +39,13 @@ class Compile extends BaseCommand
     public function handle()
     {
       chdir(resource_path('assets/ts'));
-      Command::executeRaw('tsc');
+      $path = $this->argument("path");
+      if(isset($path))
+      {
+          Logger::info('execute '.$path);
+        Command::executeRaw('tsc', ["-p", $path]);
+      }else
+      Logger::info('execute tsc');
+        Command::executeRaw('tsc');
     }
 }

@@ -542,7 +542,23 @@ function __match($file, $exclude)
 function is_email($email){
     return filter_var($email, \FILTER_VALIDATE_EMAIL);
 }
-
+/**
+ * Recursive remove dir
+ */
+ function rrmdir($dir) { 
+   if (is_dir($dir)) { 
+     $objects = scandir($dir); 
+     foreach ($objects as $object) { 
+       if ($object != "." && $object != "..") { 
+         if (is_dir($dir."/".$object))
+           rrmdir($dir."/".$object);
+         else
+           unlink($dir."/".$object); 
+       } 
+     }
+     rmdir($dir); 
+   } 
+ }
 function clean_email($email)
 {
     if(($index=strpos($email, "+")) !== False)
@@ -592,7 +608,14 @@ function camel($string, $delimiter = '-', $replace = '')
 
    return $string;
 }
-
+function rglob($pattern, $flags = 0) 
+{
+    $files = glob($pattern, $flags); 
+    foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
+        $files = array_merge($files, rglob($dir.'/'.basename($pattern), $flags));
+    }
+    return $files;
+}
 function array_orderby()
 {
     $args = func_get_args();
