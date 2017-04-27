@@ -10,6 +10,40 @@ class Cachefile
 	{
 		
 	}
+    public function hasCache($path)
+	{
+        $prefix = "";
+        if(starts_with($path, "/"))
+        {
+            $path = substr($path, 1);
+            $prefix = "/";
+        }
+        if(starts_with($path, "js/"))
+        {
+            $path = substr($path, 3);
+            $prefix .= "js/";
+        }
+        if(starts_with($path, "css/"))
+        {
+            $path = substr($path, 4);
+            $prefix .= "css/";
+        }
+        if(!isset($this->cache))
+        {
+            $cachepath = storage_path('framework/cache/assets.php');
+            if(file_exists($cachepath))
+            {
+                $this->cache = include $cachepath;
+            }else {
+                $this->cache = [];
+            }
+        }
+        if(!isset($this->cache[$path]))
+        {
+            return false;
+        }
+        return true;
+    }
 	public function handle($path)
 	{
         $prefix = "";
