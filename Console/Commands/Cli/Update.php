@@ -336,8 +336,6 @@ class Update extends Command
          $this->call('config:cache');
          $this->call('route:cache');
          $this->call('optimize');
-         
-         $this->call('tsc:cache');
     }
     protected function pullGit($directory = NULL)
     {

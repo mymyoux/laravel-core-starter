@@ -539,6 +539,17 @@ function __match($file, $exclude)
 
     return False;
 }
+function method_parent_exists($object,$method)
+{
+    foreach(class_parents($object) as $parent)
+    {
+        if(method_exists($parent,$method))
+        {
+           return true;
+        }
+    }
+    return false;
+}
 function is_email($email){
     return filter_var($email, \FILTER_VALIDATE_EMAIL);
 }
