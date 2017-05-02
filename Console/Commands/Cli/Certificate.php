@@ -81,9 +81,9 @@ class Certificate extends Command
 
         $result = $this->cmd("cd $path && openssl x509", ['-req -days 3650', '-in ' . $dns . '.csr', '-signkey ' . $dns . '.key', '-out ' . $dns . '.crt']);
 
-        $result = $this->cmd('cd ' . $path . ' && cat /System/Library/OpenSSL/openssl.cnf > ' . $path . '/' . $dns . '.cnf.yb && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf.yb');
+        $result = $this->cmd('cd ' . $path . ' && cat /System/Library/OpenSSL/openssl.cnf > ' . $path . '/' . $dns . '.cnf && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf');
 
-        $result = $this->cmd("cd $path && openssl req", ['-x509 -nodes -new -days 3650', '-subj /CN=' . $dns . ' -reqexts SAN -extensions SAN -config ' . $path . '/' . $dns . '.cnf.yb -sha256', '-key ' . $dns . '.key', '-out ' . $dns . '.crt']);
+        $result = $this->cmd("cd $path && openssl req", ['-x509 -nodes -new -days 3650', '-subj /CN=' . $dns . ' -reqexts SAN -extensions SAN -config ' . $path . '/' . $dns . '.cnf -sha256', '-key ' . $dns . '.key', '-out ' . $dns . '.crt']);
     }
 
     protected function cmd($command, $params = NULL, $execute = True, $stdin_autoinput = [])
