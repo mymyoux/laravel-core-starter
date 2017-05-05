@@ -36,11 +36,17 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        if(App::runningInConsole())
+        try
         {
-            ErrorService::record($exception);
+            if(App::runningInConsole())
+            {
+                ErrorService::record($exception);
+            }
+            parent::report($exception);
+        }catch(\Exception $e)
+        {
+            dd($e);
         }
-        parent::report($exception);
     }
 
     /**
