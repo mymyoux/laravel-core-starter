@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Exception;
-
+use Logger;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -36,6 +36,10 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+	if(config('database.connections.mysql.database') == "forge"){
+	Logger::error('Are you sure to have correctly setup your .env file ? ');
+		return;//	dd($exception);
+	}
         try
         {
             if(App::runningInConsole())
