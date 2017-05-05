@@ -51,7 +51,18 @@ class Certificate extends Command
     {
         $dns = $this->argument('dns');
 
-        $path = $this->ask('Do you want to copy the files to apache ?', '/usr/local/etc/apache2/2.4/');
+        $config = ["linux"=> ["apache_path"=> "/etc/apache2","ssl_config"=> "/etc/ssl/openssl.cnf"],
+        "mac"=>["apache_path"=> "/usr/local/etc/apache2/2.4/","ssl_config"=> "/System/Library/OpenSSL/openssl.cnf"]];
+        if(PHP_OS == 'Linux')
+        {
+            $config = $config["linux"];
+        }else
+        {
+            $config = $config["mac"];
+        }
+
+
+        $path = $this->ask('Do you want to copy the files to apache ?',   $config["apache_path"]);
 
         $result = $this->cmd("cd $path && ssh-keygen", ['-f ' . $dns . '.key'], true, [
             'Overwrite (y/n)?'  => 'y'
@@ -88,7 +99,7 @@ class Certificate extends Command
         {
             $sslconf = "/System/Library/OpenSSL/openssl.cnf";
         }
-        $result = $this->cmd('cd ' . $path . ' && cat '.$sslconf.' > ' . $path . '/' . $dns . '.cnf && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf');
+        $result = $this->cmd('cd ' . $path . ' && cat '.$config["ssl_config"].' > ' . $path . '/' . $dns . '.cnf && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf');
 
         $result = $this->cmd("cd $path && openssl req", ['-x509 -nodes -new -days 3650', '-subj /CN=' . $dns . ' -reqexts SAN -extensions SAN -config ' . $path . '/' . $dns . '.cnf -sha256', '-key ' . $dns . '.key', '-out ' . $dns . '.crt']);
     }
