@@ -81,7 +81,14 @@ class Certificate extends Command
 
         $result = $this->cmd("cd $path && openssl x509", ['-req -days 3650', '-in ' . $dns . '.csr', '-signkey ' . $dns . '.key', '-out ' . $dns . '.crt']);
 
-        $result = $this->cmd('cd ' . $path . ' && cat /System/Library/OpenSSL/openssl.cnf > ' . $path . '/' . $dns . '.cnf && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf');
+        if(PHP_OS == 'Linux')
+        {
+            $sslconf = "/etc/ssl/openssl.cnf";
+        }else
+        {
+            $sslconf = "/System/Library/OpenSSL/openssl.cnf";
+        }
+        $result = $this->cmd('cd ' . $path . ' && cat '.$sslconf.' > ' . $path . '/' . $dns . '.cnf && printf \'[SAN]\nsubjectAltName=DNS:' . $dns . '\n\' >> ' . $path . '/' . $dns . '.cnf');
 
         $result = $this->cmd("cd $path && openssl req", ['-x509 -nodes -new -days 3650', '-subj /CN=' . $dns . ' -reqexts SAN -extensions SAN -config ' . $path . '/' . $dns . '.cnf -sha256', '-key ' . $dns . '.key', '-out ' . $dns . '.crt']);
     }
