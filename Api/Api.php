@@ -345,7 +345,7 @@ class Api
                         } 
                         if(in_array($config->path, $paths))
                         {
-                            Logger::warn('ignore '.$config->path.' from '.$className.'@'.$methodName);
+                            //Logger::warn('ignore '.$config->path.' from '.$className.'@'.$methodName);
                             break;
                         }
                         $route = Route::match(['get', 'post'], $config->path, $current_namespace.$config->route)->name($config->path);
