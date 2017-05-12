@@ -4,6 +4,7 @@ namespace Core\Model;
 
 use Core\Database\Eloquent\Model;
 use DB;
+use Core\Model\CrawlAttempt;
 
 class Crawl extends Model
 {
@@ -55,7 +56,7 @@ class Crawl extends Model
     protected $table = 'crawl';
     protected $primaryKey = 'id_crawl';
 
-    protected $fillable = ['state','value','extracted','tries'];
+    protected $fillable = ['url', 'curl', 'type', 'uuid', 'id_external', 'data', 'priority', 'binary', 'id_crawl_login', 'version', 'state','value','extracted','tries'];
 
     public function attempt()
     {
@@ -63,6 +64,28 @@ class Crawl extends Model
     }
     public function createAttempt($data)
     {
-    	
+
     }
+
+    public static function parse($crawl, $uuid, $ip = NULL)
+	{
+		$attempt = new CrawlAttempt;
+    	$attempt->id_crawl = $crawl->id_crawl;
+    	$attempt->ip = $ip;
+    	$attempt->type = $crawl->type;
+    	$attempt->uuid = $uuid;
+    	$attempt->state = self::STATE_PARSING;
+
+    	$attempt->save();
+
+    	return $attempt;
+
+		// if(!isset($ip))
+		// {
+		// 		$ip = $this->getIP();
+		// }
+		// $this->table(CrawlTable::TABLE_ATTEMPT)->insert(array("uuid"=>$uuid,"id_crawl"=>$crawl["id_crawl"],"state"=>CrawlTable::STATE_PARSING,"ip"=>$ip,"type"=>$crawl["type"]));
+
+		// return $this->table(CrawlTable::TABLE_ATTEMPT)->lastInsertValue;
+	}
 }

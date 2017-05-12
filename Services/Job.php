@@ -1,9 +1,18 @@
 <?php
 namespace Core\Services;
 use Core\Queue\Job as QJob;
+use Queue;
 
 class Job
 {
+    public static function putRaw( $tube, $data )
+    {
+        $beanstalk = Queue::getPheanstalk();
+
+        $id = $beanstalk->putInTube($tube, json_encode($data));
+
+        return $id;
+    }
 
 	public static function create( $class, $arguments  = NULL)
 	{
