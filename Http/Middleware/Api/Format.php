@@ -18,11 +18,15 @@ class Format
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        
+
+
         if(isset($response->exception))
         {
             return $response;
         }
+        if (is_array($response))
+            return ["data"=>$response];
+
         return ["data"=>$response->getOriginalContent()];
     }
     public function terminate($request, $response)
