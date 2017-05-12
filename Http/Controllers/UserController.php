@@ -12,6 +12,7 @@ use \Core\Api\Paginate;
 use Core\Api\Annotations as ghost;
 use Tables\USER_LOGIN_TOKEN;
 use Tables\USER as TUSER;
+use Illuminate\Support\Facades\Route;
   /**
    * @ghost\Role("user")
    */
@@ -30,11 +31,24 @@ class UserController extends Controller
       {
           return null;
       }
-   		$result = Api::get('user/get-infos')->send(["id_user"=>$user->id_user.""]);
-        if(isset($result))
-            $result->token = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->id_user])->first()->token;
+   		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
+      if(isset($result))
+      {
+        $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->getKey()])->first();
+
+        if (!isset($request))
+        {
+          $token = generate_token();
+          USER_LOGIN_TOKEN::insert(["id_user"=>$result->getKey(),"token"=>$token]);
+        }
+        else
+          $token = $request->token;
+
+        $result->token = $token;
+      }
+
    		return $result;
-    } 
+    }
    /**
     * Get infos on specific user
 	  * @ghost\Param(name="id_user",required=true,requirements="\d+",type="int")
@@ -85,5 +99,5 @@ class UserController extends Controller
         }
         $request = $paginate->apply($request);
         return $request->get();
-    } 
+    }
 }
