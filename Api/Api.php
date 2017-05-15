@@ -108,7 +108,9 @@ class Api
     {
          $temp = Request::input();
 
-        $request = Request::create($this->path, $this->method);
+        $prefix = config('api.prefix') ? config('api.prefix') . '/': '';
+
+        $request = Request::create($prefix . $this->path, $this->method);
         if(isset($this->params))
         {
             foreach($this->params as $key=>$value)
@@ -262,14 +264,14 @@ class Api
 
             // $folder = join_paths($root, "app/Http/Controllers");
             $files = File::allFiles($folder);
-           
+
 
             foreach ($files as $file)
             {
                 $infos = pathinfo($file);
                 if($infos["extension"] != "php")
                     continue;
-                
+
 
                 $class_data = ClassHelper::getInformations($file);
 
@@ -325,14 +327,14 @@ class Api
                         foreach($classAnnotations as $annotation)
                         {
                            $annotation->handleAnnotations($annotations);
-                        } 
+                        }
                         foreach($classAnnotations as $annotation)
                         {
                            if(!$annotation->hasBeenHandled())
                            {
                                 $annotations[] = $annotation;
                            }
-                        } 
+                        }
                         $config = new \StdClass();
                         $config->middlewares = [];
                         $config->path = $path.uncamel($methodName);
@@ -342,7 +344,7 @@ class Api
                         {
                            $annotation->boot();
                            $annotation->handle($config);
-                        } 
+                        }
                         if(in_array($config->path, $paths))
                         {
                             //Logger::warn('ignore '.$config->path.' from '.$className.'@'.$methodName);

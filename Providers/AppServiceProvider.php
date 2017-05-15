@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerNotification();
         $this->registerLogger();
         $this->registerMail();
+        $this->registerCrawl();
     }
 
     protected function registerStats()
@@ -73,6 +74,10 @@ class AppServiceProvider extends ServiceProvider
     protected function registerLogger()
     {
         $this->app->singleton('logger', '\Core\Services\Logger');
+    }
+    protected function registerCrawl()
+    {
+        $this->app->singleton('crawl', '\Core\Services\Crawl');
     }
 }
 

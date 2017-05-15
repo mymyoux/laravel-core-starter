@@ -83,6 +83,8 @@ trait PseudoTrait
    }
    public function addPseudoTrait($trait)
    {
+      if (null === $trait) return;
+
       if(is_string($trait))
       {
         if(isset($this->traits[$trait]))

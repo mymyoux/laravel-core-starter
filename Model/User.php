@@ -27,6 +27,7 @@ use Core\Core\PseudoTrait;
 use Tables\USER_ROLE;
 use Tables\USER_LOGIN_TOKEN;
 use Tables\USER as TUSER;
+
 class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
@@ -45,7 +46,7 @@ class User extends Model implements
     const UPDATED_AT = 'updated_time';
 
     protected $table = TUSER::TABLE;
-    protected $primaryKey = 'id_user'; 
+    protected $primaryKey = 'id_user';
     /**
      * The attributes that are mass assignable.
      *
@@ -77,6 +78,7 @@ class User extends Model implements
     protected static function boot()
     {
         parent::boot();
+        if (TUSER::hasColumn('deleted'))
         static::addGlobalScope('deleted', function (Builder $builder) {
             $builder->where(TUSER::deleted, '=', 0);
         });
