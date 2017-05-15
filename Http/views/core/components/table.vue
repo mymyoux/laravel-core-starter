@@ -1,7 +1,7 @@
 <div>
 
 <div class="new-template-page scroll-list-users">
-    <h1>Events</h1>
+    <h1>lists</h1>
     <span class="subtitle">Subtitle</span>
 
 <div class="list-users">
@@ -10,8 +10,8 @@
         <div class="export">
             <div class="cta-blue-s" on-click="exportData()">((export))</div>
         </div>
-        <div v-on:click="openSearch(event)" class="searchbox btn">
-            <input data-field="search" type="search" placeholder="((search))" value="" on-keyup="onKeyUp(event)" on-blur="onBlur(event)"/>
+        <div v-on:click="openSearch(list)" class="searchbox btn">
+            <input data-field="search" type="search" placeholder="((search))" value="" on-keyup="onKeyUp(list)" on-blur="onBlur(list)"/>
             <i class="icon-search"></i>
         </div>
 
@@ -63,24 +63,24 @@
             </div>
         </div>-->
 
-        <!--<li v-for="event in events.models">
-            {{ event.state }}
+        <!--<li v-for="list in lists.models">
+            {{ list.state }}
         </li>-->
 
-        <div v-if="events" v-for="event in events.models" class="table-tr">
+        <div v-if="list" v-for="item in list.models" class="table-tr">
             <div class="table-td">
                 <span>
-                     {{event.id_event}}
+                     {{item.id_event}}
                 </span>
             </div>
             <div class="table-td">
                 <span>
-                    {{ event.type }}
+                    {{ item.type }}
                 </span>
             </div>
             <div class="table-td">
                 <span>
-                    {{ event.state }}
+                    {{ item.state }}
                 </span>
             </div>
         </div>

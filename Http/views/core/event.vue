@@ -1,5 +1,5 @@
 <div>
 
-    <component-table></component-table>
+    <component-table :list="events"></component-table>
 
 </div>
