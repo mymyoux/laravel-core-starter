@@ -25,7 +25,8 @@ use Core\Core\PseudoTrait;
 
 use Tables\USER_ROLE;
 use Tables\USER_LOGIN_TOKEN;
-use Tables\USERS as TUSER;
+use Tables\USER as TUSER;
+
 class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
