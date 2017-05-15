@@ -4,6 +4,7 @@ namespace Core\Model;
 
 use Illuminate\Notifications\Notifiable;
 use Core\Model\IModel;
+use Core\Model\Event;
 use Core\Traits\Cached;
 use DB;
 use Core\Traits\Role;
@@ -162,5 +163,9 @@ class User extends Model implements
             return NULL;
         }
         return $this->getById($id_user);
+    }
+    public function infos()
+    {
+        return $this->morphMany('Core\Model\Event', 'owner');
     }
 }

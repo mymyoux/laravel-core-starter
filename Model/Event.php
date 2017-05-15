@@ -72,3 +72,4 @@ class Event extends Model
         });
     }
 }
+
