@@ -92,11 +92,23 @@ class Job
     /**
      * Build tube name
      * @param  string $class Tube's name
-     * @return string Tube's name  with prefix 
+     * @return string Tube's name  with prefix
      */
     protected function buildTubeName($class)
     {
-        $tube   = defined("$class::name")?$class::name:NULL;
+        if (defined("$class::name"))
+        {
+            $tube = $class::name;
+            if(config('queue.prefix'))
+            {
+                $tube = config('queue.prefix').$tube;
+            }
+
+            return $tube;
+        }
+
+        $tube   = null;
+
         $index = strpos($class, 'Queue\\');
         if($index !== False)
         {
@@ -131,8 +143,9 @@ class Job
         //prefix
         if(config('queue.prefix'))
         {
-            $tube = config('queue.prefix').$tube;   
+            $tube = config('queue.prefix').$tube;
         }
+
         return $tube;
     }
     public function cancelAllPrevious()
@@ -191,7 +204,8 @@ class Job
 
         if (0 === $count && $now === false)
         {
-            Notification::alert('beanstalkd');
+            // error recursive alert beanstlakd
+            // Notification::alert('beanstalkd');
         }
     }
 
@@ -288,7 +302,7 @@ class Job
                 }
             }
 
-            
+
             if(isset($previous_user))
                 Auth::setUser($previous_user);
 
@@ -320,7 +334,7 @@ class Job
     }
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($job)
     {
-        
+
         $maxTries = $job->maxTries();
 
         if ($maxTries === 0 || $job->attempts() <= $maxTries) {
@@ -367,5 +381,5 @@ class Job
         }
     }
 
-      
+
 }
