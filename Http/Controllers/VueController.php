@@ -223,6 +223,7 @@ class VueController extends Controller
             foreach($paths as $path)
             {
                 $full_path = join_paths($path, $folder, $requestedPath).".".$this->extension;
+                
                 if(file_exists($full_path))
                 {
                     $foundPath = new stdClass();

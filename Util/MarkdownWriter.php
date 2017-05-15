@@ -17,6 +17,7 @@ class MarkdownWriter
 	const TYPE_TABLE = "table";
 	const TYPE_DATA = "data";
 	const TYPE_ASIDE = "aside";
+	const TYPE_HTML = "html";
 
 	protected $tokens;
 	protected $data;
@@ -24,6 +25,13 @@ class MarkdownWriter
 	{
 		$this->tokens = [];
 		$this->data = [];
+	}
+	public function html($content)
+	{
+		$token = new stdClass();
+		$token->type = MarkdownWriter::TYPE_HTML;
+		$token->content = $content;
+		$this->tokens[] = $token;
 	}
 	public function data($name, $data)
 	{
@@ -167,6 +175,10 @@ class MarkdownWriter
 				if($token->type == MarkdownWriter::TYPE_ASIDE)
 				{
 					$text.="<aside class=\"".$token->level."\">\n".$token->value."\n</aside>\n\n";
+				}else
+				if($token->type == MarkdownWriter::TYPE_HTML)
+				{
+					$text.=$token->content."\n\n";
 				}else
 				if($token->type == MarkdownWriter::TYPE_TABLE)
 				{
