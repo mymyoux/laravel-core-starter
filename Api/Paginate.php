@@ -18,6 +18,7 @@ class Paginate
 	protected $previous;
 	protected $directions;
 	protected $keys;
+	protected $mapping;
 
 	public function __construct(Request $request)
 	{
@@ -27,8 +28,17 @@ class Paginate
 	{
 		$this->request = $request;
 	}
-	public function onResults($data)
+	public function onResults($query, $data)
 	{
+		//TODO:handle others form of mapping
+		$mapping = $this->mapping;
+		if(isset($mapping) && is_string($mapping))
+		{
+			if($query->from != $mapping)
+			{
+				return;
+			}
+		}
 		$apidata = [];
 		$apidata["count"] = count($data);
 		$keys = $this->keys;
@@ -103,7 +113,6 @@ class Paginate
                 return false;
             }));
         }
-
         if(!empty($data))
         {
             $previous = [];
@@ -126,8 +135,7 @@ class Paginate
             }
             $apidata["next"] = $next;
             $apidata["previous"] = $previous;
-        }
-
+		}
 		Api::addApiData(["paginate"=>$apidata]);
 	}
 	public function apply($request, $mapping = NULL, $havingOnly = NULL)
@@ -195,6 +203,7 @@ class Paginate
                 $keys[$index] = $key;
             }
         }
+		$this->mapping = $mapping;
         $columns->parseParameters($keys);
         $columns->addSelectForHaving($originalQuery, $keys);
 
