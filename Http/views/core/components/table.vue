@@ -6,7 +6,7 @@
 
 <div class="list-users">
 
-    <div class="menu-actions table-menu-actions">
+    <div v-if="actions" class="menu-actions table-menu-actions">
         <div class="export">
             <div class="cta-blue-s" on-click="exportData()">((export))</div>
         </div>
@@ -21,39 +21,20 @@
             </select>
         </div>
 
-        <!--
-        <div class="item">
-            <div class="custom-select tag scroll" >
-                <div data-field="position" data-type="reallist">
-                    <ul class="click select" data-multiple data-static>
-                        <p>
-                            All
-                        </p>
-                        <ul class="list-scroll click" data-multiple data-static>
-
-                            <li on-click="" value="{{this}}">Name<span class="checkbox-square"></span></li>
-
-                        </ul>
-                    </ul>
-                </div>
-            </div>
-        </div>-->
 
     </div>
     <div class="table">
 
         <div class="table-tr table-header">
 
-            <div class="table-th" on-click="">
-                <span>Id</span>
+            <div v-for="(column,i) in list.columns" class="table-th" v-bind:class="[
+            {
+                sortable:column.sortable,
+                filterable:column.filterable,
+                resizable:column.resizable
+            },column.headerClasses?column.headerClasses:'']" v-if="column.visible">
+                <span>{{column.title}}</span>
             </div>
-            <div class="table-th" on-click="">
-                <span>Type</span>
-            </div>
-            <div class="table-th" on-click="">
-                <span>State</span>
-            </div>
-
         </div>
 
         <!--<div class="timer small red close" data-id="">
@@ -67,21 +48,14 @@
             {{ list.state }}
         </li>-->
 
-        <div v-if="list" v-for="item in list.models" class="table-tr">
-            <div class="table-td">
-                <span>
-                     {{item.id_event}}
+        <div v-if="list" v-for="item in list.models" class="table-tr" :class="{'link-inside':list.config.link}">
+            <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible">
+                <span v-if="!column.type">
+                     {{item[column.prop]}}
                 </span>
-            </div>
-            <div class="table-td">
-                <span>
-                    {{ item.type }}
-                </span>
-            </div>
-            <div class="table-td">
-                <span>
-                    {{ item.state }}
-                </span>
+                 <component v-else v-bind:is="column.type" :item="item" :column="column">
+                   
+                </component>
             </div>
         </div>
         <div class="table-tr link-inside" on-click="loadMore(list)">

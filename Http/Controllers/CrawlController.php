@@ -104,7 +104,11 @@ class CrawlController extends Controller
 
     	$attempt->save();
     	$crawl->increment('tries');
-    	$result = $crawl->update(["value"=>$request->input('value'),"state"=>$attempt->state]);
+
+        $value = $request->input('value');
+        if (is_array($value))
+            $value = json_encode($value);
+    	$result = $crawl->update(["value"=>$value,"state"=>$attempt->state]);
 
     	$data = $success?[]:["state"=>"failed"];
         return CrawlService::parse( $crawl->id_crawl, $data );

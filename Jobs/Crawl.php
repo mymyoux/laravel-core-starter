@@ -19,6 +19,7 @@ class Crawl extends JobHandler
 {
     const name = 'crawl';
 
+    public $queue = self::name;
     protected $html;
     protected $crawl;
 
@@ -56,13 +57,6 @@ class Crawl extends JobHandler
         }
     }
 
-    // abstract public function parse();
-
-    public function failed()
-    {
-        // to override
-        return null;
-    }
     public function initParse()
     {
         $this->html = \pQuery::parseStr($this->crawl->value);
@@ -90,6 +84,19 @@ class Crawl extends JobHandler
     	$result = Api::post('crawl/updateparse')->params( $params )->response();
 
     	return $result;
+    }
+
+    public function failed()
+    {
+      $params =  [
+        "id_crawl_attempt"=>$this->crawl->id_crawl_attempt,
+        "state"=>CrawlModel::STATE_PARSING_FAILED,
+        "success"=>false,
+    ];
+
+      $result = Api::post('crawl/updateparse')->params( $params )->response();
+
+      return $result;
     }
   //   public function deleted($data)
   //   {
