@@ -16,7 +16,7 @@ class MySqlProcessor extends BaseMySqlProcessor
          $results = parent::processSelect($query, $results);
          $results = array_map([$this,"convertType"], $results);
          if(isset($this->selectListener))
-            $this->selectListener->onResults($results);
+            $this->selectListener->onResults($query, $results);
         return $results;
     }
     protected function convertType($item)

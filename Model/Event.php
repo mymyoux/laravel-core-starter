@@ -3,7 +3,8 @@
 namespace Core\Model;
 
 use Core\Database\Eloquent\Model;
-use DB;
+use Db;
+use Auth;
 use Illuminate\Database\Eloquent\Builder;
 class Event extends Model
 {
@@ -19,6 +20,7 @@ class Event extends Model
 	 * done
 	 */
 	const STATE_DONE = "done";
+	const STATE_POSTPONED = "postpone";
 	/**
 	 * Have to be traited
 	 */
@@ -40,10 +42,66 @@ class Event extends Model
     {
         return $this->morphTo();
     }
-	protected function create($type, $data = NULL, $owner = NULL, $external = NULL)
+	public function answer($result, $state = NULL, $postpone_time = NULL, $id_user = NULL)
 	{
-		$event = new Event();
-		$event->type = $type;
+		if($state === NULL)
+		{
+			$state =  isset($postpone_time)?static::STATE_POSTPONED:static::STATE_DONE;
+		}
+		if($state == static::STATE_POSTPONED || $postpone_time === True)
+		{
+			if(!isset($postpone_time) || $postpone_time === True)
+			{
+				$postpone_time = date('Y-m-d H:i:s', time());
+			}
+		}
+		if(!isset($id_user))
+		{
+			$id_user = Auth::id();
+		}
+		if($id_user === False)
+		{
+			$id_user = NULL;
+		}
+		$data = ["id_event"=>$this->getKey(), "step"=>$this->step,"result" => json_encode($result), "id_user"=>$id_user,"state"=>$state,"notification_time"=>$postpone_time];
+		Db::table('event_action')->insert($data);
+		foreach($data as $key=>$value)
+		{
+			if($key == "id_user")
+			{
+				continue;
+			}	
+			$this->$key = $value;
+		}
+		if(isset($data["notification_time"]))
+		{
+			$this->state = static::STATE_POSTPONED;
+		}
+		$this->save();
+	}
+	public function done($result = NULL, $id_user = NULL)
+	{
+		return $this->answer($result, static::STATE_DONE, NULL, $id_user);
+	}
+	public function fail($result = NULL, $id_user = NULL)
+	{
+		return $this->answer($result, static::STATE_FAILED, NULL, $id_user);
+	}
+	public function nextStep($step, $result, $state = NULL, $postpone_time = NULL, $id_user = NULL)
+	{
+		$this->step = $step;
+		return $this->answer($result, $state, $postpone_time, $id_user);
+	}
+	protected function create($data = NULL, $owner = NULL, $external = NULL, $notification = NULL)
+	{
+		if(static::class===Event::class)
+		{
+			throw new \Exception("you can't use event class directly");
+		}
+		$cls = static::class;
+		$event = new $cls();
+		$event->type = $cls;
+		$event->notification_time = $notification;
 		if(isset($external))
 			$event->external()->associate($external);
 		if(isset($owner))
@@ -51,6 +109,10 @@ class Event extends Model
 		if(isset($data))
 		{
 			$event->data = json_encode($data);
+		}
+		if(!isset($event->notification_time))
+		{
+			$event->notification_time = date('Y-m-d H:i:s', time());
 		}
 		return $event;
 	}
