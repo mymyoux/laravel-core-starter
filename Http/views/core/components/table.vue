@@ -1,10 +1,14 @@
 <div>
 
+<!--<div v-on:scroll="onScroll" class="new-template-page scroll-list-users">
+<div @scroll="handleScroll" class="new-template-page scroll-list-users">-->
+
 <div class="new-template-page scroll-list-users">
+
     <h1>lists</h1>
     <span class="subtitle">Subtitle</span>
 
-<div class="list-users">
+<div class="list-table">
 
     <div v-if="actions" class="menu-actions table-menu-actions">
         <div class="export">
@@ -53,20 +57,9 @@
                 <span v-if="!column.type">
                      {{item[column.prop]}}
                 </span>
-                 <component v-else v-bind:is="column.type" :item="item" :column="column">
-                   
-                </component>
-            </div>
-        </div>
-        <div class="table-tr link-inside" on-click="loadMore(list)">
-            <div class="table-td"></div>
-        </div>
-    </div>
+                 <component v-else v-bind:is="column.type" :item="item" :column="column" :data="data" :alert="alert">
 
-    <div class="search-filter is_animated cabinet">
-        <div class="search_loader" style="width: 100%">
-            <div class="loader">
-                <span class="load"></span>
+                </component>
             </div>
         </div>
     </div>
