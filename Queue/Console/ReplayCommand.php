@@ -165,8 +165,9 @@ class ReplayCommand extends CoreCommand
                 $job->id = $result->id;
                 $job->loadDbData($result);
                 $job->handle();
-
+                
                 $result->state      = Beanstalkd::STATE_REPLAYING_EXECUTED;
+                $result->queue  = $prefix .$result->queue;
                 $result->save();
             }
             catch(\Exception $e)
@@ -174,7 +175,7 @@ class ReplayCommand extends CoreCommand
                 $failed[] = $id;
 
                 Logger::error($e->getMessage());
-
+                $result->queue  = $prefix .$result->queue;
                 $result->state      = Beanstalkd::STATE_REPLAYING_FAILED;
                 $result->save();
             }
