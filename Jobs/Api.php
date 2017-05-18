@@ -36,7 +36,6 @@ class Api extends JobHandler
      */
     public function handle()
     {
-
         $result = ApiService::path($this->path)->method($this->method)->params($this->params)->user($this->api_user)->send($this->add_params);
 
         // if(isset($result) && $this->output->isVerbose())

@@ -127,10 +127,12 @@ class ReplayCommand extends CoreCommand
                     Logger::error('No record with id '.$id);
                     continue;
                 }
+                $prefix = config('app.env').'_';
                 if(config('queue.prefix'))
                 {
-                    $result->queue = substr($result->queue, strlen(config('queue.prefix')));
+                    $prefix .= config('queue.prefix');
                 }
+                $result->queue = substr($result->queue, strlen($prefix));
                 if(!isset($result->queue))
                 {
                     $queue = $this->params()->fromRoute('queue');

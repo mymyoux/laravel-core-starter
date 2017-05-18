@@ -5,6 +5,7 @@ namespace Core\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use Core\Model\Event;
+use App\Events\CompanySignupEvent;
 use Auth;
 use Api;
 use Core\Exception\ApiException;
@@ -33,7 +34,7 @@ class EventController extends Controller
     {
         //dd(Auth::user());
 
-        Event::create("test",["test"=>"oui"], Auth::user(), Auth::user())->save();
+        CompanySignupEvent::create(["test"=>"oui"], Auth::user(), Auth::user())->save();
 
         //$events = Event::all();
         //$event = Event::with('owner','external')->find(1);

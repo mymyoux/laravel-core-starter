@@ -77,7 +77,9 @@ class Event extends Model
 		{
 			$this->state = static::STATE_POSTPONED;
 		}
+		$handler = $this->type;
 		$this->save();
+		$handler::handle($this);
 	}
 	public function done($result = NULL, $id_user = NULL)
 	{
@@ -91,6 +93,10 @@ class Event extends Model
 	{
 		$this->step = $step;
 		return $this->answer($result, $state, $postpone_time, $id_user);
+	}
+	protected function get($external)
+	{
+		return static::where(["external_type"=>get_class($external),"external_id"=>$external->getKey()])->first();
 	}
 	protected function create($data = NULL, $owner = NULL, $external = NULL, $notification = NULL)
 	{

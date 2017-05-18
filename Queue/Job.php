@@ -54,11 +54,12 @@ class Job
     }
     public function getUnprefixedTube()
     {
+        $prefix = config('app.env').'_';
         if(config('queue.prefix'))
         {
-            return substr($this->tube, strlen(config('queue.prefix')));
+            $prefix .= config('queue.prefix');
         }
-        return $this->tube;
+        return substr($this->tube, strlen($prefix));
     }
     public function identifier($identifier)
     {
@@ -99,10 +100,12 @@ class Job
         if (defined("$class::name"))
         {
             $tube = $class::name;
+            $prefix = config('app.env').'_';
             if(config('queue.prefix'))
             {
-                $tube = config('queue.prefix').$tube;
+                $prefix.= config('queue.prefix');
             }
+            $tube = $prefix.$tube;
 
             return $tube;
         }
@@ -141,9 +144,10 @@ class Job
             $tube = $prefix."/".$tube;
         }
         //prefix
+        $prefix = config('app.env').'_';
         if(config('queue.prefix'))
         {
-            $tube = config('queue.prefix').$tube;
+            $prefix.= config('queue.prefix');
         }
 
         return $tube;
