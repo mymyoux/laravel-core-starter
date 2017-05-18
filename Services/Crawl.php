@@ -7,13 +7,14 @@ use Api;
 
 class Crawl
 {
-	public static function create( $url, $class, $id_external = null, $id_crawl_login = null )
+	public static function create( $url, $class, $type = null, $id_external = null, $id_crawl_login = null )
 	{
 		$params = [
 			"url"=>trim($url),
 			"tor"=>0,
 			"priority"=>1,
-			"type"=> $class,
+			"type"=> $type,
+			"cls"=> $class,
 			"id_external"=>$id_external,
 			'state' => 'crawl_needs_login',
 			'asked' => 1,
@@ -31,6 +32,6 @@ class Crawl
     	$crawl = CrawlModel::find($id_crawl);
 
     	if ($crawl)
-			Job::create($crawl->type, array_merge($data, ["id_crawl"=> $id_crawl]))->send();
+			Job::create($crawl->cls, array_merge($data, ["id_crawl"=> $id_crawl]))->send();
 	}
 }
