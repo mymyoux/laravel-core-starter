@@ -10,6 +10,7 @@ class ConsoleServiceProvider extends ServiceProvider
 
     protected $commands =
     [
+        'Core\Console\Commands\Api\Call',
         'Core\Console\Commands\Api\Replay',
         'Core\Console\Commands\Cli\ClearCache',
         'Core\Console\Commands\Cli\GenerateCron',

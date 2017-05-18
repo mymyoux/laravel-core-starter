@@ -127,10 +127,12 @@ class ReplayCommand extends CoreCommand
                     Logger::error('No record with id '.$id);
                     continue;
                 }
+                $prefix = config('app.env').'_';
                 if(config('queue.prefix'))
                 {
-                    $result->queue = substr($result->queue, strlen(config('queue.prefix')));
+                    $prefix .= config('queue.prefix');
                 }
+                $result->queue = substr($result->queue, strlen($prefix));
                 if(!isset($result->queue))
                 {
                     $queue = $this->params()->fromRoute('queue');
@@ -163,8 +165,9 @@ class ReplayCommand extends CoreCommand
                 $job->id = $result->id;
                 $job->loadDbData($result);
                 $job->handle();
-
+                
                 $result->state      = Beanstalkd::STATE_REPLAYING_EXECUTED;
+                $result->queue  = $prefix .$result->queue;
                 $result->save();
             }
             catch(\Exception $e)
@@ -172,7 +175,7 @@ class ReplayCommand extends CoreCommand
                 $failed[] = $id;
 
                 Logger::error($e->getMessage());
-
+                $result->queue  = $prefix .$result->queue;
                 $result->state      = Beanstalkd::STATE_REPLAYING_FAILED;
                 $result->save();
             }

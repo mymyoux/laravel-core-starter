@@ -75,9 +75,11 @@ class Event extends Model
 		}
 		if(isset($data["notification_time"]))
 		{
-			$this->state = static::STATE_POSTPONED;
+			$this->state = $state;//static::STATE_POSTPONED;
 		}
+		$handler = $this->type;
 		$this->save();
+		$handler::handle($this);
 	}
 	public function done($result = NULL, $id_user = NULL)
 	{
@@ -90,7 +92,15 @@ class Event extends Model
 	public function nextStep($step, $result, $state = NULL, $postpone_time = NULL, $id_user = NULL)
 	{
 		$this->step = $step;
+		if($state === NULL)
+		{
+			$state =  isset($postpone_time)?static::STATE_POSTPONED:static::STATE_PENDING;
+		}
 		return $this->answer($result, $state, $postpone_time, $id_user);
+	}
+	protected function get($external)
+	{
+		return static::where(["external_type"=>get_class($external),"external_id"=>$external->getKey()])->first();
 	}
 	protected function create($data = NULL, $owner = NULL, $external = NULL, $notification = NULL)
 	{

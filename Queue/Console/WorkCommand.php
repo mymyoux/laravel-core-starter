@@ -73,10 +73,12 @@ class WorkCommand extends BaseWorkCommand
     protected function getQueue($connection)
     {
         $queue = parent::getQueue($connection);
+         $prefix = config('app.env').'_';
         if(config('queue.prefix'))
         {
-            $queue = config('queue.prefix').$queue;
+            $prefix .= config('queue.prefix');
         }
+        $queue = $prefix.$queue;
         return $queue;
     }
 }

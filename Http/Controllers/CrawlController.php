@@ -115,7 +115,8 @@ class CrawlController extends Controller
     	// Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$]))->send();
     }
 	/**
-	 * @ghost\Param(name="type",required=true)
+     * @ghost\Param(name="type",required=true)
+     * @ghost\Param(name="cls",required=true)
 	 * @ghost\Param(name="url",required=true)
 	 * @ghost\Param(name="curl",required=false)
 	 * @ghost\Param(name="state",required=false,default="crawl_needs_login")
@@ -133,7 +134,8 @@ class CrawlController extends Controller
 		{
 			$crawl->url = "https://".$crawl->url;
 		}
-		$crawl->type = $request->input('type');
+        $crawl->cls = $request->input('cls');
+        $crawl->type = $request->input('type');
 		$crawl->state = $request->input('state');
 		$crawl->uuid = $request->input('uuid');
 		$crawl->data = $request->input('data');

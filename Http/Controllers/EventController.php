@@ -5,6 +5,7 @@ namespace Core\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use Core\Model\Event;
+use App\Events\CompanySignupEvent;
 use Auth;
 use Api;
 use Core\Exception\ApiException;
@@ -33,7 +34,7 @@ class EventController extends Controller
     {
         //dd(Auth::user());
 
-        Event::create("test",["test"=>"oui"], Auth::user(), Auth::user())->save();
+        //CompanySignupEvent::create(["test"=>"oui"], Auth::user(), Auth::user())->save();
 
         //$events = Event::all();
         //$event = Event::with('owner','external')->find(1);
@@ -59,6 +60,19 @@ class EventController extends Controller
         $postpone = $request->input('postpone')?date("Y-m-d H:i:s", time()+$request->input('postpone')):NULL;
 
         $event->answer($request->input('result'), $request->input('state'),$postpone, Auth::id());
+    }
+    /**
+     * @ghost\Param(name="id_event",required=true,requirements="\d+",type="int")
+     */
+    public function handle(Request $request)
+    {
+        $event = Event::find($request->input('id_event'));
+        if(!isset($event))
+        {
+            throw new ApiException('bad_event');
+        }
+        $handler = $event->type;
+        $handler::handle($event);
     }
 
 }

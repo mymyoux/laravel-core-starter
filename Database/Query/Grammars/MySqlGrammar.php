@@ -15,7 +15,6 @@ class MySqlGrammar extends \Illuminate\Database\Query\Grammars\MySqlGrammar
      */
     public function getDateFormat()
     {
-        //dd('h');
-        return 'Y-m-d H:i:s.s';
+        return 'Y-m-d H:i:s.u';
     }
 }
