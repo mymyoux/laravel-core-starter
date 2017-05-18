@@ -15,6 +15,16 @@ abstract class Model extends BaseModel
         return 'Y-m-d H:i:s.u';
     }
 
+    public function asDateTime( $value )
+    {
+        if (!strpos($value, '.'))
+        {
+            $value .= '.000';
+        }
+
+        return parent::asDateTime($value);
+    }
+
     protected function newBaseQueryBuilder()
     {
         $connection = $this->getConnection();
@@ -33,7 +43,7 @@ abstract class Model extends BaseModel
     {
         $data = parent::toArray();
 
-        if(isset($this->primaryKey) && isset($data[$this->primaryKey]))
+        if(isset($this->primaryKey) && !is_array($this->primaryKey) && isset($data[$this->primaryKey]))
             $data["id"] = $data[$this->primaryKey];
 
         return $data;
