@@ -34,7 +34,7 @@ class Param
         {
             settype($value, $param->type);
         }
-        $input = Request::input();
+        $input = array_merge(Request::input(), Request::file());
         if(!isset($input))
         {
             $input = [];
