@@ -24,7 +24,7 @@ trait Cached
 	}
 	protected function invalidate()
 	{
-		$key = str_replace("%id", $this->id_user, static::$_cached_key);
+		$key = str_replace("%id", $this->getKey(), static::$_cached_key);
         Cache::forget($key);
 	}
 	public static function bootCached()
