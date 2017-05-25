@@ -8,8 +8,9 @@ use Schema;
 use App;
 use Api;
 use App\User;
-use Tables\TEMPLATE;
+use Core\Model\Template;
 use Logger;
+use Core\Model\Translation;
 class Cache extends Command
 {
     /**
@@ -43,59 +44,67 @@ class Cache extends Command
      */
     public function handle()
     {
-        
+        $locales = Translation::getLocales();
        $templates = API::get('vue/get-all')->send();
        $types = array_merge(["app", "core"], User::getAvailableTypes());
-       foreach($types as $type)
+       foreach($locales as $locale)
        {
-           foreach($templates as $template)
-           {
-               $result = API::get('vue/get')->send(['type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
-                $rawTemplate = 
-                [
-                    "path"=>$template,
-                    "type"=>$type,
-                    "md5"=>md5($result)
-                ];
-                $dbTemplate = TEMPLATE::select('id_template','md5')->where(["path"=>$template,"type"=>$type])->first();
-                if(!isset($dbTemplate))
-                {
-                    Logger::info('create '.$template.' ['.$type.']');
-                    $rawTemplate["version"] = 1; 
-                    $id = TEMPLATE::insertGetId($rawTemplate);
-                    $this->cache($template, $type);
-                    continue;
-                }else
-                {
-                    $id = $dbTemplate->id_template;
-                    if($dbTemplate->md5 == $rawTemplate["md5"])
-                    {
-                        continue;
-                    }
-                }
-                Logger::warn('update '.$template.' ['.$type.']');
-                TEMPLATE::where(["path"=>$template,"type"=>$type])->update(['md5'=>$rawTemplate["md5"]]);
-                TEMPLATE::select('id_template','md5')->where(["path"=>$template,"type"=>$type])->increment('version');
 
-                $this->cache($template, $type);
-           }
+        foreach($types as $type)
+        {
+            
+            foreach($templates as $template)
+            {
+                $result = API::get('vue/get')->send(['locale'=>$locale,'type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
+                    $rawTemplate = 
+                    [
+                        "path"=>$template,
+                        "type"=>$type,
+                        "md5"=>md5($result),
+                        "locale"=>$locale
+                    ];
+                    $dbTemplate = Template::select('id_template','md5')->where(["locale"=>$locale,"path"=>$template,"type"=>$type])->first();
+                    if(!isset($dbTemplate))
+                    {
+                        Logger::info('create '.$template.':'.$locale.' ['.$type.']');
+                        $rawTemplate["version"] = 1; 
+                        $id = Template::insertGetId($rawTemplate);
+                        $this->cache($template, $type, $locale);
+                        continue;
+                    }else
+                    {
+                        $id = $dbTemplate->id_template;
+                        if($dbTemplate->md5 == $rawTemplate["md5"])
+                        {
+                            continue;
+                        }
+                    }
+                    Logger::warn('update '.$template.':'.$locale.' ['.$type.']');
+                    Template::where(["id_template"=>$id])->update(['md5'=>$rawTemplate["md5"]]);
+                    Template::find($id)->increment('version');
+                    $this->cache($template, $type, $locale);
+            }
+        }
        }
        $increment_all = $this->option('increment-all');
        if($increment_all != 0)
        {
            Logger::warn('increment all version by 1');
-            TEMPLATE::update(["version"=>Db::raw('version + 1')]);
+            Template::update(["version"=>Db::raw('version + 1')]);
        }
     }
-    private function cache($name, $type)
+    private function cache($name, $type, $locale)
     {
-        $filepath = storage_path('framework/cache/views/'.$type.'/'.$name.'.php');
+        $filepath = storage_path('framework/cache/views/'.$locale.'/'.$type.'/'.$name.'.php');
         $dirpath = dirname($filepath);
         if(!file_exists($dirpath))
         {
             mkdir($dirpath, 0777, True);
         }
-        $result = API::get('vue/get')->send(['type'=>$type, "path"=>$name, "skiphelpers"=>False]);
+        if(file_exists($filepath))
+            unlink($filepath);
+        $result = API::get('vue/get')->send(['locale'=>$locale,'type'=>$type, "path"=>$name, "skiphelpers"=>False]);
+        Logger::info($filepath." ==> ".$result["version"]);
         file_put_contents($filepath, "<?php\nreturn ".var_export($result, True).";");
     }
 

@@ -240,6 +240,7 @@ return [
         'Storage' => Illuminate\Support\Facades\Storage::class,
         'Tables' => Core\Facades\Tables::class,
         'Table' => Core\Facades\Table::class,
+        'Translate' => Core\Facades\Translate::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,

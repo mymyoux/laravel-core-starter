@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerLogger();
         $this->registerMail();
         $this->registerCrawl();
+        $this->registerTranslation();
     }
 
     protected function registerStats()
@@ -78,6 +79,10 @@ class AppServiceProvider extends ServiceProvider
     protected function registerCrawl()
     {
         $this->app->singleton('crawl', '\Core\Services\Crawl');
+    }
+    protected function registerTranslation()
+    {
+        $this->app->singleton('translate', '\Core\Services\Translate');
     }
 }
 
