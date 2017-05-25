@@ -48,7 +48,8 @@ class Paginate
             {
                 foreach($keys as $index=>$key)
                 {
-
+					if (!isset($item->$key)) continue;
+					
                     $direction = $this->directions[$index];
                     if($direction>0)
                     {
@@ -86,7 +87,9 @@ class Paginate
             {
                 foreach($keys as $index=>$key)
                 {
-                     $direction = $this->direction[$index];
+					if (!isset($item->$key)) continue;
+                    
+					$direction = $this->direction[$index];
                     if($direction<0)
                     {
                         if($item->$key<=$this->previous[$index])
@@ -135,7 +138,9 @@ class Paginate
             }
             $apidata["next"] = $next;
             $apidata["previous"] = $previous;
+
 		}
+		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
 	}
 	public function apply($request, $mapping = NULL, $havingOnly = NULL)
