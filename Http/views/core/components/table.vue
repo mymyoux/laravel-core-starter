@@ -6,7 +6,7 @@
 <div class="new-template-page scroll-list-users">
 
     <h1>lists</h1>
-    <span class="subtitle">Subtitle</span>
+    <span class="subtitle">Subtitle {{trad('test')}}</span>
 
 <div class="list-table">
 
@@ -15,7 +15,7 @@
             <div class="cta-blue-s" on-click="exportData()">((export))</div>
         </div>
         <div v-on:click="openSearch(list)" class="searchbox btn">
-            <input data-field="search" type="search" placeholder="((search))" value="" on-keyup="onKeyUp(list)" on-blur="onBlur(list)"/>
+            <input data-field="search" type="search" :placeholder="((search))" value="" on-keyup="onKeyUp(list)" on-blur="onBlur(list)"/>
             <i class="icon-search"></i>
         </div>
 

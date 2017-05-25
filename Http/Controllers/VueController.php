@@ -26,12 +26,15 @@ use File;
 use Tables\TEMPLATE;
 use View;
 use \Illuminate\View\Compilers\BladeCompiler;
+use Translate;
 class VueController extends Controller
 {
     const DEFAULT_EXTENSION = "vue";
     protected $folders;
     protected $paths;
     protected $extension;
+    protected $locale;
+    protected $type;
     protected $skiphelpers = False;
     public function index()
     {
@@ -41,16 +44,21 @@ class VueController extends Controller
 	 * Get template for a view
      * @ghost\Param(name="path",required=true)
      * @ghost\Param(name="type",required=false)
+     * @ghost\Param(name="locale",required=false)
      * @ghost\Param(name="skiphelpers",requirements="boolean",default=false,required=false)
      * @return Asked template
 	 */
     public function get(Request $request)
     {   
+        $locale = $request->input('locale')??$_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        $this->locale  = Translate::getLocale($locale);
+        
         $this->skiphelpers = $request->input('skiphelpers');
         $this->extension = static::DEFAULT_EXTENSION;
         $this->paths = $this->getPaths();
         $folders = ["app", "core"];
         $type = $request->input('type')??(Auth::check()?Auth::user()->type:NULL);
+        $this->type = $type;
         if(isset($type))
             array_unshift($folders, $type);
 
@@ -60,7 +68,7 @@ class VueController extends Controller
         $requestedPath = $request->input('path');
         if(!$this->skiphelpers)
         {
-            $template = $this->getFromCache($requestedPath, $folders[0]);
+            $template = $this->getFromCache($requestedPath, $folders[0], $this->locale);
             if(isset($template))
             {
                 $template["cache"] = True;
@@ -75,11 +83,12 @@ class VueController extends Controller
             "version"=>$this->getVersion($request)
         ];
     } 
-    public function getFromCache($path, $type)
+    public function getFromCache($path, $type, $locale)
     {
-        $data = @include storage_path('framework/cache/views/'.$type.'/'.$path.'.php');
+        $data = @include storage_path('framework/cache/views/'.$locale.'/'.$type.'/'.$path.'.php');
         if($data === False)
             return NULL;
+        $data["path"] = 'framework/cache/views/'.$locale.'/'.$type.'/'.$path.'.php';
         return $data;
     }
     /**
@@ -126,7 +135,8 @@ class VueController extends Controller
         {
             $requests[] =  TEMPLATE::select('*')
             ->where('type', '=', $folder)
-            ->where('path', '=', $path);
+            ->where('path', '=', $path)
+            ->where('locale', '=', $this->locale);
         }
         
         $union = $requests[0];
@@ -251,18 +261,19 @@ class VueController extends Controller
     }
     protected function parse($content, $path)
     {
-        $content = preg_replace_callback("/\(\(([^\)]+)\)\)/", function($matches) use($path, $content)
+        $content = preg_replace_callback("/(.{0,50})\(\(([^\)]+)\)\)/", function($matches) use($path, $content)
         {
-            $line = $matches[1];
+            $line = $matches[2];
            if(starts_with($line,"#"))
             {
                 $replacement = $this->_helpers(substr($line, 1), $path);
             }else
             {
-                $replacement = $this->_translate($line, $path);
+                $replacement = $this->_translate($line, $path, $matches[1]);
             }
-            return $replacement;
+            return $matches[1].$replacement;
         }, $content);
+
         $count = preg_match_all("/<component-([^> ]+)/", $content, $matches);
         if($count)
         {
@@ -276,10 +287,100 @@ class VueController extends Controller
         }
         return $content;
     }
-    protected function _translate($content, $path, $line = 0)
+    protected function _translate($content, $path, $previous)
     {
-        //TODO:handle
-        return $content;
+        $parts = explode(",",trim($content));
+        $key = trim($parts[0]);
+        $params = trim(join(" ",array_slice($parts, 1)));
+        $convert = True;
+
+        $prefixKey = True;
+
+        if(preg_match("/[^a-z0-9\.]/i", $key) === 1 || starts_with($key, "*") || (strlen($params) && !is_numeric($params)))
+        {
+            if(preg_match("/[^a-z0-9\.]/i", $key) === 1 || starts_with($key, "*"))
+            {
+                $prefixKey = false;
+            }
+            $convert = False;
+        }
+        if($prefixKey && strpos($key,".")===False)
+        {
+            $full_path = str_replace("/",".",$path->requestedPath);
+            if(!strlen($full_path))
+            {
+                $full_path = "app";
+            }
+            $key = $full_path.".".$key;
+        }
+        if($convert)
+        {
+           return Translate::t($key, $this->type, $this->locale, $params);
+        }
+        
+        $i = -1;
+        $quote = False;
+        $dynamic = false;
+        while(-$i<strlen($previous))
+        {
+            if(substr($previous, $i, 1)==" ")
+            {
+                $i--;
+                continue;
+            }
+            if(!$quote && substr($previous, $i, 1)=="'")
+            {
+                $quote = 1;
+                $i--;
+                continue;
+            }
+            if(!$quote && substr($previous, $i, 1)=='"')
+            {
+                $quote = 2;
+                $i--;
+                continue;
+            }  
+            if(!$quote)
+            {
+                $dynamic = False;
+                break;
+            }
+            if($quote && substr($previous, $i, 1)=='=')
+            {
+                $dynamic = true;
+                break;
+            }
+        }
+        if(starts_with($key, '*'))
+        {
+            $key = substr($key, 1);
+        }
+        if($prefixKey)
+        {
+            if($dynamic && $quote== 1)
+            {
+                    $key = '"'.$key.'"';
+            }
+            else {
+                $key = "'".$key."'";
+            }
+        }
+        $vue = "";
+        if(!$dynamic)
+        {
+            $vue .="{{";
+        }
+        $vue.="trad(".$key;
+        if(strlen($params))
+        {
+            $vue.=",".$params;
+        }
+        $vue.=")";
+        if(!$dynamic)
+        {
+            $vue.="}}";
+        }
+        return $vue;
     }
     protected function _helpers($content, $path, $line = 0)
     {
