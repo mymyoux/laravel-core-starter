@@ -5,6 +5,8 @@ namespace Core\Services;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use App;
 use Illuminate\Support\Debug\Dumper;
+use Auth;
+
 class Logger
 {
 	CONST LOG_CRITICAL  = 6;

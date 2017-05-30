@@ -48,7 +48,8 @@ class Paginate
             {
                 foreach($keys as $index=>$key)
                 {
-
+					if (!isset($item->$key)) continue;
+					
                     $direction = $this->directions[$index];
                     if($direction>0)
                     {
@@ -86,7 +87,9 @@ class Paginate
             {
                 foreach($keys as $index=>$key)
                 {
-                     $direction = $this->direction[$index];
+					if (!isset($item->$key)) continue;
+                    
+					$direction = $this->direction[$index];
                     if($direction<0)
                     {
                         if($item->$key<=$this->previous[$index])
@@ -135,7 +138,9 @@ class Paginate
             }
             $apidata["next"] = $next;
             $apidata["previous"] = $previous;
+
 		}
+		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
 	}
 	public function apply($request, $mapping = NULL, $havingOnly = NULL)
@@ -319,7 +324,7 @@ class Paginate
 			$query->havingRaw("(", [], "and");
 	        if(isset($keys) || isset($limit))
 	        {
-	            if(isset($next) || isset($previous))
+	            if(isset($next) || isset($previous))
 	            {
 	            	$data = isset($next)?$next:$previous;
 	                $first = True;
@@ -538,6 +543,9 @@ class ColumnsTester
 		//agreggate
 		if(strpos($name, "(")!==False)
 		{
+			// @ascheron: Bug IF without having => SQL: select `match`.*, IF(match.game_time > NOW(), 1, 0) AS upcoming from `match` inner join `game` on `game`.`id_game` = `match`.`id_game` inner join `game_mode` on `game_mode`.`id_game_mode` = `match`.`id_game_mode` where (`game_mode`.`is_active` = 1 and `game`.`is_active` = 1) group by `match`.`id_match` having (  ) order by `match`.`game_time` desc limit 10
+			if (strpos($name, "IF") !== false)
+				return null;
 			$this->needsHaving = True;
 			return NULL;
 		}

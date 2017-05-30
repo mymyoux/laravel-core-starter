@@ -89,7 +89,7 @@ class User extends Model implements
 
     public function getRolesAttribute()
     {
-        return $thi->attributes["roles"] = $this->roles;
+        return $this->attributes["roles"] = $this->roles;
     }
     public function isAdmin()
     {
