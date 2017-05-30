@@ -115,7 +115,6 @@ class SocialController extends Controller
         $connector->setScopes($request->session()->pull('scopes'));
         //$request->session()->forget('scopes');
         $class      = '\Core\Model\Connector\\' . ucfirst($api);
-
         $url_redirect = "/";
         if($request->session()->has('hash'))
         {
