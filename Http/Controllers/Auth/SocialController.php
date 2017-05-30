@@ -26,6 +26,11 @@ class SocialController extends Controller
      */
     public function redirectToProvider(Request $request, $api)
     {
+        $api_token = $request->input('api_token');
+        if(isset($api_token))
+        {
+            $request->session()->put('api_token',$api_token);
+        }
         $redirect = $request->input('hash');
         if(isset($redirect))
         {
@@ -120,6 +125,15 @@ class SocialController extends Controller
         {
             $url_redirect = URL::route('/', ["#".$request->session()->get('hash')]);
             $request->session()->forget('hash');
+        }
+        if($request->session()->has('api_token'))
+        {
+            $token_user = User::findByApiToken($request->session()->put('api_token'));
+            if(isse($token_user))
+            {
+                Auth::login($token_user);
+            }
+            $request->session()->forget('api_token');
         }
         // echo '<pre>';
         // var_dump($connector);
