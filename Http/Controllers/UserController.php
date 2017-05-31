@@ -27,25 +27,30 @@ class UserController extends Controller
     public function me(Request $request)
     {
    		$user = Auth::user();
-      if(!isset($user))
-      {
-          return null;
-      }
-   		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
-      if(isset($result))
-      {
-        $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->getKey()])->first();
-
-        if (!isset($request))
+        if(!isset($user))
         {
-          $token = generate_token();
-          USER_LOGIN_TOKEN::insert(["id_user"=>$result->getKey(),"token"=>$token]);
+            return null;
         }
-        else
-          $token = $request->token;
+   		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
+        if(isset($result))
+        {
+            $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->getKey()])->first();
 
-        $result->token = $token;
-      }
+            if (!isset($request))
+            {
+                $token = generate_token();
+                USER_LOGIN_TOKEN::insert(["id_user"=>$result->getKey(),"token"=>$token]);
+            }
+            else
+            $token = $request->token;
+
+            $result->token = $token;
+        }
+
+        if (Auth::user()->isImpersonated())
+        {
+            $result->real_user = Auth::user()->getRealUser();
+        }
 
    		return $result;
     }
