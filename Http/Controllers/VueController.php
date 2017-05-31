@@ -286,6 +286,14 @@ class VueController extends Controller
                 }
             }
         }
+
+        // replace svg
+        $content = preg_replace_callback('/<img\s+[^>]*src="([^.]*\.svg)"[^>]*>/', function($a) {
+            return str_replace(['<img', '/>'],['<div', '>'], $a[0]) . file_get_contents(public_path() . $a[1]) . '</div>';
+        }, $content);
+
+
+        
         return $content;
     }
     protected function _translate($content, $path, $previous)
