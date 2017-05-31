@@ -40,7 +40,11 @@ class EventController extends Controller
         //$event = Event::with('owner','external')->find(1);
         $request = Event::with('owner','external');
         $request = $paginate->apply($request, "event");
-        $event = $request->get();
+        $event = $request->get()->map(function($item)
+        {
+            $item->shortType = uncamel(last(explode('\\',$item->type)));
+            return $item;
+        });
 
         return $event;
     } 

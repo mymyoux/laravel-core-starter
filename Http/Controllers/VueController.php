@@ -322,10 +322,7 @@ class VueController extends Controller
             }
             $key = $full_path.".".$key;
         }
-        if($convert)
-        {
-           return Translate::t($key, $this->type, $this->locale, $params);
-        }
+        
         
         $i = -1;
         $quote = False;
@@ -360,6 +357,11 @@ class VueController extends Controller
                 break;
             }
         }
+        if($convert && !$dynamic)
+        {
+           return Translate::t($key, $this->type, $this->locale, $params);
+        }
+        
         if(starts_with($key, '*'))
         {
             $key = substr($key, 1);
