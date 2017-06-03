@@ -97,8 +97,8 @@ class Error extends Model
             $user = Auth::getUser();
             if(isset($user))
             {
-                $info["id_user"] = $user->id_user;
-                $info["id_real_user"] = $user->getRealUser()->id_user;
+                $info["id_user"] = $user->getKey();
+                $info["id_real_user"] = $user->getRealUser()->getKey();
             }
         }catch(\Exception $e)
         {

@@ -43,7 +43,7 @@ abstract class Model extends BaseModel
     {
         $data = parent::toArray();
 
-        if(isset($this->primaryKey) && !is_array($this->primaryKey) && isset($data[$this->primaryKey]))
+        if(isset($this->primaryKey) && !is_array($this->primaryKey) && isset($data[$this->primaryKey]) && !isset($data["id"]))
             $data["id"] = $data[$this->primaryKey];
 
         return $data;
