@@ -14,6 +14,7 @@ use Auth;
 use Illuminate\Foundation\Application;
 class Slack extends JobHandler
 {
+    protected $token;
      public static function getDelayRetry()
     {
         return 0;
@@ -26,11 +27,20 @@ class Slack extends JobHandler
     protected function unserializeData($data)
     {
         $this->data = [];
+        if(isset($data->token))
+        {
+            $this->token = $data->token;
+             $this->data["token"] = $this->token;
+        }
         $this->data["username"] = $data->bot_name ?? config('services.slack.username', 'robot');
         $this->data["icon_emoji"] = $data->icon ?? config('services.slack.icon', ':deciduous_tree:');
         $this->data["text"] = $data->message ?? '';
         $this->data["channel"] = $data->channel ?? config('services.slack.channel', 'general');
         $this->data["attachments"] = $data->attachments ?? NULL;
+        if(isset($this->data["attachments"]))
+        {
+            $this->data["attachments"] = json_encode($this->data["attachments"]);
+        }
         $allowed_env = config('services.slack.allowed_env', ['prod']);
         if(!Notification::isAllowedEnv())
         {
@@ -43,6 +53,21 @@ class Slack extends JobHandler
     }
     public function handle()
     {
+        if(isset($this->token))
+        {
+            $ch = curl_init("https://slack.com/api/chat.postMessage");
+            curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, 'POST');
+            $json = http_build_query($this->data);
+            echo $json;
+            var_dump($this->data);
+            curl_setopt($ch, \CURLOPT_POSTFIELDS, $json);
+            curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, \CURLOPT_SSL_VERIFYPEER, false);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            dd($result);
+            return $result;
+        }
         $slacks  = config('services.slack.accounts');
         if(!empty($slacks))
         {

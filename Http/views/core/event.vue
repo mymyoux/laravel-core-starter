@@ -23,5 +23,10 @@ Page event
         <h2 v-if="event.result">
             {{event.result}}
         </h2>
+        <footer>
+            <button>Postpone</button>
+            <button>Done</button>
+            <button>Delete</button>
+        </footer>
     </div>
 </div>

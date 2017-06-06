@@ -14,7 +14,7 @@ use Core\Models\Social;
 use Core\Http\Controllers\Controller;
 use Tables\USER_LOGIN_TOKEN;
 use URL;
-use Core\Events\SocialAddededEvent;
+use Core\Events\SocialAddedEvent;
 use Core\Events\SocialScopeChangedEvent;
 class SocialController extends Controller
 {
@@ -43,6 +43,7 @@ class SocialController extends Controller
             $scopes = array_map('trim', explode(',', $request->input('scopes')));
         }else
         {
+            
             //default scopes
             $connector = Db::table('connector')->where(['name'=>$api])->first();
             if(isset($connector->scopes))
@@ -102,7 +103,11 @@ class SocialController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        return redirect('/');
+        return redirect($this->getDefaultURLRedirect());
+    }
+    public function getDefaultURLRedirect()
+    {
+        return "/";
     }
     /**
      * Obtain the user information from GitHub.
@@ -111,16 +116,13 @@ class SocialController extends Controller
      */
     public function handleProviderCallback(Request $request, Response $response, $api)
     {
-        
         $user       = Socialite::driver($api)->user();
-        
         $manager = new Manager();
-
         $connector  = $manager->get($api, $user);
         $connector->setScopes($request->session()->pull('scopes'));
         //$request->session()->forget('scopes');
         $class      = '\Core\Model\Connector\\' . ucfirst($api);
-        $url_redirect = "/";
+        $url_redirect = $this->getDefaultURLRedirect();
         if($request->session()->has('hash'))
         {
             $url_redirect = URL::route('/', ["#".$request->session()->get('hash')]);
@@ -128,8 +130,8 @@ class SocialController extends Controller
         }
         if($request->session()->has('api_token'))
         {
-            $token_user = User::findByApiToken($request->session()->put('api_token'));
-            if(isse($token_user))
+            $token_user = User::findByApiToken($request->session()->get('api_token'));
+            if(isset($token_user))
             {
                 Auth::login($token_user);
             }
@@ -185,7 +187,7 @@ class SocialController extends Controller
                 'scopes'        => $connector->getScopes()!=NULL?implode(",", $connector->getScopes()):NULL,
                 'email'=> $connector->getEmail()
             ]);
-            event(new SocialAddededEvent($exist));
+            event(new SocialAddedEvent($exist));
         }
         else
         {
@@ -204,7 +206,6 @@ class SocialController extends Controller
 
         $informations   = $class::where('id_user', '=', Auth::id())->first();
         $data           = $connector->toArray();
-
         if (null === $informations)
         {
             $data['id_user']    = Auth::id();

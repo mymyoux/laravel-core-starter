@@ -11,7 +11,6 @@ class Manager
 		$class 		= '\Core\Connector\\' . ucfirst($api);
 		$connector 	= new $class( $data );
 
-
 		$model = Connector::getConnector( $api );
 		$connector->setConnectorModel( $model );
 

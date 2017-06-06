@@ -32,7 +32,8 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
         Event::listen('Illuminate\Cache\Events\CacheMissed', CacheListener::class);
         Event::listen('Illuminate\Cache\Events\CacheHit', CacheListener::class);
-        Event::listen('Core\Events\SocialScopeChangedEvent', GithubController::class.'@scopeChanged');
+        if(class_exists(GithubController::class))
+            Event::listen('Core\Events\SocialScopeChangedEvent', GithubController::class.'@scopeChanged');
         Event::listen('eloquent.saved:*', Listener::class.'@saved');
         Event::listen('eloquent.deleted:*', Listener::class.'@deleted');
                 //
