@@ -299,7 +299,7 @@ class Update extends Command
     protected function runTsc()
     {
         $env = config('app.env');
-        $env = "prod";
+        //$env = "prod";
         $tsconfig_files = File::glob(resource_path('assets/ts/').'tsconfig.'.$env.'.*.json');
         if(empty($tsconfig_files))
         {
