@@ -18,4 +18,8 @@ return [
         'redirect' => env('SLACK_REDIRECT_URI'),  
         'verification_token'=>env('SLACK_VERIFICATION_TOKEN'),
     ], 
+    'gmap' => 
+    [
+        'api_key' => env('GMAP_API_KEY')
+    ]
 ];

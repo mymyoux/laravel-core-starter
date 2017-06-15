@@ -47,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerMail();
         $this->registerCrawl();
         $this->registerTranslation();
+        $this->registerGMap();
     }
 
     protected function registerStats()
@@ -83,6 +84,10 @@ class AppServiceProvider extends ServiceProvider
     protected function registerTranslation()
     {
         $this->app->singleton('translate', '\Core\Services\Translate');
+    }
+    protected function registerGMap()
+    {
+        $this->app->singleton('gmap', '\Core\Services\GMap');
     }
 }
 
