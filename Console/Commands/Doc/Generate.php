@@ -78,7 +78,7 @@ class Generate extends CoreCommand
      
         if($generate_ts)
         {
-           $this->generateTS(); 
+           //$this->generateTS(); 
         }
      
         
@@ -98,7 +98,7 @@ class Generate extends CoreCommand
 
         $json_path = public_path('docs.json');//join_paths(base_path(config('doc.typescript.path')),"source","doc.json");
         //js
-        //  ExecCommand::executeRaw("typedoc", ["--json",$json_path,"--mode", "modules"]);
+        ExecCommand::executeRaw("typedoc", ["--json",$json_path,"--mode", "modules"]);
 
         $json = json_decode(file_get_contents($json_path));
 
