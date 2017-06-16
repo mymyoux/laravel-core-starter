@@ -48,7 +48,7 @@ class EventDate extends AbstractMigration
             ->addColumn('id_event', 'integer', ['limit' => 11, 'null' => false, 'signed' => false])
             ->addColumn('id_user', 'integer', ['limit' => 11, 'null' => true, 'signed' => false])
             ->addColumn('state', 'string', ['limit' => 2000, 'null' => false])
-            ->addColumn('result', 'string', ['limit' => MysqlAdapter::TEXT_LONG, 'null' => true])
+            ->addColumn('result', 'text', ['limit' => MysqlAdapter::TEXT_LONG, 'null' => true])
             ->addColumn('created_time', 'timestamp', ['null' => true])
             ->addColumn('updated_time', 'timestamp', ['null' => true])
             ->addColumn('notification_time', 'timestamp', ['null' => true])
