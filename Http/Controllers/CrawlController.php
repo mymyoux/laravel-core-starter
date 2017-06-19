@@ -111,7 +111,11 @@ class CrawlController extends Controller
     	$result = $crawl->update(["value"=>$value,"state"=>$attempt->state]);
 
     	$data = $success?[]:["state"=>"failed"];
-        return CrawlService::parse( $crawl->id_crawl, $data );
+        if($crawl->version == "zend")
+        {
+            Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$crawl->id_crawl]))->send();
+        }else
+            return CrawlService::parse( $crawl->id_crawl, $data );
     	// Job::createz('crawl-parse', array_merge($data,["id_crawl"=>$]))->send();
     }
 	/**
