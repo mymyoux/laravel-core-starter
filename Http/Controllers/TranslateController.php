@@ -24,6 +24,7 @@ use Crawl as CrawlService;
 use Core\Model\Crawl;
 use Core\Model\CrawlAttempt;
 use Core\Model\Translation;
+use Core\Model\LangModel;
 use Illuminate\Support\Facades\Redis;
 class TranslateController extends Controller
 {
@@ -103,4 +104,26 @@ class TranslateController extends Controller
            return $data;
         });
     }
+    /**
+     * @ghost\Role("admin")
+     * @ghost\Paginate(allowed="id,created_time,updated_time",keys="created_time",directions="-1", limit=10)
+     */
+    public function list(Request $request, Paginate $paginate)
+    {
+        $request = Translation::whereNotNull('locale');
+
+        $request = $paginate->apply($request, "translate");
+        
+        $data= $request->get()->makeVisible(['id','created_time'])->map(function($item)
+        {
+            if(!isset($item->path))
+            {
+                $item->path = $item->controller.".".$item->action.".".$item->key;
+            }
+            return $item;
+        })->makeHidden(['controller','action','key'])->toArray();
+        
+
+        return $data;
+    }   
 }

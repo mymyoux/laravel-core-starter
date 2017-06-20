@@ -41,10 +41,15 @@
         </div>
 
         <div v-if="list" v-for="item in list.models" class="table-tr" :class="{'link-inside':list.config.link}">
-            <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible" :class="{'link-inside':typeof column.link == 'string'}" v-on:click="click(item,column, $event)">
-                <span v-if="!column.type">
-                     {{item[column.prop]}}
-                </span>
+            <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible" :class="{'link-inside':typeof column.link == 'string', 'editable':column.editable === true}" v-on:click="click(item,column, $event)">
+                <div v-if="!column.type">
+                    <span v-if="column.editable">
+                        edit
+                    </span>
+                    <span >
+                        {{item[column.prop]}}
+                    </span>
+                </div>
                  <component v-else v-bind:is="column.type" :item="item" :column="column" :data="data" :alert="alert">
 
                 </component>
