@@ -19,7 +19,6 @@ class Format
     {
         $response = $next($request);
 
-
         if(isset($response->exception))
         {
             return $response;

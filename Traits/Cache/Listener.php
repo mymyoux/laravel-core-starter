@@ -7,7 +7,7 @@ class Listener
 {
     public function deleted($event,$model)
     {
-        array_map([$this, "onDeleted"], $models);
+        array_map([$this, "onDeleted"], $model);
     }
      protected function onDeleted($model)
     {
