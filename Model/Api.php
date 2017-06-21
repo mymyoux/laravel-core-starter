@@ -28,17 +28,18 @@ class Api extends Model
     	$user = Auth::getUser();
     	if(isset($user))
     	{
-    		$data["id_user"] = $user->getRealUser()->id_user;
+    		$data["id_user"] = $user->getRealUser()->getKey();
+
     		if($user->isImpersonated())
     		{
-    			$data["id_user_impersonated"] = $user->id_user;
+    			$data["id_user_impersonated"] = $user->getKey();
     		}
     	}
     	$data["path"] = Route::getFacadeRoot()->current()->uri();
     	$data["method"] = $request->method();
     	$data["params"] = json_encode($request->all());
     	$data["value"] = method_exists($response , "getOriginalContent")?$response->getOriginalContent():$response;
-    	$data["success"] = !isset($data["value"]["exception"]);
+    	$data["success"] = is_array($data["value"]) && !isset($data["value"]["exception"]);
     	if(isset($data["value"]["exception"]))
     	{
     		$data["id_error"] = $data["value"]["exception"]["id"];
