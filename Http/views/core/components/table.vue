@@ -17,14 +17,13 @@
             <div class="export">
                 <div class="cta-blue-s">export</div>
             </div>
-            <div v-on:click="openSearch(list)" class="searchbox btn">
-                <input data-field="search" type="search" placeholder="search" value="" on-keyup="onKeyUp(list)" on-blur="onBlur(list)"/>
+            <div v-on:click="openSearch()" class="searchbox btn" :class="{open:search_open || list.search, fill:list.search}">
+                <input class="search_global" v-model="list.search" type="search" placeholder="search" value="" @keyup.enter="onSearchGlobal($event)" @blur="onSearchGlobal($event, true)"/>
                 <i class="icon-search"></i>
             </div>
-
-            <div class="custom-select custom-select-no-conflict">
-                <select>
-                    <option value="" ></option>
+            <div v-for="choice, key in list.choices" class="custom-select custom-select-no-conflict">
+                <select v-model="list.choosen[key]" @change="choiceChange(key, $event)">
+                    <option v-for="item in choice" :value="item.value" >{{item.label}}</option>
                 </select>
             </div>
         </div>
