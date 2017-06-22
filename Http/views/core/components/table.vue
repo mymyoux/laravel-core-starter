@@ -56,7 +56,8 @@
                 </div>
             </div>
         </div>
-        <div v-if="list" v-for="item in list.models" class="table-tr table-item" :class="{'link-inside':list.config.link,deletable:list.config.deletable}" @click="liclick(item, $event)" :data-create="item._creating">
+        
+        <div v-if="list && list.models && list.models.length" v-for="item in list.models" class="table-tr table-item" :class="{'link-inside':list.config.link,deletable:list.config.deletable}" @click="liclick(item, $event)" :data-create="item._creating">
             <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible" :class="{'link-inside':typeof column.link == 'string', 'editable':column.editable === true}" v-on:click="click(item,column, $event)">
                 <div v-if="!column.type">
                     <div v-if="column.editable && edition && edition === item" class="edit-input">
@@ -95,6 +96,20 @@
                     &nbsp;
                 </span>
             </div>
+        </div>
+        <div v-if="!loading && (!list || !list.models || !list.models.length)" class="no-result">
+				<p>no result</p>
+        </div>
+        <div class="table-tr table-item width-fix">
+                <div v-for="(column,i) in list.columns" class="table-td">
+                    <div>
+                        <div>
+                            <span>
+                                &nbsp;
+                            </span>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 
