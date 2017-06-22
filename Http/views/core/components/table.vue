@@ -67,8 +67,8 @@
                         </span>
                     </div>
                     <div v-else>
-                        <span v-if="column.editable" class="edition" @click="edit(item, column, $event)">
-                            edit
+                        <span v-if="column.editable" class="edition icon-edit" @click="edit(item, column, $event)">
+                            &nbsp;
                         </span>
                         <span @dblclick="edit(item, column, $event)">
                             {{item[column.prop]}}
@@ -79,21 +79,21 @@
 
                 </component>
             </div>
-            <div v-if="edition && edition === item">
-                <span @click="edited(item, $event)">ok</span>
-                <span @click="cancel(item, $event)">cancel</span>
+            <div v-if="edition && edition === item" class="edit-save">
+                <span @click="edited(item, $event)" class="icon-check">&nbsp;</span>
+                <span @click="cancel(item, $event)" class="icon-cross2">&nbsp;</span>
             </div>
             <div v-if="list.config.deletable && item !== edition"  class="button-deletable">
-                <div v-if="deleting">
-                    <span @click="remove(item, $event)">
+                <div v-if="deleting" class="confirm-delete">
+                    <span @click="remove(item, $event)" class="confirm">
                         confirm
                     </span>
                     <span @click="cancelRemove(item, $event)">
                         cancel
                     </span>
                 </div>
-                <span v-else @click="askRemove(item, $event)">
-                    delete
+                <span v-else @click="askRemove(item, $event)" class="icon-delete">
+                    &nbsp;
                 </span>
             </div>
         </div>
