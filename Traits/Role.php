@@ -13,10 +13,13 @@ trait Role
 	{
 		$this->roles[] = $role;
 	}
-	public function hasRole($role)
+	public function hasRole($role, $strict = false)
 	{
 		if($role == static::$ROLE_CONNECTED && isset($this->id_user))
 			return True;
+
+		if ($strict)
+			return in_array($role, $this->roles);
 
 		return in_array($role, $this->roles) || ($role != static::$ROLE_DISCONNECTED && in_array(static::$ROLE_ADMIN, $this->roles));
 	}
