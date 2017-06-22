@@ -203,7 +203,7 @@ class TranslateController extends Controller
      * @ghost\Role("admin")
      * @ghost\Param(name="filter",required=false)
      * @ghost\Param(name="search",required=false)
-     * @ghost\Paginate(allowed="id,created_time,updated_time",keys="created_time",directions="-1", limit=10)
+     * @ghost\Paginate(allowed="id,created_time,updated_time,path,locale,singular,plurial",keys="created_time",directions="-1", limit=10)
      */
     public function list(Request $request, Paginate $paginate)
     {
@@ -251,7 +251,7 @@ class TranslateController extends Controller
         $request = $paginate->apply($request, "translate");
         
         
-        $data= $request->get()->makeVisible(['id','created_time'])->map(function($item)
+        $data= $request->select(["*",Db::raw("IF(path IS NULL,CONCAT(controller,'.',action,'.',`key`),path) as path")])->get()->makeVisible(['id','created_time'])->map(function($item)
         {
             if(!isset($item->path))
             {
