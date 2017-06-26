@@ -87,6 +87,11 @@ class User extends Model implements
 
     protected $realUser;
 
+    public function getCompany()
+    {
+        return null;
+    }
+
     public function getRolesAttribute()
     {
         return $this->attributes["roles"] = $this->roles;

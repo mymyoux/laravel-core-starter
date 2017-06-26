@@ -64,7 +64,7 @@ class Translation extends Model
         $translation = $this->translates($key, $locale, $type, False);
         if(!isset($translation))
             return $key;
-        if(isset($options))
+        if(!empty($options))
         {
             if(is_numeric($options))
             {
@@ -74,7 +74,7 @@ class Translation extends Model
             }else
             {
                 $translate = $translation["singular"];
-                foreach($option as $key=>$value)
+                foreach($options as $key=>$value)
                 {
                     $translate = str_replace('{{'.$key.'}}',$value,$translate);
                 }
