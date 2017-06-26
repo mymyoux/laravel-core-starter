@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Core\Traits\Job;
 use App;
 use Notification;
+
 class JobHandler implements ShouldQueue
 {
     use Job;
@@ -31,6 +32,6 @@ class JobHandler implements ShouldQueue
     }
     public function handle()
     {
-       
+ 
     }
 }

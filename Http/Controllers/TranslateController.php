@@ -27,6 +27,7 @@ use Core\Model\Translation;
 use Core\Model\LangModel;
 use Illuminate\Support\Facades\Redis;
 use Response;
+use Core\Jobs\Translation as TranslationJob;
 class TranslateController extends Controller
 {
      /**
@@ -138,6 +139,7 @@ class TranslateController extends Controller
         $translation->singular = $request->input('singular');
         $translation->plurial = $request->input('plurial');
         $translation->save();
+        $this->rebuild();
         return $translation;
     }
     /**
@@ -147,6 +149,7 @@ class TranslateController extends Controller
     public function delete(Request $request)
     {
         Translation::destroy($request->input('id'));
+        $this->rebuild();
     }
     /**
      * @ghost\Role("admin")
@@ -262,4 +265,8 @@ class TranslateController extends Controller
         
         return $data;
     }   
+    protected function rebuild()
+    {
+        Job::create(TranslationJob::class)->throttle(60);
+    }
 }
