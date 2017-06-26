@@ -40,6 +40,7 @@ class Job
     public function __construct( $class, $data = NULL)
     {
         $this->tube   = $this->buildTubeName($class);
+        Logger::warn($this->tube);
         $this->class        = $class;
         $this->data         = $data;
         $user = Auth::getUser();
@@ -149,7 +150,7 @@ class Job
         {
             $prefix.= config('queue.prefix');
         }
-
+        $tube = $prefix.$tube;
         return $tube;
     }
     public function cancelAllPrevious()
@@ -245,6 +246,7 @@ class Job
                 throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);
             }
             $id_beanstalkd  = $this->dispatch( $job );
+            Logger::info('dispatch');
         }
         catch (\Pheanstalk\Exception\ConnectionException $e)
         {
