@@ -4,6 +4,8 @@ namespace Core\Jobs;
 use Core\Queue\JobHandler;
 use Logger;
 use Artisan;
+use Core\Util\Command;
+use Illuminate\Console\Application;
 class Translation extends JobHandler
 {
     
