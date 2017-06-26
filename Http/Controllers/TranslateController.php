@@ -184,13 +184,17 @@ class TranslateController extends Controller
             $where["type"] = $request->input('type');
         }
         $req = Translation::where($where);
+        if(!$request->input('type'))
+        {
+            $req->whereNull('type');
+        }
         if($request->input('id'))
         {
             $req = $req->where('id','!=',$request->input('id'));
         }
         $result = $req->first();
         if(isset($result))
-            return ["column"=>"key_path","error"=>"key/locale already exists"];
+            return ["column"=>"path","error"=>"key/locale already exists"];
         if($request->input('id'))
         {
             return (int)$request->input('id');
@@ -216,9 +220,9 @@ class TranslateController extends Controller
 
         if(isset($filter))
         {
-            if(isset($filter["key_path"]))
+            if(isset($filter["path"]))
             {
-                $request = $request->where('path','like','%'.$filter["key_path"].'%');
+                $request = $request->where('path','like','%'.$filter["path"].'%');
             }
             if(isset($filter["locale"]))
             {
@@ -243,10 +247,6 @@ class TranslateController extends Controller
                 $keys =array_keys($filter);
                 foreach($keys as $key)
                 {
-                    if($key == "key_path")
-                    {
-                        $key = "path";
-                    }
                     $query = $query->orWhere($key,'like','%'.$search.'%');
                 }
             });
