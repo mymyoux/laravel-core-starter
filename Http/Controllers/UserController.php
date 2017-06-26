@@ -67,6 +67,19 @@ class UserController extends Controller
     	return $user;
     }
     /**
+    * Get infos on specific user
+	  * @ghost\Role("admin")
+	  * @ghost\Param(name="id_user",required=true,requirements="\d+",type="int")
+    * @warning We will limit this access
+    * @return User user
+	  */
+    public function get(Request $request)
+    {
+    	$id_user = $request->input('id_user');
+    	$user = User::getById($id_user);
+    	return $user;
+    }
+    /**
      * @ghost\Param(name="search")
      * @ghost\Paginate(allowed="id_user,created_time,updated_time,email,first_name,last_name,login",keys="first_name",directions="1", limit=10)
 	 */

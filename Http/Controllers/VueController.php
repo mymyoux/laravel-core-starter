@@ -303,9 +303,9 @@ class VueController extends Controller
 
         $prefixKey = True;
 
-        if(preg_match("/[^a-z0-9\.]/i", $key) === 1 || starts_with($key, "*") || (strlen($params) && !is_numeric($params)))
+        if(preg_match("/[^a-z0-9\._]/i", $key) === 1 || starts_with($key, "*") || (strlen($params) && !is_numeric($params)))
         {
-            if(preg_match("/[^a-z0-9\.]/i", $key) === 1 || starts_with($key, "*"))
+            if(preg_match("/[^a-z0-9\._]/i", $key) === 1 || starts_with($key, "*"))
             {
                 $prefixKey = false;
             }
