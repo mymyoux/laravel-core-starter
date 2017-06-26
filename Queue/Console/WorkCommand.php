@@ -79,6 +79,7 @@ class WorkCommand extends BaseWorkCommand
             $prefix .= config('queue.prefix');
         }
         $queue = $prefix.$queue;
+        Logger::info('listen to queue:'.$queue);
         return $queue;
     }
 }
