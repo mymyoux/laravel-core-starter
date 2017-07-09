@@ -544,8 +544,9 @@ class ColumnsTester
 		if(strpos($name, "(")!==False)
 		{
 			// @ascheron: Bug IF without having => SQL: select `match`.*, IF(match.game_time > NOW(), 1, 0) AS upcoming from `match` inner join `game` on `game`.`id_game` = `match`.`id_game` inner join `game_mode` on `game_mode`.`id_game_mode` = `match`.`id_game_mode` where (`game_mode`.`is_active` = 1 and `game`.`is_active` = 1) group by `match`.`id_match` having (  ) order by `match`.`game_time` desc limit 10
-			if (strpos($name, "IF") !== false)
+			if (strpos($name, "IF") !== false || strpos($name, "SUM") !== false || strpos($name, "MAX") !== false || strpos($name, "COUNT") !== false)
 				return null;
+
 			$this->needsHaving = True;
 			return NULL;
 		}
