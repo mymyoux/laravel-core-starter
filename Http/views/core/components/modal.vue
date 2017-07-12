@@ -1,13 +1,19 @@
 <div>
     <div class="modal hide" id="#myModal1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content big">
                 <div class="modal-header">
                     <button @click="closeModal()" type="button" class="close"><span aria-hidden="true">x</span></button>
                     <h1>Alert</h1>
                 </div>
 
                 <div class="modal-body">
+
+                    <section class="description">
+                        {{ data.description }}
+                    </section>
+
+                    <component-autocomplete :selection="data.company_name"></component-autocomplete>
 
                     <section class="search main-search">
 
@@ -102,7 +108,9 @@
 
                     </section>
 
-                    <a v-on:click="alert(data)" title="" class="btn btn-color btn-alert">Create Alert</a>
+                    <section class="footer">
+                        <a v-on:click="alert(data)" title="" class="btn btn-color btn-alert">Create Alert</a>
+                    </div>
 
                 </div>
 
