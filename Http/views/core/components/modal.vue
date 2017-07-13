@@ -13,7 +13,15 @@
                         {{ data.description }}
                     </section>
 
-                    <component-autocomplete :selection="data.company_name"></component-autocomplete>
+                    <div class="item">
+                        <p>Company :</p>
+                        <div class="custom-select tag scroll" >
+                            <div class="company">
+                                <component-autocomplete :selection="data.company_name"></component-autocomplete>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <section class="search main-search">
 
