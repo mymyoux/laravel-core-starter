@@ -1,5 +1,5 @@
 <div>
-    <div class="modal hide" id="#myModal1">
+    <div class="modal hide" id="#myModal">
         <div class="modal-dialog">
             <div class="modal-content big">
                 <div class="modal-header">
