@@ -24,6 +24,10 @@ return [
     */
 
     'env' => env('APP_ENV', NULL),
+    /**
+     * Redis local cache -> avoid code cache from redis
+     */
+    'local_cache' => env('LOCAL_CACHE', True),
 
     /*
     |--------------------------------------------------------------------------
