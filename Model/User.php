@@ -87,7 +87,6 @@ class User extends Model implements
 
     protected $realUser;
 
-
     public function getRolesAttribute()
     {
         return $this->attributes["roles"] = $this->roles;
