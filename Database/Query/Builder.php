@@ -20,22 +20,30 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Db;
 class Builder extends BaseBuilder
 {
-     public function insert(array $values)
+    public function _insert(array $values)
     {
         if(!isset($values["created_time"]))
         {
             $values["created_time"] = Db::raw('NOW(3)');
         }
+
+        return $values;
+    }
+
+    public function insert(array $values)
+    {
+        $values = $this->_insert($values);
+
         return parent::insert($values);
     }
-     public function insertGetId(array $values, $sequence = null)
+    
+    public function insertGetId(array $values, $sequence = null)
     {
-       if(!isset($values["created_time"]))
-		{
-			$values["created_time"] = Db::raw('NOW(3)');
-	    }
+        $values = $this->_insert($values);
+        
 	    return parent::insertGetId($values, $sequence);
     }
+    
     public function toRawSQL()
     {
         $model = $this;
