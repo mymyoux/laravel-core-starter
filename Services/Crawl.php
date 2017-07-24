@@ -7,7 +7,7 @@ use Api;
 
 class Crawl
 {
-	public static function create( $url, $class, $type = null, $id_external = null, $id_crawl_login = null )
+	public static function create( $url, $class, $type = null, $config = null )
 	{
 		$params = [
 			"url"=>trim($url),
@@ -15,12 +15,25 @@ class Crawl
 			"priority"=>1,
 			"type"=> $type,
 			"cls"=> $class,
-			"id_external"=>$id_external,
 			'state' => 'crawl_needs_login',
 			'asked' => 1,
 			'data'=> "cabinet_needs_login",
-			'id_crawl_login' => $id_crawl_login
 		];
+
+		if ($config)
+		{
+			if (isset($config['id_external']))
+				$params['id_external'] = $config['id_external'];
+			
+			if (isset($config['id_crawl_login']))
+				$params['id_crawl_login'] = $config['id_crawl_login'];
+			
+			if (isset($config['post_params']))
+				$params['post_params'] = $config['post_params'];
+
+			if (isset($config['referrer']))
+				$params['referrer'] = $config['referrer'];
+		}
 
     	$result = Api::post('crawl/add')->params( $params )->response();
 

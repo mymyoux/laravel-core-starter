@@ -51,12 +51,10 @@
                             <p>Places:</p>
                             <div class="input-container">
                                 <span class="icon-location"></span>
-                                <div  id="locationField" class="input-place" data-field="place" data-type="gmap_place" data-autocomplete="place_" data-additionals="place_id,address_components,formatted_address,geometry,types" data-types="all">
-                                    <input id="place" required type="text">
-                                </div>
+                            <component-autocomplete :selection="data.location"></component-autocomplete>
                             </div>
                         </div>
-
+                       
                         <div class="item">
                             <p>With the following skills:</p>
                             <div class="input-container">
