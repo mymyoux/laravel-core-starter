@@ -126,6 +126,11 @@ class CrawlController extends Controller
 	 * @ghost\Param(name="state",required=false,default="crawl_needs_login")
 	 * @ghost\Param(name="uuid",required=false)
 	 * @ghost\Param(name="data",required=false)
+
+	 * @ghost\Param(name="post_params",required=false)
+	 * @ghost\Param(name="referrer",required=false)
+
+
 	 * @ghost\Param(name="binary",requirements="boolean", required=false, default=false)
 	 * @ghost\Param(name="id_crawl_login",requirements="\d+",required=false)
 	 * Adds a new crawl
@@ -146,6 +151,19 @@ class CrawlController extends Controller
 		$crawl->binary = (int) $request->input('binary', 0);
 		$crawl->id_crawl_login = $request->input('id_crawl_login');
         $crawl->version = 'laravel';
+
+        $post_params = $request->input('post_params');
+        $referrer = $request->input('referrer');
+
+        if (isset($post_params))
+        {
+            $crawl->post_params = $post_params;
+        }
+
+        if (isset($referrer))
+        {
+            $crawl->referrer = $referrer;
+        }
 
         $crawl->save();
 
