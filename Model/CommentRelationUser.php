@@ -17,10 +17,10 @@ class CommentRelationUser extends Model
 
     public function relation()
     {
-        return $this->belongsTo('Core\Model\CommentRelation', 'id_comment_relation','id_comment_relation');
+        return $this->belongsTo(CommentRelation::class, 'id_comment_relation','id_comment_relation');
     }
-    public function user()
+    public function external()
     {
-        return $this->belongsTo('App\User', 'id_user','id_user');
+        return $this->morphTo();
     }
 }

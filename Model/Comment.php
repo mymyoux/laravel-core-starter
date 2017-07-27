@@ -13,10 +13,10 @@ class Comment extends Model
     protected $table = 'comment';
     protected $primaryKey = 'id_comment';
 
-    protected $fillable = ['comment','external_id','external_type'];
-    public function external()
+    protected $fillable = ['comment','id_comment_relation','id_user'];
+    public function relation()
     {
-        return $this->morphTo();
+        return $this->belongsTo(CommentRelation::class, 'id_comment_relation','id_comment_relation');
     }
      public function user()
     {

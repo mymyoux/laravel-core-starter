@@ -20,7 +20,7 @@ class CommentRelation extends Model
         return $this->morphOne('Core\Model\Comment', 'external');
     }
      
-    public function users()
+    public function objects()
     {
         return $this->hasMany('Core\Model\CommentRelationUser', 'id_comment_relation','id_comment_relation');
     }
