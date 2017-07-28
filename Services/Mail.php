@@ -14,11 +14,11 @@ class Mail
 	{
         $this->mandrill = $mandrill;
 	}
-    public function template($template, $to, $data = NULL, $config = NULL, $send_at = NULL, $ip_pool = NULL)
+    static public function template($template, $to, $data = NULL, $config = NULL, $send_at = NULL, $ip_pool = NULL)
     {
         $data = $data??[];
         $message = $config??[];
-        return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool]);
+        return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool])->send();
     }
     public function _sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool)
     {
@@ -30,6 +30,7 @@ class Mail
         {
             $to = [$to];
         }
+        
         $to = array_map(function($item){ $item["email"] = clean_email($item["email"]); return $item;},array_values(array_filter(array_map(function($recipient)
         {
             if(is_numeric($recipient))
@@ -62,6 +63,8 @@ class Mail
                     "id_user"=>$user->id_user
                 ];
             }
+
+            
             if(is_array($recipient))
             {
                 if(!isset($recipient["email"]))
@@ -74,11 +77,25 @@ class Mail
                 }
                 return $recipient;
             }
+            
+            if(is_object($recipient))
+            {
+                return
+                [
+                    "email"=>$recipient->email,
+                    "name"=>$recipient->login??$recipient->first_name,
+                    "type"=>"to",
+                    "id_user"=>$recipient->id_user
+                ];
+            }
+
             return NULL;
         }, $to), function($item)
         {
             return isset($item);
         })));
+
+        
         if(empty($to))
         {
             throw Exception('no valid recipient for email');
@@ -89,6 +106,7 @@ class Mail
             {
                 $to = array_map(function($recipient)
                 {
+                    
                     $recipient['email'] = config('services.mandrill.email');
                     return $recipient;
                 }, $to);
@@ -96,8 +114,15 @@ class Mail
                 return Logger::info('Email test mode on - sending fake email '.$template.' to '.join(", ",array_map(function($item){return $item["email"];},$to)));
             }
         }
+        
         if(!isset($message['merge_language']))
             $message['merge_language'] = 'handlebars';
+
+        if (empty($message['from_mail']))
+            $message['from_email']  = config('services.mandrill.from_email');
+
+        if (empty($message['from_name']))
+            $message['from_name']   = config('services.mandrill.from_name');
 
         $message['to'] = array_map(function($item)
         {
@@ -108,7 +133,20 @@ class Mail
             return $item;
         },$to);
 
-        $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, True,$send_at, $ip_pool);
+        $data = (array) $data;
+
+        foreach ($data as $key => $value)
+        {
+            $data[$key] = [
+                'name'  => $key,
+                'content'   => $value
+            ];
+        }
+        
+        $data = array_values($data);
+   
+        $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, true, $send_at, $ip_pool);
+
         foreach($result as $key=>$resultemail)
         {
             $mail = new MailModel;
