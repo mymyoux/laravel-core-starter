@@ -206,6 +206,7 @@ return [
 
     'aliases' => [
         'Api' => Core\Facades\Api::class,
+        'Action' => Core\Facades\Action::class,
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
