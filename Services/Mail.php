@@ -7,6 +7,10 @@ use App\User;
 use Core\Model\Mail as MailModel;
 use Logger;
 use Auth;
+
+use Core\Model\Mandrill\Template as MandrillTemplateModel;
+
+
 class Mail
 {
 	protected $mandrill;
@@ -18,6 +22,47 @@ class Mail
     {
         $data = $data??[];
         $message = $config??[];
+
+        if ($to instanceof \App\User)
+        {
+            if ($to->hasPlace())
+            {
+                $id_place = $to->getPlaceID();
+                $language = null;
+
+                switch ($id_place)
+                {
+                    case 193:
+                        $language = 'fr';
+                    break;
+                }
+
+                if (null !== $language)
+                {
+                    $template_exist = MandrillTemplateModel::getTemplate( $template, $language );
+
+                    if (null !== $template_exist)
+                    {
+                        $template = $template_exist->slug;
+                    }
+                }
+                else
+                {
+                    $language = 'en';
+                }
+
+                if (isset($message))
+                {
+                    if (!isset($message['tags']))
+                    {
+                        $message['tags'] = [];
+                    }
+
+                    $message['tags'][] = 'lang-' . $language;
+                }
+            }
+        }
+
         return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool])->send();
     }
     public function _sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool)
@@ -26,6 +71,7 @@ class Mail
         {
             throw Exception('no recipient for email');
         }
+
         if(!is_array($to))
         {
             $to = [$to];
@@ -115,16 +161,16 @@ class Mail
             }
         }
         
-        if(!isset($message['merge_language']))
-            $message['merge_language'] = 'handlebars';
+        if(!isset($message->merge_language))
+            $message->merge_language = 'handlebars';
 
-        if (empty($message['from_mail']))
-            $message['from_email']  = config('services.mandrill.from_email');
+        if (empty($message->from_mail))
+            $message->from_email  = config('services.mandrill.from_email');
 
-        if (empty($message['from_name']))
-            $message['from_name']   = config('services.mandrill.from_name');
+        if (empty($message->from_name))
+            $message->from_name   = config('services.mandrill.from_name');
 
-        $message['to'] = array_map(function($item)
+        $message->to = array_map(function($item)
         {
             if(isset($item["id_user"]))
             {
@@ -145,18 +191,21 @@ class Mail
         
         $data = array_values($data);
    
+   
         $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, true, $send_at, $ip_pool);
 
         foreach($result as $key=>$resultemail)
         {
+
+            
             $mail = new MailModel;
             $mail->type = $template;
             $mail->from = Auth::id();
-            if(isset($message["subject"]))
-                $mail->subject = $message['subject'];
+            if(isset($message->subject))
+                $mail->subject = $message->subject;
             $mail->recipient = $resultemail["email"];
-            if(isset($message["from_email"]))
-                $mail->sender = $message['from_email'];
+            if(isset($message->from_email))
+                $mail->sender = $message->from_email;
             $mail->message = json_encode($message);
             //TODO:maybe result is not in the same order => check email inside $to
             if($key<count($to))
@@ -174,6 +223,7 @@ class Mail
             $mail->id_mandrill = $resultemail["_id"];
             $mail->save();
         }
+
         return $result;
     }
 }
