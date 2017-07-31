@@ -30,6 +30,10 @@ class Stats
 		{
 			$this->api[$uri] = ["count"=>0];
 		}
+		if(!isset($this->api[$uri]['count']))
+		{
+			$this->api[$uri]['count'] = 0;
+		}
 		$this->api[$uri]["count"]++; 
 	}
 	public function getApiStats()
