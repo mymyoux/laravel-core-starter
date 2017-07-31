@@ -27,12 +27,14 @@ class CommentController extends Controller
      /**
      * @ghost\Param(name="objects",requirements="\d+", array=true)
      * @ghost\Param(name="id_relation",requirements="\d+")
+     * @ghost\Param(name="types",array=true,required=false)
      * @return JsonModel
      */
     public function list(Request $request, Paginate $paginate)
     {
         $objects = $request->input('objects');
         $id_relation = $request->input('id_relation');
+        $types = $request->input('types');
         if(empty($objects) && !isset($id_relation))
         {
             throw new ApiException("objects_or_id_relation_required");
@@ -75,6 +77,10 @@ class CommentController extends Controller
         {
             $request->where('comment.id_relation','=',$id_relation);
         }
+        if(!empty($types))
+        {
+            $request->whereIn('comment.access_type', $types);
+        }
         $request->orderBy('comment.created_time','ASC');
         return $request->get();
     }
@@ -102,6 +108,11 @@ class CommentController extends Controller
         if(mb_strlen(trim($comment_text)) == 0)
         {
             throw new ApiException("comment_empty");
+        }
+        $type = $request->input('type');
+        if(!isset($type))
+        {
+            $type = Auth::type();
         }
         DB::beginTransaction();
 
@@ -148,6 +159,7 @@ class CommentController extends Controller
                 $relation->load('objects.external');
                 $comment->relation()->associate($relation);
             }
+            $comment->access_type = $type;
             $comment->comment = $comment_text;
             $comment->save();
             DB::commit();
@@ -192,6 +204,7 @@ class CommentController extends Controller
      * @ghost\Param(name="objects",requirements="\d+", array=true)
      * @ghost\Param(name="id_relation",requirements="\d+")
      * @ghost\Param(name="comment", required=true)
+     * @ghost\Param(name="type", required=false)
      * @return JsonModel
      */
     public function create(Request $request)
@@ -206,6 +219,11 @@ class CommentController extends Controller
         if(mb_strlen(trim($comment_text)) == 0)
         {
             throw new ApiException("comment_empty");
+        }
+        $type = $request->input('type');
+        if(!isset($type))
+        {
+            $type = Auth::type();
         }
         DB::beginTransaction();
         try
@@ -248,6 +266,7 @@ class CommentController extends Controller
                 $comment->relation()->associate($relation);
             }
             $comment->comment = $comment_text;
+            $comment->access_type = $type;
             $comment->save();
             DB::commit();
         }
