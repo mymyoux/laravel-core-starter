@@ -44,7 +44,7 @@ class ViewController extends Controller
         $this->extension = ViewController::DEFAULT_EXTENSION;
         $this->paths = $this->getPaths();
         $folders = ["app", "core"];
-        $type = $request->input('type', Auth::check()?Auth::user()->type:NULL);
+        $type = $request->input('type', Auth::type());
         if(isset($type))
             array_unshift($folders, $type);
         $this->folders = $folders;
@@ -89,7 +89,7 @@ class ViewController extends Controller
     public function getVersion(Request $request)
     {
         $path = $request->input('path');
-        $type = $request->input('type', Auth::check()?Auth::user()->type:NULL);
+        $type = $request->input('type', Auth::type());
         $folders = ["app", "core"];
         if(isset($type))
             array_unshift($folders, $type);
@@ -127,7 +127,7 @@ class ViewController extends Controller
     {
         $templates = $request->input('templates');
 
-        $type = Auth::check()?Auth::user()->type:"app";
+        $type = Auth::check()?Auth::type():"app";
         $request = TEMPLATE::select('path')->where('type','=',$type)
         ->where(function($request) use($templates)
         {

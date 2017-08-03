@@ -39,6 +39,10 @@ class CommentController extends Controller
         {
             throw new ApiException("objects_or_id_relation_required");
         }
+        if(isset($types) && !is_array($types))
+        {
+            $types = [$types];
+        }
         $request = Comment::select('comment.*')->with('user','relation.objects.external')
         ->join('comment_relation','comment_relation.id_comment_relation','=','comment.id_comment_relation')
         ->join('comment_relation_user','comment_relation.id_comment_relation','=','comment_relation_user.id_comment_relation')

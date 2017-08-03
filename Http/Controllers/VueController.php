@@ -57,7 +57,7 @@ class VueController extends Controller
         $this->extension = static::DEFAULT_EXTENSION;
         $this->paths = $this->getPaths();
         $folders = ["app", "core"];
-        $type = $request->input('type')??(Auth::check()?Auth::user()->type:NULL);
+        $type = $request->input('type')??Auth::type();
         $this->type = $type;
         if(isset($type))
             array_unshift($folders, $type);
@@ -124,7 +124,7 @@ class VueController extends Controller
     public function getVersion(Request $request)
     {
         $path = $request->input('path');
-        $type = $request->input('type')??(Auth::check()?Auth::user()->type:"app");
+        $type = $request->input('type')??(Auth::check()?Auth::type():"app");
         $folders = ["app", "core"];
         if(isset($type))
             array_unshift($folders, $type);
@@ -163,7 +163,7 @@ class VueController extends Controller
     {
         $templates = $request->input('templates');
 
-        $type = Auth::check() && isset(Auth::user()->type) ? Auth::user()->type : "app";
+        $type = Auth::check()? Auth::type() : "app";
         $request = TEMPLATE::select('path')->where('type','=',$type)
         ->where(function($request) use($templates)
         {
