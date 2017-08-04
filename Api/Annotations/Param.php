@@ -220,7 +220,14 @@ class Param extends CoreAnnotation
             return (false === $this->array) ? $data[0]:$value;
             // $object->value = (false === $this->array) ? $data[0]:$value;
             // return $object;//return  (false === $this->array) ? $data[0]:$value;
+        }else if($value !== null)
+        {
+            if($this->array && !is_array($value))
+            {
+                $value = [$value];
+            }
         }
+        
         return $value;
     }
 }
