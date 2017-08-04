@@ -143,16 +143,16 @@ class Paginate
 		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
 	}
-	public function apply($request, $mapping = NULL, $havingOnly = NULL)
+	public function apply(&$request, $mapping = NULL, $havingOnly = NULL)
 	{
 		$originalQuery = method_exists($request, "getQuery")?$request->getQuery():$request;
 
-		if(!isset($originalQuery->processor) || !method_exists($originalQuery->processor, "setSelectListener"))
-		{
-			$originalQuery->processor = new \Core\Api\Paginate\Processor();
+		// if(!isset($originalQuery->processor) || !method_exists($originalQuery->processor, "setSelectListener"))
+		// {
+		// 	$originalQuery->processor = new \Core\Api\Paginate\Processor();
 			
-		}
-		$originalQuery->processor->setSelectListener($this);
+		// }
+		//$originalQuery->processor->setSelectListener($this);
 
 		$paginate = $this->request->input("paginate");
 		//$request->limit($paginate["limit"]);
@@ -399,6 +399,7 @@ class Paginate
             	$originalQuery->orderBy($key, $direction);
             }
         }
+		$request = new RequestWrapper($request, $this);
 		return $request;
 	}
 
@@ -579,5 +580,21 @@ class ColumnsTester
 			}
 		}
 		return NULL;
+	}
+}
+use Core\Util\Wrapper;
+class RequestWrapper extends Wrapper
+{
+	protected $paginate;
+	public function __construct($wrapped, $paginate)
+	{
+		parent::__construct($wrapped);
+		$this->paginate = $paginate;
+	}
+	public function get()
+	{
+		$results = $this->wrapped->get();
+		$this->paginate->onResults($this->wrapped, $results);
+		return $results;
 	}
 }

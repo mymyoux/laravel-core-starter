@@ -58,7 +58,7 @@ class TranslateController extends Controller
             }, $key);
         }
         //get all subkeys
-        $translation = Translation::translates($key, $locale, Auth::check()?Auth::user()->type:NULL, True);
+        $translation = Translation::translates($key, $locale, Auth::type(), True);
        return ["translations"=>$translation->map(function($item)
        {
            $data = ["key"=>$item->fullKey(),"singular"=>$item->singular];
@@ -91,7 +91,7 @@ class TranslateController extends Controller
         {
             $hkeys[] = $key.".";
         }
-        $translation = Translation::translates($hkeys, $locale, Auth::check()?Auth::user()->type:NULL, True);
+        $translation = Translation::translates($hkeys, $locale, Auth::type(), True);
         return $translation->filter(function($item) use($keys)
         {
             return $item->updated_time->format("Y-m-d H:i:s.u")>$keys[$item->shortKey()];
