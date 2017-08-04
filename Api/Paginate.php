@@ -30,6 +30,8 @@ class Paginate
 	}
 	public function onResults($query, $data)
 	{
+		$query = method_exists($query, "getQuery")?$query->getQuery():$query;
+		
 		//TODO:handle others form of mapping
 		$mapping = $this->mapping;
 		if(isset($mapping) && is_string($mapping))
