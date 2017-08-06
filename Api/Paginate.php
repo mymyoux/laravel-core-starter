@@ -5,6 +5,8 @@ use Core\Exception\Exception;
 use Illuminate\Http\Request;
 use DB;
 use Api;
+use Illuminate\Database\Eloquent\Collection;
+
 class Paginate
 {
 	const HAVING = "having";
@@ -30,8 +32,9 @@ class Paginate
 	}
 	public function onResults($query, $data)
 	{
-		$query = method_exists($query, "getQuery")?$query->getQuery():$query;
-		
+		$query 	= method_exists($query, "getQuery")?$query->getQuery():$query;
+		$is_collection = $data instanceof Collection;
+
 		//TODO:handle others form of mapping
 		$mapping = $this->mapping;
 		if(isset($mapping) && is_string($mapping))
@@ -44,44 +47,129 @@ class Paginate
 		$apidata = [];
 		$apidata["count"] = count($data);
 		$keys = $this->keys;
+
 		if(isset($this->next))
 		{
-	         $data = array_values(array_filter($data, function($item) use($keys)
-            {
-                foreach($keys as $index=>$key)
-                {
-					if (!isset($item->$key)) continue;
-					
-                    $direction = $this->directions[$index];
-                    if($direction>0)
-                    {
-                        if($item->$key<=$this->next[$index])
-                        {
-                            continue;
-                        }
-                       // $where = $where->greaterThan($key, $this->next[$index]);
-                    }else
-                    {
-                        if($item->$key>=$this->next[$index])
-                        {
-                            continue;
-                        }
-                        //$where = $where->lessThan($key, $this->next[$index]);
-                    }
+			if ($is_collection)
+			{
+				$data = $data->filter(function($item) use($keys)
+				{
+					foreach($keys as $index=>$key)
+					{
+						if (!isset($item->$key)) continue;
+						
+						$direction = $this->directions[$index];
+						if($direction>0)
+						{
+							if($item->$key<=$this->next[$index])
+							{
+								continue;
+							}
+						// $where = $where->greaterThan($key, $this->next[$index]);
+						}else
+						{
+							if($item->$key>=$this->next[$index])
+							{
+								continue;
+							}
+							//$where = $where->lessThan($key, $this->next[$index]);
+						}
 
-                    for($i=0;$i<$index; $i++)
-                    {
-                        if($item->{$keys[$i]}!=$this->next[$i])
-                        {
-                            continue 2;
-                        }
-                        //$where = $where->and;
-                        //$where = $where->equalTo($keys[$i], $this->next[$i]);
-                    }
-                   return true;
-                }
-                return false;
-            }));
+						for($i=0;$i<$index; $i++)
+						{
+							if($item->{$keys[$i]}!=$this->next[$i])
+							{
+								continue 2;
+							}
+							//$where = $where->and;
+							//$where = $where->equalTo($keys[$i], $this->next[$i]);
+						}
+					return true;
+					}
+					return false;
+				});
+			}
+			else
+			{
+				if ($is_collection)
+				{
+					$data = $data->filter(function($item) use($keys)
+					{
+						foreach($keys as $index=>$key)
+						{
+							if (!isset($item->$key)) continue;
+							
+							$direction = $this->directions[$index];
+							if($direction>0)
+							{
+								if($item->$key<=$this->next[$index])
+								{
+									continue;
+								}
+							// $where = $where->greaterThan($key, $this->next[$index]);
+							}else
+							{
+								if($item->$key>=$this->next[$index])
+								{
+									continue;
+								}
+								//$where = $where->lessThan($key, $this->next[$index]);
+							}
+
+							for($i=0;$i<$index; $i++)
+							{
+								if($item->{$keys[$i]}!=$this->next[$i])
+								{
+									continue 2;
+								}
+								//$where = $where->and;
+								//$where = $where->equalTo($keys[$i], $this->next[$i]);
+							}
+						return true;
+						}
+						return false;
+					});
+				}
+				else
+				{
+					$data = array_values(array_filter($data, function($item) use($keys)
+					{
+						foreach($keys as $index=>$key)
+						{
+							if (!isset($item->$key)) continue;
+							
+							$direction = $this->directions[$index];
+							if($direction>0)
+							{
+								if($item->$key<=$this->next[$index])
+								{
+									continue;
+								}
+							// $where = $where->greaterThan($key, $this->next[$index]);
+							}else
+							{
+								if($item->$key>=$this->next[$index])
+								{
+									continue;
+								}
+								//$where = $where->lessThan($key, $this->next[$index]);
+							}
+
+							for($i=0;$i<$index; $i++)
+							{
+								if($item->{$keys[$i]}!=$this->next[$i])
+								{
+									continue 2;
+								}
+								//$where = $where->and;
+								//$where = $where->equalTo($keys[$i], $this->next[$i]);
+							}
+						return true;
+						}
+						return false;
+					}));
+				}
+			}
 		}
 		 if(isset($this->previous))
         {
