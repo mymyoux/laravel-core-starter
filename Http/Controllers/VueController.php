@@ -163,7 +163,7 @@ class VueController extends Controller
     {
         $templates = $request->input('templates');
 
-        $type = Auth::check()? Auth::type() : "app";
+        $type = Auth::check() && Auth::type() ? Auth::type() : "app";
         $request = TEMPLATE::select('path')->where('type','=',$type)
         ->where(function($request) use($templates)
         {
