@@ -213,7 +213,7 @@ class Paginate
             {
                 if(isset($data[0]->{$key}))
                 {
-                    $previous[] = $data[0]->{$key};
+                    $previous[] = $this->formatPaginate( $data[0]->{$key} );
                 }
             }
             $next = [];
@@ -223,7 +223,7 @@ class Paginate
             {
                 if(isset($data[$len]->{$key}))
                 {
-                    $next[] = $data[$len]->{$key};
+					$next[] = $this->formatPaginate( $data[$len]->{$key} );
                 }
             }
             $apidata["next"] = $next;
@@ -233,6 +233,20 @@ class Paginate
 		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
 	}
+
+	private function formatPaginate( $value )
+	{
+		if ($value instanceof \Carbon\Carbon)
+		{
+			$reflection = new \ReflectionObject($value);
+			$property 	= $reflection->getProperty('date');
+			$original 	= $property->getValue($value);
+			$value 		= $original; // only what to get the original date
+		}
+
+		return $value;
+	}
+
 	public function apply(&$request, $mapping = NULL, $havingOnly = NULL)
 	{
 		$originalQuery = method_exists($request, "getQuery")?$request->getQuery():$request;
