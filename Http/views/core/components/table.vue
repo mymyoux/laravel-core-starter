@@ -34,12 +34,12 @@
                     <option v-for="value, key in list.displayFilters()" :value="value" :selected="(list.current_filter == value ? 'selected' : '')">{{ value }}</option>
                 </select>
             </div>
-            <div v-else class="item">
+            <div v-else-if="list.multiFilters() && list.displayFilters().length > 0" class="item">
                 <div class="custom-select tag scroll" >
                     <div data-field="position" data-type="reallist">
                         <ul class="click select" data-multiple data-static>
                             <p>
-                                <span v-if="list.current_filters.length == 0">All</span>
+                                <span v-if="list.current_filters && list.current_filters.length == 0">All</span>
                                 <span v-else v-for="value, key in list.current_filters">
                                     {{ value }},                                
                                 </span>
@@ -63,8 +63,8 @@
                 sortable:column.sortable,
                 filterable:column.filterable,
                 resizable:column.resizable
-            },column.headerClasses?column.headerClasses:'']" v-if="column.visible">
-                <span>{{column.title}}</span>
+            },column.headerClasses?column.headerClasses:'']" v-if="column.visible" @click="sorting(list, column)">
+                <span>{{column.title}} <span v-if="column.sortable"><i :class="'icon-arrow' + (true === column.selected? (column.order[0] === 1 ? 'up' : 'down') : '')"></i></span></span>
             </div>
         </div>
         <div class="table-tr table-search" v-if="list.config.searchable">

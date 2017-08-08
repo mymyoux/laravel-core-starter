@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 class Api
 {
     public static $data = [[]];
+    
 
     public static function addAPIData($data)
     {
@@ -27,6 +28,11 @@ class Api
     public static function popAPIData()
     {
         return array_pop(static::$data);
+    }
+    public static function getAllAPIDATA()
+    {
+        //debug only
+        return static::$data;
     }
     protected static function array_merge($array1, $array2)
     {
@@ -157,12 +163,14 @@ class Api
     {
         static::$data[] = [];
         $rawresponse = $this->dispatching($params);
-        $api_data = static::popAPIData();
+        //$api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();
+        
         if($rawresponse instanceof JsonResponse)
         {
             $rawresponse = $rawresponse->getData(True);
         }
+        $api_data = isset($rawresponse["api_data"])?$rawresponse["api_data"]:NULL;
         $response = new ApiResponse();
         if(isset($rawresponse["data"]))
             $response->value = $rawresponse["data"];

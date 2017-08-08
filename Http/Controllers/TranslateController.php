@@ -253,7 +253,6 @@ class TranslateController extends Controller
         }
         $request = $paginate->apply($request, "translate");
         
-        
         $data= $request->select(["*",Db::raw("IF(path IS NULL,CONCAT(controller,'.',action,'.',`key`),path) as path")])->get()->makeVisible(['id','created_time'])->map(function($item)
         {
             if(!isset($item->path))
