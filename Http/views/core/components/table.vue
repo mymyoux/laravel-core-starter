@@ -39,7 +39,7 @@
                     <div data-field="position" data-type="reallist">
                         <ul class="click select" data-multiple data-static>
                             <p>
-                                <span v-if="list.current_filters.length == 0">All</span>
+                                <span v-if="list.current_filters && list.current_filters.length == 0">All</span>
                                 <span v-else v-for="value, key in list.current_filters">
                                     {{ value }},                                
                                 </span>
