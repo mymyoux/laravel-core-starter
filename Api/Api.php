@@ -27,7 +27,6 @@ class Api
     }
     public static function popAPIData()
     {
-        Logger::warn('pop');
         return array_pop(static::$data);
     }
     public static function getAllAPIDATA()
@@ -163,7 +162,6 @@ class Api
     public function response($params = NULL)
     {
         static::$data[] = [];
-        Logger::info('put');
         $rawresponse = $this->dispatching($params);
         //$api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();

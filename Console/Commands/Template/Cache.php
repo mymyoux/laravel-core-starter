@@ -52,17 +52,13 @@ class Cache extends Command
         $locales = Translation::getLocales();
        $templates = API::get('vue/get-all')->send();
        $types = array_merge(["app", "core"], User::getAvailableTypes());
-       $t = 0;
        foreach($locales as $locale)
        {
-
         foreach($types as $type)
         {
             
             foreach($templates as $template)
             {
-                $t++;
-                Logger::info($template.' ['.$type.'] '. $this->memory().' --- '.$t);
                 $result = API::get('vue/get')->send(['locale'=>$locale,'type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
                     $rawTemplate = 
                     [
