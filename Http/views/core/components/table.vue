@@ -1,4 +1,4 @@
-<div   @click="checkOutside($event)">
+<div @click="checkOutside($event)">
 
 <div class="new-template-page scroll-list-users">
 
@@ -26,7 +26,33 @@
                     <option v-for="item in choice" :value="item.value" >{{item.label}}</option>
                 </select>
             </div>
+
+            <!-- filters -->
+            <div v-if="!list.multiFilters() && list.displayFilters().length > 0" :class="'custom-select custom-select-no-conflict' +( list.current_filter?' fill':'')">
+                <select v-model="list.current_filter" @change="filterChange( list )">
+                    <option value="">((filter_all))</option>
+                    <option v-for="value, key in list.displayFilters()" :value="value" :selected="(list.current_filter == value ? 'selected' : '')">{{ value }}</option>
+                </select>
+            </div>
+            <div v-else class="item">
+                <div class="custom-select tag scroll" >
+                    <div data-field="position" data-type="reallist">
+                        <ul class="click select" data-multiple data-static>
+                            <p>
+                                <span v-if="list.current_filters.length == 0">All</span>
+                                <span v-else v-for="value, key in list.current_filters">
+                                    {{ value }},                                
+                                </span>
+                            </p>
+                            <ul class="list-scroll click" data-multiple data-static>
+                                <li v-for="value, key in list.displayFilters()" @click="addFilterMultiSelect(list, value)" :value="value">{{ value }}<span :class="'checkbox-square' + (list.current_filters.indexOf(value) != -1 ? 'active' : '')"></span></li>
+                            </ul>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </slot>
     <div class="table">
 
