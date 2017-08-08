@@ -34,7 +34,6 @@ class Paginate
 	{
 		$query 	= method_exists($query, "getQuery")?$query->getQuery():$query;
 		$is_collection = $data instanceof Collection;
-
 		//TODO:handle others form of mapping
 		$mapping = $this->mapping;
 		if(isset($mapping) && is_string($mapping))
@@ -503,6 +502,7 @@ class Paginate
             	$originalQuery->orderBy($key, $direction);
             }
         }
+		
 		$request = new RequestWrapper($request, $this);
 		return $request;
 	}
@@ -700,5 +700,12 @@ class RequestWrapper extends Wrapper
 		$results = $this->wrapped->get();
 		$this->paginate->onResults($this->wrapped, $results);
 		return $results;
+	}
+	public function __call($name, $params)
+	{
+		$result = $this->wrapped->$name(...$params);
+		if($result === $this->wrapped)
+			return $this;
+		return $result;
 	}
 }
