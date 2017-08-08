@@ -5,7 +5,8 @@ namespace Core\Http\Middleware\Api;
 use Closure;
 use Response;
 use Api;
-
+use Logger;
+use Illuminate\Http\JsonResponse;
 class Data
 {
     /**
@@ -23,7 +24,13 @@ class Data
         $response = $next($request);
         $data = Api::popApiData();
         if(!empty($data))
+        {
+            if($response instanceof JsonResponse)
+            {
+                $response->api_data = $data;
+            }else
             $response["api_data"] = $data;
+        }
         return $response;
     }
 }
