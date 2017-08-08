@@ -36,7 +36,12 @@ class Cache extends Command
     {
         parent::__construct();
     }
-
+    protected function memory()
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        $size = memory_get_usage(true);
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
     /**
      * Execute the console command.
      *
@@ -47,6 +52,7 @@ class Cache extends Command
         $locales = Translation::getLocales();
        $templates = API::get('vue/get-all')->send();
        $types = array_merge(["app", "core"], User::getAvailableTypes());
+       $t = 0;
        foreach($locales as $locale)
        {
 
@@ -55,6 +61,8 @@ class Cache extends Command
             
             foreach($templates as $template)
             {
+                $t++;
+                Logger::info($template.' ['.$type.'] '. $this->memory().' --- '.$t);
                 $result = API::get('vue/get')->send(['locale'=>$locale,'type'=>$type, "path"=>$template, "skiphelpers"=>True])["template"];
                     $rawTemplate = 
                     [
