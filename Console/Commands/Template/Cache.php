@@ -36,7 +36,12 @@ class Cache extends Command
     {
         parent::__construct();
     }
-
+    protected function memory()
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        $size = memory_get_usage(true);
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
     /**
      * Execute the console command.
      *
@@ -49,7 +54,6 @@ class Cache extends Command
        $types = array_merge(["app", "core"], User::getAvailableTypes());
        foreach($locales as $locale)
        {
-
         foreach($types as $type)
         {
             

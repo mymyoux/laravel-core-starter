@@ -65,7 +65,7 @@ class Api
 	}
     public function isMainCall()
     {
-        return count(static::$data) == 1;
+        return count(static::$data) == 0;
     }
     public function get($path)
     {
@@ -171,6 +171,7 @@ class Api
             $rawresponse = $rawresponse->getData(True);
         }
         $api_data = isset($rawresponse["api_data"])?$rawresponse["api_data"]:NULL;
+        //var_dump($api_data);
         $response = new ApiResponse();
         if(isset($rawresponse["data"]))
             $response->value = $rawresponse["data"];

@@ -41,7 +41,7 @@
                             <p>
                                 <span v-if="list.current_filters && list.current_filters.length == 0">All</span>
                                 <span v-else v-for="value, key in list.current_filters">
-                                    {{ value }},                                
+                                    {{ value }}{{ key !== list.current_filters.length - 1 ? ', ' : ''}}
                                 </span>
                             </p>
                             <ul class="list-scroll click" data-multiple data-static>
@@ -61,10 +61,11 @@
             <div  v-for="(column,i) in list.columns" class="table-th" v-bind:class="[
             {
                 sortable:column.sortable,
+                sorted:column.selected,
                 filterable:column.filterable,
                 resizable:column.resizable
             },column.headerClasses?column.headerClasses:'']" v-if="column.visible" @click="sorting(list, column)">
-                <span>{{column.title}} <span v-if="column.sortable"><i :class="'icon-arrow' + (true === column.selected? (column.order[0] === 1 ? 'up' : 'down') : '')"></i></span></span>
+                <span>{{column.title}} <span v-if="column.sortable"><i :class="'icon-arrow ' + (true === column.selected? (column.order[0] === 1 ? 'up' : 'down') : '')"></i></span></span>
             </div>
         </div>
         <div class="table-tr table-search" v-if="list.config.searchable">
