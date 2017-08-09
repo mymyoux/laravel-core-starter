@@ -2,7 +2,7 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use App\Traits\HasCompositePrimaryKey;
+use Core\Model\Traits\HasCompositePrimaryKey;
 
 
 class Role extends Model
