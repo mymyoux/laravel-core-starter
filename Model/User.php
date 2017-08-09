@@ -68,7 +68,7 @@ class User extends Model implements
     protected $hidden = [
         'deleted','temp','cgu_accepted','remember_token'
     ];
-    protected $appends = ["roles"];
+    public $appends = ["roles"];
 
 
     /**
