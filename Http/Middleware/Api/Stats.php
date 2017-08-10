@@ -85,7 +85,7 @@ class Stats
             return;
          }
         $queries = DB::getQueryLog();
-        $min_time = config("log.database.min_time", 0);
+        $min_time = config("log.database.min_time", 1000);
         foreach($queries as $query)
         {
             if($query["time"] > $min_time)
