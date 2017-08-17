@@ -39,7 +39,8 @@ class Watch extends BaseCommand
     {
         chdir(resource_path('assets/sass'));
         
-        $this->call('sass:compile');
-        Command::executeRaw("node node_modules/node-sass/bin/node-sass --output-style expanded --source-map-embed --watch . --output ../../../public/css");
+        // $this->call('sass:compile');
+        // Command::executeRaw("node node_modules/node-sass/bin/node-sass --output-style expanded --source-map-embed --watch . --output ../../../public/css");
+        Command::executeRaw("gulp sass:watch");
     }
 }
