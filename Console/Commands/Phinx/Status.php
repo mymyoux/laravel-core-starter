@@ -22,7 +22,7 @@ class Status extends PhinxCommand
      *
      * @var string
      */
-    protected $signature = 'phinx:status';
+    protected $signature = 'phinx:status {--folder=}';
 
     /**
      * The console command description.
