@@ -300,8 +300,12 @@ class Job
                     $this->raiseAfterJobEvent($fakejob);
                     $has_error = False;
                 } catch (Exception $e) {
+                    if(Auth::isAdmin())
+                        Logger::error($e->getMessage()."\n".$e->getFile().":".$e->getLine());
                     $this->handleJobException($fakejob, $e);
                 } catch (Throwable $e) {
+                    if(Auth::isAdmin())
+                        Logger::error($e->getMessage()."\n".$e->getFile().":".$e->getLine());
                     $this->handleJobException(
                        $fakejob, new FatalThrowableError($e)
                     );
