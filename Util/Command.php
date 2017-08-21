@@ -14,7 +14,7 @@ class Command
         {
             $command.=" ".join(" ",$params);
         }
-        $process = proc_open($command,  [], $pipes);
+        $process = proc_open($command,  [], $pipes, getcwd());
         if (is_resource($process)) {
             return proc_close($process);
         }
@@ -39,7 +39,7 @@ class Command
                2 => array("pipe", "w")    // stderr is a pipe that the child will write to
             );
 
-            $process = proc_open($command, $descriptorspec, $pipes);
+            $process = proc_open($command, $descriptorspec, $pipes, getcwd());
             if (is_resource($process)) {
                 while ($s = fgets($pipes[1])) {
                    if(!$silent)
