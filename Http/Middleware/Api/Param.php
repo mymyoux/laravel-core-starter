@@ -34,10 +34,22 @@ class Param
         {
             if (null !== $value)
             {
-                if ($param->type === 'boolean')
-                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                else
-                    settype($value, $param->type);
+                if($param->array)
+                {
+                    foreach($value as &$v)
+                    {
+                        if ($param->type === 'boolean')
+                            $v = filter_var($v, FILTER_VALIDATE_BOOLEAN);
+                        else
+                            settype($v, $param->type);
+                    }
+                }else
+                {
+                    if ($param->type === 'boolean')
+                        $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                    else
+                        settype($value, $param->type);
+                }
             }
         }
         $input = array_merge(Request::input(), Request::file());
