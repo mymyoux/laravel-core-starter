@@ -588,6 +588,7 @@ class ColumnsTester
 				$this->havingColumns = array_merge($this->havingColumns, $result);
 			}else
 			{
+				//var_dump($column);
 				$this->havingColumns[] = $column;
 			}
 		}

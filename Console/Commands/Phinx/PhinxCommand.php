@@ -55,17 +55,16 @@ abstract class PhinxCommand extends Command
             $forged_config["paths"]["migrations"] = base_path($forged_config["paths"][$folder]);
         }else
         {
-            $forged_config["paths"]["migrations"] = "{".join(",",array_reduce(array_keys($forged_config["paths"]), function($previous, $item) use($forged_config)
+            $forged_config["paths"]["migrations"] = array_reduce(array_keys($forged_config["paths"]), function($previous, $item) use($forged_config)
             {
                 if($item == "default")
                     return $previous;
 
                 $previous[] = base_path($forged_config["paths"][$item]);
                 return $previous;
-            }, []))."}";
+            }, []);
         }
         $env = App::environment();
-
         $adapter = config("database.default");
         $pdo = config("database.connections.$adapter");
         $pdo["adapter"] = $adapter;
