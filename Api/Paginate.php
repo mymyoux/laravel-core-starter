@@ -616,6 +616,7 @@ class ColumnsTester
 				$this->havingColumns[] = $column;
 			}
 		}
+		
 		$this->havingOnly = isset($havingOnly)?$havingOnly:[];
 		$this->havingOnly = array_reduce($this->havingOnly, function($previous, $item)
 		{
@@ -666,7 +667,7 @@ class ColumnsTester
 	}
 	public function hasHaving()
 	{
-		return $this->needsHaving || !empty($this->havingOnly) || !empty($this->havingColumns); 
+		return $this->needsHaving || !empty($this->havingOnly); 
 	}
 	protected function getHavingColumns($name)
 	{
