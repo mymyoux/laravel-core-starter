@@ -281,4 +281,16 @@ class CommentController extends Controller
         }
         return $comment;
     }
+    /**
+     * @ghost\Param(name="id_comment",type="int",requirements="\d+",required=true)
+     */
+    public function delete(Request $request)
+    {
+        $id_comment = $request->input("id_comment");
+        $comment = Comment::find($id_comment);
+        if(isset($comment)){
+            $comment->delete();
+        }
+        return $id_comment;
+    }
 }

@@ -3,12 +3,16 @@
 namespace Core\Model;
 
 use Core\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 
 class Comment extends Model
 {
+    use SoftDeletes;
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
+
+    protected $dates = ['deleted_at'];
 
     protected $table = 'comment';
     protected $primaryKey = 'id_comment';
