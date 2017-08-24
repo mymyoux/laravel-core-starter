@@ -11,6 +11,7 @@ Helpful module for laravel project
 * **((custom.key))** will be translate from **custom.key** - PHP Side
 * **((\*key))** will use key as a variable and will be transformed into **trad(key)**
 * **(('static.'+key))** will use key as a variable and will be transformed into **trad('static.'+key)**
+* **((.key))** will be prefixed by master name
 * **((key,count))** will be transformed into **trad('template.key', count)**. If count is a plain number, it will be translated from PHP side. Count value will be used to determine singular/plurial form.
 * **((key,{'json_key':'value'}))** will be transformed into **trad('template.key', {'json_key':'value'})**
 
