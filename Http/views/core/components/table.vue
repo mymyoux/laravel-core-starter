@@ -2,9 +2,9 @@
 
 <div class="new-template-page scroll-list-users">
 
-    <h1>lists</h1>
+   <!-- <h1>lists</h1>
     <span class="subtitle">Subtitle</span>
-
+    -->
 <div class="list-table vue">
     <slot name="header">
 
