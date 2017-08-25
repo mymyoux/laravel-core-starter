@@ -59,8 +59,6 @@ class CommentController extends Controller
             {
                 $query->from('comment_relation_user')->select('comment_relation_user.id_comment_relation');
 
-                //dd($objects[0]['id']);
-
                 if ($objects[0]['id'] == Auth::getUser()->id_user) // get all comments from a cabinet
                 {
                     $query->orWhere(function($query) use($objects)
@@ -71,10 +69,10 @@ class CommentController extends Controller
 
                     $query
                         ->groupBy('comment_relation_user.id_comment_relation');
-                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',1);
 
                 }
                 else { //get comments of a specific candidate cabinet
+                    //dd($objects[0]['id']);
 
                     foreach($objects as $object)
                     {
@@ -86,8 +84,8 @@ class CommentController extends Controller
                     }
 
                     $query
-                        ->groupBy('comment_relation_user.id_comment_relation')
-                        ->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects));
+                        ->groupBy('comment_relation_user.id_comment_relation');
+                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects));
                 }
             });
             // $request->where(function($query) use($objects)
