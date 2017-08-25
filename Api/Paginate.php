@@ -420,11 +420,11 @@ class Paginate
 		{	
 			$query = $originalQuery;
 			//having hack
-			$query->havingRaw("(", [], "and");
 	        if(isset($keys) || isset($limit))
 	        {
-	            if(isset($next) || isset($previous))
+				if(isset($next) || isset($previous))
 	            {
+					$query->havingRaw("(", [], "and");
 	            	$data = isset($next)?$next:$previous;
 	                $first = True;
 	                foreach($keys as $index=>$key)
@@ -478,9 +478,9 @@ class Paginate
 	                    }
 	                    $first = False;
 	                }
+					$query->havingRaw(")", [], "");
 	            }
 	        }
-	        $query->havingRaw(")", [], "");
 		}
 		if(!empty($directions))
         {
@@ -567,19 +567,43 @@ class ColumnsTester
         $selectKeys = [];
         foreach($columns as $select)
         {
-        	$havingColumns = array_merge($havingColumns, array_reduce(explode(",", $select), function($previous, $item)
+			//var_dump($select);
+			if(($index = mb_strpos($select, "("))!==False)
+			{
+				$first = $index++;
+				$opened = 1;
+				$str_len = mb_strlen($select);
+				while($opened && $index<$str_len)
+				{
+					$char = mb_substr($select, $index, 1);
+					if($char == "(")
+					{
+						$opened++;
+					}else
+					if($char == ")")
+					{
+						$opened--;
+					}
+					$index++;
+				}
+				//TODO: maybe rename first part as unmatching column
+				$select = mb_substr($select, 0, $first).mb_substr($select, $index);
+			}
+			$currentHavingOnly = [];
+        	$havingColumns = array_merge($havingColumns, array_reduce(explode(",", $select), function($previous, $item) use($select, &$currentHavingOnly)
     		{
     			$item = str_replace('‘', '', $item);
     			$item = trim($item);
-    			$data = [];
+				$data = [];
     			preg_match(ColumnsTester::PATTERN, $item , $data);
     			$having = [$data[1]];
     			if(count($data)>2)
     			{
-    				$having[] = $data[4];
+					$having[] = $data[4];
+					$currentHavingOnly[] = $data[4];
     			}
     			return array_merge($previous, $having);
-    		}, []));
+			}, []));
 		}
 		foreach($havingColumns as $column)
 		{
@@ -588,15 +612,21 @@ class ColumnsTester
 				$this->havingColumns = array_merge($this->havingColumns, $result);
 			}else
 			{
+				//var_dump($column);
 				$this->havingColumns[] = $column;
 			}
 		}
+		
 		$this->havingOnly = isset($havingOnly)?$havingOnly:[];
 		$this->havingOnly = array_reduce($this->havingOnly, function($previous, $item)
 		{
-			$previous = array_merge($previous, $this->getHavingColumns($item));
+			$columns = $this->getHavingColumns($item);
+			$previous = array_merge($previous, $columns);
 			return $previous;
 		}, []);
+
+		//add as
+		$this->havingOnly = array_merge($currentHavingOnly, $this->havingOnly);
 	}
 	public function parseParameters($params)
 	{
@@ -637,19 +667,33 @@ class ColumnsTester
 	}
 	public function hasHaving()
 	{
-		return $this->needsHaving;
+		return $this->needsHaving || !empty($this->havingOnly); 
 	}
 	protected function getHavingColumns($name)
 	{
+		$cols = NULL;
+		if(mb_strpos($name, " as ")!==False)
+		{
+			$parts = explode(" as ", $name);
+			$first = implode(" as ",array_slice($parts, 0, count($parts)-1));
+			$second = $parts[count($parts)-1];
+			
+			$cols = $this->getHavingColumns($first);
+			if(!empty($cols))
+			{
+				return array_merge([$second], $cols);
+			}
+			return [$second];
+		}
 		//agreggate
 		if(strpos($name, "(")!==False)
 		{
 			// @ascheron: Bug IF without having => SQL: select `match`.*, IF(match.game_time > NOW(), 1, 0) AS upcoming from `match` inner join `game` on `game`.`id_game` = `match`.`id_game` inner join `game_mode` on `game_mode`.`id_game_mode` = `match`.`id_game_mode` where (`game_mode`.`is_active` = 1 and `game`.`is_active` = 1) group by `match`.`id_match` having (  ) order by `match`.`game_time` desc limit 10
-			if (strpos($name, "IF") !== false || strpos($name, "SUM") !== false || strpos($name, "MAX") !== false || strpos($name, "COUNT") !== false)
-				return null;
+			// if (strpos($name, "IF") !== false || strpos($name, "SUM") !== false || strpos($name, "MAX") !== false || strpos($name, "COUNT") !== false)
+			// 	return null;
 
 			$this->needsHaving = True;
-			return NULL;
+			return $cols;
 		}
 		$names = explode(".", $name);
 		if(count($names) == 1)

@@ -368,10 +368,23 @@ class CommentController extends Controller
     public function notification(Request $request)
     {
         $request = CommentStateModel::select("comment_state.id", "comment_state.read_time as comment_read_time", "comment_state.created_time as comment_created_time")
-            ->where('comment_state.id_user_cabinet', '=', Db::raw('"'.Auth::getUser()->id_user.'"'))
-            ->where('comment_state.id_user', '!=', Db::raw('"'.Auth::getUser()->id_user.'"'))
+            ->where('comment_state.id_user_cabinet', '=', Db::raw('"' . Auth::getUser()->id_user . '"'))
+            ->where('comment_state.id_user', '!=', Db::raw('"' . Auth::getUser()->id_user . '"'))
             ->first();
 
         return $request;
+    }
+
+    /**
+     * @ghost\Param(name="id_comment",type="int",requirements="\d+",required=true)
+     */
+    public function delete(Request $request)
+    {
+        $id_comment = $request->input("id_comment");
+        $comment = Comment::find($id_comment);
+        if(isset($comment)){
+            $comment->delete();
+        }
+        return $id_comment;
     }
 }
