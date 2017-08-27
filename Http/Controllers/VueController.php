@@ -302,6 +302,12 @@ class VueController extends Controller
         $convert = True;
 
         $prefixKey = True;
+        $context_prefix = False;
+        if( starts_with($key, ".") )
+        {
+            $key = substr($key, 1);
+            $context_prefix = True;
+        }
 
         if(preg_match("/[^a-z0-9\._]/i", $key) === 1 || starts_with($key, "*") || (strlen($params) && !is_numeric($params)))
         {
@@ -355,7 +361,7 @@ class VueController extends Controller
                 break;
             }
         }
-        if($convert && !$dynamic)
+        if($convert && !$dynamic && !$context_prefix)
         {
            return Translate::t($key, $this->type, $this->locale, $params);
         }
@@ -380,10 +386,15 @@ class VueController extends Controller
             $vue .="{{";
         }
         $vue.="trad(".$key;
-        if(strlen($params))
+        if(strlen($params) || $context_prefix)
         {
-            $vue.=",".$params;
+            if(strlen($params))
+                $vue.=",".$params;
+            else
+                $vue.=",null";
         }
+        if($context_prefix)
+            $vue.=",true";
         $vue.=")";
         if(!$dynamic)
         {

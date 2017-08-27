@@ -2,8 +2,10 @@
 
 <div class="new-template-page scroll-list-users">
 
-    <h1>lists</h1>
-    <span class="subtitle">Subtitle</span>
+    <slot name="title">
+        <h1 v-if="title">((.title))</h1>
+        <span v-if="subtitle" class="subtitle">((.subtitle))</span>
+    </slot>
 
 <div class="list-table vue">
     <slot name="header">
@@ -14,9 +16,9 @@
             <div class="create" v-if="list.config.creatable">
                 <div class="cta-blue-s" @click="create($event)">create</div>
             </div>
-            <div class="export">
+            <!--<div class="export">
                 <div class="cta-blue-s">export</div>
-            </div>
+            </div>-->
             <div v-on:click="openSearch()" class="searchbox btn" :class="{open:search_open || list.search, fill:list.search}">
                 <input class="search_global" v-model="list.search" type="search" placeholder="search" value="" @keyup.enter="onSearchGlobal($event)" @blur="onSearchGlobal($event, true)"/>
                 <i class="icon-search"></i>
