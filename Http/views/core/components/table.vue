@@ -3,8 +3,8 @@
 <div class="new-template-page scroll-list-users">
 
     <slot name="title">
-        <h1 v-if="title">((.title))</h1>
-        <span v-if="subtitle" class="subtitle">((.subtitle))</span>
+        <h1>((.title))</h1>
+        <span class="subtitle">((.subtitle))</span>
     </slot>
 
 <div class="list-table vue">
