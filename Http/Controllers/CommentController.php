@@ -316,13 +316,10 @@ class CommentController extends Controller
                     ->where('id_user_cabinet', '=', $user_destination)
                     ->first();
 
-                dd($user_destination);
-
                 if ($objects[0]["type"] != 'App\Model\CompanyModel')
                 {
                     if (!isset($comment_state))
                     {
-                        dd($comment_state);
                         $comment_state = new CommentStateModel;
 
                         if ($user->isCabinetEmployee())
