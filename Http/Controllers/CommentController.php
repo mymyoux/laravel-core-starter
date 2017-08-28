@@ -307,17 +307,14 @@ class CommentController extends Controller
                 }
 
                 $user = Auth::getUser();
+                $user_destination = $objects[0]["id"];
 
                 if ($user->isCabinetEmployee())
-                {
-                    $comment_state = CommentStateModel::where('id_user', '=', Auth::getUser()->id_user)
-                        ->where('id_user_cabinet', '=', Auth::getUser()->id_user)
-                        ->first();
-                } else {
-                    $comment_state = CommentStateModel::where(["id_user_cabinet"=>$objects[0]["id"]])
-                        ->where('id_user', '=', Auth::getUser()->id_user)
-                        ->first();
-                }
+                    $user_destination = $user;
+
+                $comment_state = CommentStateModel::where('id_user', '=', $user->id_user)
+                    ->where('id_user_cabinet', '=', $user_destination)
+                    ->first();
 
                 if ($objects[0]["type"] != 'App\Model\CompanyModel')
                 {
