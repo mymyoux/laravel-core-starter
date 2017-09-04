@@ -79,8 +79,9 @@ class CommentController extends Controller
                             $query->where('comment_relation.name', 'LIKE', '%'.(int)$object["id"].'%');
                     }
 
-                    $query->groupBy('comment_relation_user.id_comment_relation');
-                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects));
+                    $query->groupBy('comment_relation_user.id_comment_relation')
+                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
+                        ;
                 }
             });
         }else
@@ -114,6 +115,9 @@ class CommentController extends Controller
         }
 
         $request->orderBy('comment.created_time','ASC');
+
+        echo $request->getQuery()->toRawSql();
+        exit;
 
         return $request->get();
     }
