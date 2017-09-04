@@ -20,6 +20,7 @@ use Core\Model\CommentRelation;
 use Core\Model\CommentRelationUser;
 use Core\Model\Comment;
 use App\Model\Comment\CommentStateModel;
+use App\Model\Cabinet\EmployeeModel;
 /**
  * ghost\Role('admin')
  */
@@ -71,32 +72,18 @@ class CommentController extends Controller
 
                 }
                 else { //get comments of a specific candidate cabinet
-                    //dd($objects[0]['id']);
+
                     foreach($objects as $object)
                     {
-                        $query->orWhere(function($query) use($object)
-                        {
-                            $query->where('comment_relation_user.external_id','=',(int)$object["id"]);
-                            $query->where('comment_relation_user.external_type','=',$object["type"]);
-                        });
+                        if ((int)$object["id"] != Auth::getUser()->id_user)
+                            $query->where('comment_relation.name', 'LIKE', '%'.(int)$object["id"].'%');
                     }
 
-                    $query
-                        ->groupBy('comment_relation_user.id_comment_relation')
-                        ->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects));
+                    $query->groupBy('comment_relation_user.id_comment_relation')
+                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
+                        ;
                 }
             });
-            // $request->where(function($query) use($objects)
-            // {
-            //     foreach($objects as $object)
-            //     {
-            //         $query->orWhere(function($query) use($object)
-            //         {
-            //             $query->where('comment_relation_user.external_id','=',$object["id"]);
-            //             $query->where('comment_relation_user.external_type','=',$object["type"]);
-            //         });
-            //     }
-            // });
         }else
         {
             $request->where('comment.id_relation','=',$id_relation);
@@ -109,18 +96,18 @@ class CommentController extends Controller
         if ($user->isCabinetEmployee())
         {
             $comment_state = CommentStateModel::where(["id_user_cabinet"=>$user->id_user])
-                ->where('id_user', '!=', $user->id_user)
+                ->where('id_user', '=', $user->id_user)
                 ->first();
         }
         else {
             $comment_state = CommentStateModel::where(["id_user_cabinet"=>$objects[0]["id"]])
-                ->where('id_user', '=', $objects[0]["id"])
+                ->where('id_user', '=', Auth::getUser()->id_user)
                 ->first();
         }
 
         if (isset($comment_state))
         {
-            if ($comment_state->id_user != $user->id_user)
+            if ($comment_state->id_user == $user->id_user)
             {
                 $comment_state->read_time = date('Y-m-d H:i:s');
                 $comment_state->save();
@@ -129,7 +116,8 @@ class CommentController extends Controller
 
         $request->orderBy('comment.created_time','ASC');
 
-        //var_dump($request->get());
+        echo $request->getQuery()->toRawSql();
+        exit;
 
         return $request->get();
     }
@@ -343,7 +331,6 @@ class CommentController extends Controller
                     $comment_state->save();
                 }
 
-
                 $relation->load('objects.external');
                 $comment->relation()->associate($relation);
             }else
@@ -370,18 +357,20 @@ class CommentController extends Controller
     }
 
     /**
-     * Get comment state
+     * Get notification for a cabinet
      * @ghost\Api
      * @return  array
      */
     public function notification(Request $request)
     {
-        $request = CommentStateModel::select("comment_state.id", "comment_state.read_time as comment_read_time", "comment_state.created_time as comment_created_time")
-            ->where('comment_state.id_user_cabinet', '=', Db::raw('"' . Auth::getUser()->id_user . '"'))
-            ->where('comment_state.id_user', '!=', Db::raw('"' . Auth::getUser()->id_user . '"'))
-            ->first();
+        $id_user = Auth::getUser()->id_user;
 
-        return $request;
+        $request = CommentStateModel::select("comment_state.id", "comment_state_me.read_time", "comment_state.created_time")
+            ->join('comment_state as comment_state_me', 'comment_state_me.id_user', '=', Db::raw('"' . Auth::getUser()->id_user . '"'))
+            ->where('comment_state.id_user_cabinet', '=', $id_user)
+            ->where('comment_state.id_user', '!=', $id_user)
+            ;
+        return $request->get();
     }
 
     /**
