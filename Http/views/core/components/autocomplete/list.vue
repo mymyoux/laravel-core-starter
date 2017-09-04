@@ -7,7 +7,7 @@
             </slot>
         </slot>
     </div>
-    <input v-else spellcheck="false" @keyup="typing($event)"  @keyup.enter="enter" @blur="blur($event)" @focus="focus()" type="text" data-focus value="" v-model="choice" autocomplete="off">
+    <input v-else spellcheck="false" placeholder="((premessage_placeholder))" @keyup="typing($event)"  @keyup.enter="enter" @blur="blur($event)" @focus="focus()" type="text" data-focus value="" v-model="choice" autocomplete="off">
         <ul class="list-scroll" v-show="!hidden">
             <li v-for="item, index in list.models" @mousedown="click(item)" :class="{selected:index==selected}">
                 <slot  name="item" :text="item">
