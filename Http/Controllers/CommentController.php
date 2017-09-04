@@ -107,7 +107,7 @@ class CommentController extends Controller
 
         if (isset($comment_state))
         {
-            if ($comment_state->id_user = $user->id_user)
+            if ($comment_state->id_user == $user->id_user)
             {
                 $comment_state->read_time = date('Y-m-d H:i:s');
                 $comment_state->save();
