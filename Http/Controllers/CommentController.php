@@ -75,11 +75,15 @@ class CommentController extends Controller
 
                     foreach($objects as $object)
                     {
-                        if ((int)$object["id"] != Auth::getUser()->id_user)
-                            $query->where('comment_relation.name', 'LIKE', '%'.(int)$object["id"].'%');
+                        $query->orWhere(function($query) use($object)
+                        {
+                            $query->where('comment_relation_user.external_id','=',(int)$object["id"]);
+                            $query->where('comment_relation_user.external_type','=',$object["type"]);
+                        });
                     }
 
-                    $query->groupBy('comment_relation_user.id_comment_relation')
+                    $query
+                        ->groupBy('comment_relation_user.id_comment_relation')
                         //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
                         ;
                 }
