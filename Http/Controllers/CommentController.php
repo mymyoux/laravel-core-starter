@@ -166,6 +166,7 @@ class CommentController extends Controller
                 {
                     $relation = new CommentRelation;
                     $relation->name = $name;
+                    $relation->count = count($objects);
                     $relation->save();
                     foreach($objects as $object)
                     {
