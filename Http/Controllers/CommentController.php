@@ -38,7 +38,6 @@ class CommentController extends Controller
         $id_relation = $request->input('id_relation');
         $types = $request->input('types');
         $user = Auth::getUser();
-
         if(empty($objects) && !isset($id_relation))
         {
             throw new ApiException("objects_or_id_relation_required");
@@ -60,7 +59,7 @@ class CommentController extends Controller
             {
                 $query->from('comment_relation_user')->select('comment_relation_user.id_comment_relation');
 
-                if ($objects[0]['id'] == Auth::getUser()->id_user) // get all comments from a cabinet
+                if ($objects[0]['id'] == Auth::id()) // get all comments from a cabinet
                 {
                     $query->orWhere(function($query) use($objects)
                     {
@@ -244,6 +243,16 @@ class CommentController extends Controller
     public function create(Request $request)
     {
         $objects = $request->input('objects');
+        $exists = [];
+
+        $objects = array_values(array_filter($objects, function($item) use(&$exists)
+        {
+            $name = $item["type"].$item["id"];
+            if(in_array($name, $exists))
+                return False;
+            $exists[] = $name;
+            return True;
+        }));
         $id_relation = $request->input('id_relation');
 
         if(empty($objects) && !isset($id_relation))

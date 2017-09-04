@@ -21,6 +21,7 @@ class Paginate
 	protected $directions;
 	protected $keys;
 	protected $mapping;
+	protected $limit;
 	public function __construct(Request $request)
 	{
 		$this->setRequest($request);
@@ -225,6 +226,7 @@ class Paginate
             $apidata["previous"] = $previous;
 
 		}
+		$apidata["limit"] = $this->limit;
 		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
 	}
@@ -268,7 +270,7 @@ class Paginate
 
 		$limit = $paginate["limit"];
 
-
+		$this->limit = $limit;
 
 
 	    $columns = new ColumnsTester();
