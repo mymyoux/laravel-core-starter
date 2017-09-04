@@ -84,7 +84,7 @@ class CommentController extends Controller
 
                     $query
                         ->groupBy('comment_relation_user.id_comment_relation')
-                        //->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
+                        ->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
                         ;
                 }
             });
