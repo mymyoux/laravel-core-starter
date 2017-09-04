@@ -97,32 +97,44 @@ class CommentController extends Controller
             $request->whereIn('comment.access_type', $types);
         }
 
+        $create_state = False;
         if ($user->isCabinetEmployee())
         {
+            $create_state = True;
             $comment_state = CommentStateModel::where(["id_user_cabinet"=>$user->id_user])
                 ->where('id_user', '=', $user->id_user)
                 ->first();
         }
         else {
-            $comment_state = CommentStateModel::where(["id_user_cabinet"=>$objects[0]["id"]])
-                ->where('id_user', '=', Auth::getUser()->id_user)
-                ->first();
+            if($objects[0]["type"] == User::class)
+            {
+                $relationUser = User::getById($objects[0]["id"]);
+                if($relationUser->isCabinetEmployee())
+                {
+                    $create_state  =true;
+                    $comment_state = CommentStateModel::where(["id_user_cabinet"=>$objects[0]["id"]])
+                        ->where('id_user', '=', Auth::getUser()->id_user)
+                        ->first();
+                }
+            }
         }
-
-        if (!isset($comment_state))
+        if($create_state)
         {
-            $comment_state = new CommentStateModel;
-
-            if ($user->isCabinetEmployee())
-                $comment_state->id_user_cabinet = Auth::getUser()->id_user;
-            else
-                $comment_state->id_user_cabinet = $objects[0]["id"];
-
-            $comment_state->id_user = Auth::getUser()->id_user;
+            if (!isset($comment_state))
+            {
+                $comment_state = new CommentStateModel;
+    
+                if ($user->isCabinetEmployee())
+                    $comment_state->id_user_cabinet = Auth::getUser()->id_user;
+                else
+                    $comment_state->id_user_cabinet = $objects[0]["id"];
+    
+                $comment_state->id_user = Auth::getUser()->id_user;
+            }
+    
+            $comment_state->read_time = date('Y-m-d H:i:s');
+            $comment_state->save();
         }
-
-        $comment_state->read_time = date('Y-m-d H:i:s');
-        $comment_state->save();
 
         $request->orderBy('comment.created_time','ASC');
 
