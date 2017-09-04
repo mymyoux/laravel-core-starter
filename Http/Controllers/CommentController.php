@@ -270,6 +270,7 @@ class CommentController extends Controller
             return True;
         }));
         $id_relation = $request->input('id_relation');
+
         if(empty($objects) && !isset($id_relation))
         {
             throw new ApiException("objects_or_id_relation_required");
@@ -314,32 +315,33 @@ class CommentController extends Controller
                 }
 
                 $user = Auth::getUser();
+                $user_destination = $objects[0]["id"];
 
                 if ($user->isCabinetEmployee())
+                    $user_destination = $user->id_user;
+
+                $comment_state = CommentStateModel::where('id_user', '=', $user->id_user)
+                    ->where('id_user_cabinet', '=', $user_destination)
+                    ->first();
+
+                if ($objects[0]["type"] != 'App\Model\CompanyModel')
                 {
-                    $comment_state = CommentStateModel::where('id_user', '=', Auth::getUser()->id_user)
-                        ->where('id_user_cabinet', '=', Auth::getUser()->id_user)
-                        ->first();
-                } else {
-                    $comment_state = CommentStateModel::where(["id_user_cabinet"=>$objects[0]["id"]])
-                        ->where('id_user', '=', Auth::getUser()->id_user)
-                        ->first();
+                    if (!isset($comment_state))
+                    {
+                        $comment_state = new CommentStateModel;
+
+                        if ($user->isCabinetEmployee())
+                            $comment_state->id_user_cabinet = Auth::getUser()->id_user;
+                        else
+                            $comment_state->id_user_cabinet = $objects[0]["id"];
+
+                        $comment_state->id_user = Auth::getUser()->id_user;
+                        $comment_state->read_time = date('Y-m-d H:i:s');
+                    }
+                    $comment_state->created_time = date('Y-m-d H:i:s');
+                    $comment_state->save();
                 }
 
-                if (!isset($comment_state))
-                {
-                    $comment_state = new CommentStateModel;
-
-                    if ($user->isCabinetEmployee())
-                        $comment_state->id_user_cabinet = Auth::getUser()->id_user;
-                    else
-                        $comment_state->id_user_cabinet = $objects[0]["id"];
-
-                    $comment_state->id_user = Auth::getUser()->id_user;
-                    $comment_state->read_time = date('Y-m-d H:i:s');
-                }
-                $comment_state->created_time = date('Y-m-d H:i:s');
-                $comment_state->save();
 
                 $relation->load('objects.external');
                 $comment->relation()->associate($relation);
