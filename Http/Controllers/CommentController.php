@@ -120,8 +120,8 @@ class CommentController extends Controller
 
         $request->orderBy('comment.created_time','ASC');
 
-        echo $request->getQuery()->toRawSql();
-        exit;
+        // echo $request->getQuery()->toRawSql();
+        // exit;
 
         return $request->get();
     }
