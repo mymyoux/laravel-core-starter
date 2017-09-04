@@ -109,19 +109,22 @@ class CommentController extends Controller
                 ->first();
         }
 
-        if (isset($comment_state))
+        if (!isset($comment_state))
         {
-            if ($comment_state->id_user == $user->id_user)
-            {
-                $comment_state->read_time = date('Y-m-d H:i:s');
-                $comment_state->save();
-            }
+            $comment_state = new CommentStateModel;
+
+            if ($user->isCabinetEmployee())
+                $comment_state->id_user_cabinet = Auth::getUser()->id_user;
+            else
+                $comment_state->id_user_cabinet = $objects[0]["id"];
+
+            $comment_state->id_user = Auth::getUser()->id_user;
         }
 
-        $request->orderBy('comment.created_time','ASC');
+        $comment_state->read_time = date('Y-m-d H:i:s');
+        $comment_state->save();
 
-        // echo $request->getQuery()->toRawSql();
-        // exit;
+        $request->orderBy('comment.created_time','ASC');
 
         return $request->get();
     }
