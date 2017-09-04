@@ -60,7 +60,7 @@ class Paginate extends CoreAnnotation
     	if(isset($paginate["directions"]))
     	{
     		$paginate["directions"] = array_map(function($item){return (int)trim($item);}, $paginate["directions"]);
-    	}
+		}
     	return $paginate;
     }
     public function isAllowed($key)
