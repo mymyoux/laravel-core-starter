@@ -72,8 +72,8 @@ class Generate extends CoreCommand
 
         if($generate_php)
         {
-           $this->generatePHP(); 
-        //    $this->generatePHPAPI(); 
+        //   $this->generatePHP(); 
+            $this->generatePHPAPI(); 
         }
      
         if($generate_ts)

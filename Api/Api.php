@@ -14,6 +14,7 @@ use Core\Jobs\Api as ApiJob;
 use Logger;
 use Core\Util\ClassHelper;
 use Illuminate\Http\JsonResponse;
+use Core\Util\ModuleHelper;
 class Api
 {
     public static $data = [[]];
@@ -65,7 +66,7 @@ class Api
 	}
     public function isMainCall()
     {
-        return count(static::$data) == 1;
+        return count(static::$data) == 0;
     }
     public function get($path)
     {
@@ -171,6 +172,7 @@ class Api
             $rawresponse = $rawresponse->getData(True);
         }
         $api_data = isset($rawresponse["api_data"])?$rawresponse["api_data"]:NULL;
+        //var_dump($api_data);
         $response = new ApiResponse();
         if(isset($rawresponse["data"]))
             $response->value = $rawresponse["data"];
@@ -238,13 +240,30 @@ class Api
     }
     public function registerAnnotations()
     {
-        $folder = __DIR__.'/Annotations';
+        //$folder = __DIR__.'/Annotations';
 
-        $files = File::allFiles($folder);
-        foreach ($files as $file)
+        $paths = array_map(function($item)
         {
-            AnnotationRegistry::registerFile($file->getPathname());
+            return $item["path"];
+        },ModuleHelper::getModulesFromComposer());
+        
+        foreach($paths as $path)
+        {
+            $folder = base_path(join_paths($path, "Annotations"));
+            if(!file_exists($folder))
+            {
+                $folder = base_path(join_paths($path, "Api","Annotations"));
+            }
+            if(file_exists($folder))
+            {
+                $files = File::allFiles($folder);
+                foreach ($files as $file)
+                {
+                    AnnotationRegistry::registerFile($file->getPathname());
+                }
+            }
         }
+
 
     }
 	protected function generateRoutes()

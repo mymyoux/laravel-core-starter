@@ -10,4 +10,8 @@ class Guard extends BaseGuard
             return $this->user()->type;
         return NULL;
     }
+    public function isAdmin()
+    {
+        return $this->type() == "admin";
+    }
 }

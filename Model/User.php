@@ -68,7 +68,7 @@ class User extends Model implements
     protected $hidden = [
         'deleted','temp','cgu_accepted','remember_token'
     ];
-    protected $appends = ["roles"];
+    public $appends = ["roles"];
 
 
     /**
@@ -93,7 +93,11 @@ class User extends Model implements
     }
     public function isAdmin()
     {
-        return $this->type == "admin";
+        return $this->getRealUser()->type == "admin";
+    }
+    public function getType()
+    {
+        return $this->type;
     }
     protected function _getById($id)
     {
