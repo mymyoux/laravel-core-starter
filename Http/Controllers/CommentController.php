@@ -170,6 +170,10 @@ class CommentController extends Controller
         {
             $type = Auth::type();
         }
+        if(is_array($type))
+        {
+            $type = $type[0];
+        }
         DB::beginTransaction();
 
         try
@@ -292,6 +296,10 @@ class CommentController extends Controller
         if(!isset($type))
         {
             $type = Auth::type();
+        }
+        if(is_array($type))
+        {
+            $type = $type[0];
         }
         DB::beginTransaction();
         try
