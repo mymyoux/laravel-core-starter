@@ -52,7 +52,7 @@ class ClassHelper
 	}
 	public static function getFullClassName($path)
 	{
-		return static::getInformations($path)->class;
+		return static::getInformations($path)->fullname;
 	}
 	public static function getMethodBody($path, $withHeaders = False)
 	{
