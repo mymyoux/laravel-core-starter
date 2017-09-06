@@ -39,7 +39,7 @@ class Slack extends JobHandler
         $this->data["attachments"] = $data->attachments ?? NULL;
         if(isset($this->data["attachments"]))
         {
-            $this->data["attachments"] = json_encode($this->data["attachments"]);
+            //$this->data["attachments"] = json_encode($this->data["attachments"]);
         }
         $allowed_env = config('services.slack.allowed_env', ['prod']);
         if(!Notification::isAllowedEnv())
@@ -94,6 +94,8 @@ class Slack extends JobHandler
                     continue;
                 }
                 $url    = $slack['url'];
+                //$this->data["attachments"] = json_encode($this->data["attachments"]);
+                //$this->data["attachments"] = mb_substr($this->data["attachments"],0, mb_strlen($this->data["attachments"])-1);
                 $ch = curl_init( $url );
                 $json = json_encode($this->data);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
