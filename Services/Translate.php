@@ -22,6 +22,25 @@ class Translate
     {
            return Translation::getLocale($locale);
     }
+    public function getLocaleFromHeader()
+    {
+        $language = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        $languages = explode(";", $language);
+        $languages = array_reduce($languages, function($previous, $item)
+        {
+            $langs = explode(",",$item);
+            foreach($langs as $lang)
+            {
+                if(starts_with($lang,"q="))
+                {
+                    continue;
+                }
+                $previous[] = $lang;
+            }
+            return $previous;
+        }, []);
+        return Translation::getLocale($languages);
+    }
     public function t($key,  $type, $locale, $options = NULL)
     {
         if(!isset($locale))

@@ -50,8 +50,15 @@ class VueController extends Controller
 	 */
     public function get(Request $request)
     {   
-        $locale = $request->input('locale')??$_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        $this->locale  = Translate::getLocale($locale);
+        $locale = $request->input('locale');
+        if(!isset($locale))
+        {
+            $locale = Translate::getLocaleFromHeader();
+        }else
+        {
+            $locale = Translate::getLocale($locale);
+        }
+        $this->locale  = $locale; //Translate::getLocale($locale);
         
         $this->skiphelpers = $request->input('skiphelpers');
         $this->extension = static::DEFAULT_EXTENSION;
