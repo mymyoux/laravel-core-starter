@@ -190,8 +190,7 @@ class Mail
         }
         
         $data = array_values($data);
-   
-   
+        $message->global_merge_vars = $data;
         $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, true, $send_at, $ip_pool);
 
         foreach($result as $key=>$resultemail)
