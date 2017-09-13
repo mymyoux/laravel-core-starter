@@ -23,7 +23,7 @@ class Call extends Command
      *
      * @var string
      */
-    protected $signature = 'api:call {path} {data?}';
+    protected $signature = 'api:call {--path=} {--id_user=?} {data?}';
 
     /**
      * The console command description.
@@ -40,7 +40,8 @@ class Call extends Command
      */
     public function handle()
     {
-        $path = $this->argument('path');
+        $path = $this->option('path');
+        $id_user = $this->option('id_user');
         $data = $this->argument('data');
         if(isset($data))
         {
@@ -58,7 +59,20 @@ class Call extends Command
         if(!isset($data->api_user)){
             $data->api_user = NULL;
         }
+        if(!isset($data->api_user) && isset($id_user))
+        {
+            $data->api_user = $id_user;
+        }
         $result = ApiService::path($path)->params($data->params)->user($data->api_user)->response($data->add_params);
+        dd($result);
+        if(isset($result->stats) && isset($results->stats->log))
+            $log = $result->stats->log;
+        unset($result->stats);
+        if(isset($log))
+        {
+            $results->stats = new \StdClass();
+            $results->stats->log = $log;
+        }
         echo "------start-data-----\n";
         echo json_encode(
             $result)."\n";
