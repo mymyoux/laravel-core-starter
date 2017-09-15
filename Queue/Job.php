@@ -241,6 +241,7 @@ class Job
             $job = new $class();
             $job->id = $id;
             $job->queue = $this->tube;
+            $job->delay = $beanstalkd->delay;
             if (true === $now)
             {
                 throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);

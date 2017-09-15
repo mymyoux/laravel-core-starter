@@ -53,15 +53,14 @@ class ConfigCommand extends CoreCommand
         $jobs = array_map(
             function($file){
                 $class = ClassHelper::getFullClassName($file->getRealPath());
+               
                 return $class;
 
             },array_flatten(File::allfiles(array_flatten($this->jobFolders))));
-
         $jobs = array_filter($jobs, function($item)
         {
             return is_subclass_of($item, JobHandler::class);
         });
-
         $app = app();
         $jobs = array_map(function($item) use($app)
         {
@@ -102,7 +101,16 @@ class ConfigCommand extends CoreCommand
             }
             return $config;
         }, $jobs);
-
+        $uniquejobs = [];
+        $jobs = array_values(array_filter($jobs, function($job) use(&$uniquejobs)
+        {
+            if(!in_array($job["name"],$uniquejobs))
+            {
+                $uniquejobs[] = $job["name"];
+                return true;
+            }
+            return false;
+        }));
         $groups = [];
         foreach($jobs as &$job)
         {

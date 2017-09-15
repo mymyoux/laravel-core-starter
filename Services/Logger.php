@@ -24,6 +24,7 @@ class Logger
     private $config_query   = null;
     private $output         = null;
     private $outputs         = null;
+    public $timestamp = NULL;
 
     public function __construct()
     {
@@ -41,7 +42,18 @@ class Logger
         }
     }
 
-
+    public function startTime()
+    {
+        $this->timestamp = $this->getTime();
+    }
+    protected function getTime()
+    {
+        return round(microtime(True)*1000);
+    }
+    protected function getCurrentTime()
+    {
+        return $this->getTime()-$this->timestamp;
+    }
     public function setDisplayTime( $boolean )
     {
         $this->display_time = $boolean;
@@ -213,7 +225,6 @@ class Logger
 
         if (true === $this->display_time)
             $begin = '[' . date('Y-m-d H:i:s') . '] ' . $begin;
-
         if (true === App::runningInConsole())
         {
             if (App::runningInCron())
@@ -250,7 +261,7 @@ class Logger
         {
             if(App::isLocal() ||  (Auth::check() && Auth::getUser()->isAdmin()))
             {
-                $this->outputs[] = $style.": ".$message;
+                $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style.": ".$message;
             }
         }
     }

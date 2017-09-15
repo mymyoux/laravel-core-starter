@@ -47,16 +47,34 @@ class Translation extends Model
     }
     protected function getLocale($locale)
     {
-        $locale = strtolower($locale);
-        $locales = $this->getLocales();
-        foreach($locales as $loc)
+        if(!is_array($locale))
         {
-            if($locale == $loc)
-                return $locale;
+            $locale = [$locale];
         }
-        $index = strpos($locale, "-");
-        if($index!==False)
-            return $this->getLocale(substr($locale, $index+1));
+        $accepted_locales = array_reduce($locale, function($previous, $item)
+        {
+            $item = strtolower($item);
+            if(!in_array($item, $previous))
+                $previous[] = $item;
+            $index = strpos($item, "-");
+            if($index !== False)
+            {
+                $item = substr($item, 0, $index);
+                if(!in_array($item, $previous))
+                {
+                    $previous[] = $item;
+                }
+            }
+            return $previous;
+        }, []);
+        $locales = $this->getLocales()->toArray();
+        foreach($accepted_locales as $accepted)
+        {
+            if(in_array($accepted, $locales))
+            {
+                return $accepted;
+            }
+        }
         return static::DEFAULT_LOCALE;
     }
     protected function translate($key, $locale, $type, $options = NULL)
