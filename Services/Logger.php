@@ -36,10 +36,9 @@ class Logger
             $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 
             $this->output = new \Illuminate\Console\OutputStyle($input, $output);
-        }else
-        {
-            $this->outputs = [];
         }
+        $this->outputs = [];
+        $this->timestamp  = round(constant("LARAVEL_START")*1000);
     }
 
     public function startTime()
@@ -179,8 +178,9 @@ class Logger
     	$this->log($message, (false === $bg ? self::LOG_DEBUG : self::LOG_BG_DEBUG));
     }
 
-    private function log( $message, $type = self::LOG_NONE )
+    private function log( $msg, $type = self::LOG_NONE )
     {
+        $message = $msg;
         if (false === $this->debug && $type < self::LOG_ERROR) return;
         $begin = $end = '';
         $style = null;
@@ -257,12 +257,15 @@ class Logger
                      $this->output->writeln($message, null);
                 }
             }
+            $this->outputs[] = $type.": ".$msg;
         }else
         {
             if(App::isLocal() ||  (Auth::check() && Auth::getUser()->isAdmin()))
             {
-                $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style.": ".$message;
+                
+                $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style  .": ".$msg;
             }
+
         }
     }
     public function getOutput()
