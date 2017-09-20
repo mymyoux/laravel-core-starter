@@ -93,6 +93,10 @@ class User extends Model implements
     }
     public function isAdmin()
     {
+        return $this->type == "admin";
+    }
+    public function isRealAdmin()
+    {
         return $this->getRealUser()->type == "admin";
     }
     public function getType()
