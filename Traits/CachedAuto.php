@@ -2,25 +2,151 @@
 
 namespace Core\Traits;
 
+use Core\Traits\Cache\Serialized;
 use Logger;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 trait CachedAuto
 {
 	protected static $_cached_key;
-	protected function find($id)
+	protected function  find($id, $columns = ['*'])
 	{
-		$key = $this->getCacheKey();
+		$key = $this->getCacheKey($id);
 		$model = Cache::get($key);
 		if(!$model)
 		{
-			$model = parent::find($id);
-			Cache::forever($key, $model);
+			$model = parent::find($id, $columns);
+			$model->cache();
 		}
-        if(isset($model) && method_exists($this, "prepareModel"))
+		else
+		{
+			$this->hydrateObject($model);
+			if(method_exists($model, "afterCache"))
+			{
+				$model->afterCache();
+			}
+		}
+        if(isset($model) && method_exists($model, "prepareModel"))
         {
-        	$model = $this->prepareModel($model);
+        	$model->prepareModel($model);
         }
         return $model;
+	}
+	public function cache()
+	{
+		if(method_exists($this, "beforeCache"))
+		{
+			$this->beforeCache();
+		}
+		$object = clone $this;
+		$object->handleCache();
+		$key = $object->getCacheKey();
+		Cache::forever($key, $object);
+	}
+	public function handleCache()
+	{
+		$relations = $this->getRelations();
+		foreach($relations as $key=>$relation)
+		{
+			$this->relations[$key] = $this->deshydrateObject($relation);
+		}
+		$attributes = $this->getAttributes();
+		foreach($attributes as $key=>$attribute)
+		{
+			$this->attributes[$key] = $this->deshydrateObject($attribute);
+		}
+	}
+	public function hydrateObject($data)
+	{
+		if(!isset($data) || (!is_object($data) && !is_array($data)))
+		return $data;
+		
+		if($data instanceof Collection)
+		{
+			$data = $data->map(function(&$item)
+			{
+				return $this->hydrateObject($item);
+			});
+		}elseif(is_array($data))
+		{
+			$data = array_map(function(&$item)
+			{
+				return $this->hydrateObject($item);
+			}, $data);
+		}else
+		{
+			if($data instanceof Serialized)
+			{
+				$tmp = $data->cls::find($data->id);
+				if(isset($data->relations))
+				{
+					$tmp->relations = $data->relations;
+				}
+				$data = $tmp;
+			}
+
+			if($data instanceof Model)
+			{
+				$relations = $data->getRelations();
+				foreach($relations as $key=>$relation)
+				{
+					$data->relations[$key] = $this->hydrateObject($relation);
+				}
+			}
+		}
+		return $data;
+	}
+	protected function deshydrateObject(&$data)
+	{
+		if(!isset($data) || (!is_object($data) && !is_array($data)))
+			return $data;
+		
+		if($data instanceof Collection)
+		{
+			$data = $data->map(function(&$item)
+			{
+				return $this->deshydrateObject($item);
+			});
+		}elseif(is_array($data))
+		{
+			$data = array_map(function(&$item)
+			{
+				return $this->deshydrateObject($item);
+			}, $data);
+		}else
+		{
+			
+			$classes = class_uses($data);
+			if($data instanceof Model)
+			{
+				$relations = $data->getRelations();
+				foreach($relations as $key=>$relation)
+				{
+					
+					$data->relations[$key] = $this->deshydrateObject($relation);
+				}
+			}
+			if(isset($classes[CachedAuto::class]))
+			{
+				$tmp = new Serialized();
+				$tmp->id = $data->getKey();
+				$tmp->cls = get_class($data);
+				if($data instanceof Model)
+				{
+					$relations = $data->getRelations();
+					if(!empty($relations))
+						$tmp->relations = $relations;
+				}
+				$data = $tmp;
+			}
+		}
+		return $data;
+	}
+	public function save(array $options = [])
+	{
+		$this->invalidate();
+		return parent::save($options);
 	}
 	public function delete()
 	{
@@ -44,11 +170,12 @@ trait CachedAuto
 		}
 		return parent::destroy($ids);
 	}
-	protected function getCacheKey()
+	
+	protected function getCacheKey($id = NULL)
 	{
-		return str_replace("%id", $this->getKey(), static::$_cached_key);
+		return str_replace("%id", isset($id)?$id:$this->getKey(), static::$_cached_key);
 	}
-	public static function bootCached()
+	public static function bootCachedAuto()
 	{
 		$instance = (new static);
 		if(isset($instance->cached_key))
