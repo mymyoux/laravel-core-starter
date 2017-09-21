@@ -48,4 +48,21 @@ abstract class Model extends BaseModel
 
         return $data;
     }
+    public function __clone()
+	{
+		$this->relations = $this->___clone($this->relations);
+		$this->attributes = $this->___clone($this->attributes);
+	}
+	protected function ___clone(&$data)
+	{
+        if($data instanceof Collection)
+        {
+            return $data->map(function($item){return $this->___clone($item);});
+        }
+		if(is_object($data))
+			return clone $data;
+		if(is_array($data))
+			return array_map(function($item){return $this->___clone($item);}, $data);
+		return $data;
+	}
 }
