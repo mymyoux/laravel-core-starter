@@ -145,7 +145,7 @@ class ReplayCommand extends CoreCommand
                     $result->queue = $queue;
                 }
 
-                $user = isset($result->id_user) ? User::getById( $result->id_user ) : NULL;
+                $user = isset($result->id_user) ? User::find( $result->id_user ) : NULL;
 
                 $result->state      = Beanstalkd::STATE_REPLAYING;
                 $result->tries++;

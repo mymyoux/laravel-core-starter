@@ -74,7 +74,7 @@ class UserController extends Controller
     public function getInfos(Request $request)
     {
     	$id_user = $request->input('id_user');
-    	$user = User::getById($id_user);
+    	$user = User::find($id_user);
     	return $user;
     }
     /**
@@ -87,7 +87,7 @@ class UserController extends Controller
     public function get(Request $request)
     {
     	$id_user = $request->input('id_user');
-    	$user = User::getById($id_user);
+    	$user = User::find($id_user);
     	return $user;
     }
     /**

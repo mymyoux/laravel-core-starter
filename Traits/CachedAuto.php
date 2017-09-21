@@ -12,6 +12,12 @@ trait CachedAuto
 	protected static $_cached_key;
 	protected function  find($id, $columns = ['*'])
 	{
+		if(is_array($id))
+		{
+			return array_map(function($id){
+				return $this->find($id, $columns);
+			}, $id);
+		}
 		$key = $this->getCacheKey($id);
 		$model = Cache::get($key);
 		if(!$model)

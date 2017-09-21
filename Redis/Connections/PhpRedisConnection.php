@@ -22,6 +22,7 @@ class PhpRedisConnection extends BasePhpRedisConnection
         $result = parent::get($key);
         return $this->_data[$key] = $result;
     }
+    
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
     {
         $this->_data[$key] = $value;
