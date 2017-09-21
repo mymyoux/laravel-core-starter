@@ -7,6 +7,9 @@ use Logger;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use DeepCopy\DeepCopy;
+
+
 trait CachedAuto
 {
 	protected static $_cached_key;
@@ -41,15 +44,13 @@ trait CachedAuto
 	}
 	public function cache()
 	{
-		if(strpos(get_class($this), "CvModel")!==False)
-		{
-			$this;
-		}
 		if(method_exists($this, "beforeCache"))
 		{
 			$this->beforeCache();
 		}
-		$object = clone $this;
+		$deepCopy = new DeepCopy();
+		$object = $deepCopy->copy($this);
+		//$object = clone $this;
 		$object->handleCache();
 		$key = $object->getCacheKey();
 		Cache::forever($key, $object);
@@ -195,30 +196,5 @@ trait CachedAuto
 		{
 			static::$_cached_key = $instance->getTable().":%id";
 		}
-	}
-	public function __clone()
-	{
-		if(strpos(get_class($this), "CvModel")!==False)
-		{
-			$this;
-		}
-		$this->relations = $this->___clone($this->relations);
-		$this->attributes = $this->___clone($this->attributes);
-	}
-	protected function ___clone(&$data)
-	{
-		if(strpos(get_class($this), "CvModel")!==False)
-		{
-			$this;
-		}
-		if($data instanceof Collection)
-		{
-			return $data->map(function($item){return $this->___clone($item);});
-		}
-		if(is_object($data))
-			return clone $data;
-		if(is_array($data))
-			return array_map(function($item){return $this->___clone($item);}, $data);
-		return $data;
 	}
 }
