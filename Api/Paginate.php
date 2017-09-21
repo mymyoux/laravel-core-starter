@@ -30,6 +30,33 @@ class Paginate
 	{
 		$this->request = $request;
 	}
+	protected $_initialized;
+	protected function _initialize()
+	{
+		if(!$this->_initialized)
+		{
+			$paginate = $this->request->input("paginate");
+			$this->keys = $paginate["keys"];
+			
+				if(isset($paginate["next"]))
+					$this->next = $paginate["next"];
+				if(isset($paginate["previous"]))
+					$this->previous = $paginate["previous"];
+				$this->directions = $paginate["directions"];
+				$this->limit = $paginate["limit"];
+				$this->_initialized = true;
+		}
+	}
+	public function getLimit()
+	{
+		$this->_initialize();
+		return $this->limit;
+	}
+	public function getNext()
+	{
+		$this->_initialize();
+		return $this->next;
+	}
 	public function onResults($query, $data)
 	{
 		$query 	= method_exists($query, "getQuery")?$query->getQuery():$query;

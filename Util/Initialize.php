@@ -7,7 +7,20 @@ namespace
  * Date: 27/09/2014
  * Time: 20:14
  */
-
+if (!function_exists('first')) 
+{
+    /**
+     * Return first element of array
+     * @param array $array
+     * @return any
+     */
+    function first($array)
+    {
+        if(!count($array))
+            return NULL;
+        return array_values($array)[0];
+    }
+}
 if (!function_exists('is_url')) 
 {
     /**
