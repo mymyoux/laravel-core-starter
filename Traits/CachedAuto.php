@@ -30,7 +30,8 @@ trait CachedAuto
 		}
 		else
 		{
-			$this->hydrateObject($model);
+			$model->dishandleCache();
+			//$this->hydrateObject($model);
 			if(method_exists($model, "afterCache"))
 			{
 				$model->afterCache();
@@ -67,6 +68,10 @@ trait CachedAuto
 		{
 			$this->attributes[$key] = $this->deshydrateObject($attribute);
 		}
+	}
+	public function dishandleCache()
+	{
+		$this->hydrateObject($this);
 	}
 	public function hydrateObject($data)
 	{
