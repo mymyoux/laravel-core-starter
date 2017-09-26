@@ -26,7 +26,9 @@ trait CachedAuto
 		if(!$model)
 		{
 			$model = parent::find($id, $columns);
-			$model->cache();
+
+			if ($model !== null)
+				$model->cache();
 		}
 		else
 		{
