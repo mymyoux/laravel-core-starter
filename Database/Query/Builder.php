@@ -22,6 +22,10 @@ class Builder extends BaseBuilder
 {
     public function _insert(array $values)
     {
+        if(is_numeric_array($values))
+        {
+            return array_map(function($item){return $this->_insert($item);}, $values);
+        }
         if(!isset($values["created_time"]))
         {
             $values["created_time"] = Db::raw('NOW(3)');
