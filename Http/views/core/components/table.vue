@@ -47,7 +47,7 @@
                                 </span>
                             </p>
                             <ul class="list-scroll click" data-multiple data-static>
-                                <li v-for="value, key in list.displayFilters()" @click="addFilterMultiSelect(list, value)" :value="value">{{ value }}<span :class="'checkbox-square' + (list.current_filters.indexOf(value) != -1 ? 'active' : '')"></span></li>
+                                <li v-for="value, key in list.displayFilters()" @click="addFilterMultiSelect(list, value)" :value="value">{{ value }}<span :class="'checkbox-square' + (list.current_filters.indexOf(value) != -1 ? ' active' : '')"></span></li>
                             </ul>
                         </ul>
                     </div>

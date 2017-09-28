@@ -64,14 +64,15 @@ class Call extends Command
             $data->api_user = $id_user;
         }
         $result = ApiService::path($path)->params($data->params)->user($data->api_user)->response($data->add_params);
-        dd($result);
-        if(isset($result->stats) && isset($results->stats->log))
-            $log = $result->stats->log;
-        unset($result->stats);
+        if(isset($result->stats) && isset($result->stats["log"]))
+            $log = $result->stats["log"];
+        
         if(isset($log))
         {
-            $results->stats = new \StdClass();
-            $results->stats->log = $log;
+            $result->stats = ["log"=>$log];
+        }else
+        {
+            unset($result->stats);
         }
         echo "------start-data-----\n";
         echo json_encode(
