@@ -14,17 +14,17 @@ trait PseudoTrait
    {
         return $this->_traits[$name];
    }
-   public function __call($name, $arguments)
-   {
-        foreach($this->_traits as $key=>$pseudotrait)
-        {
-            if(method_exists($pseudotrait, $name))
-            {
-                return call_user_func_array(array($pseudotrait, $name), $arguments);
-            }
-        }
-        return parent::__call($name, $arguments);//new \Exception(get_class($this).": No trait implements the method '".$name."'");
-   }
+//    public function __call($name, $arguments)
+//    {
+//         foreach($this->_traits as $key=>$pseudotrait)
+//         {
+//             if(method_exists($pseudotrait, $name))
+//             {
+//                 return call_user_func_array(array($pseudotrait, $name), $arguments);
+//             }
+//         }
+//         return parent::__call($name, $arguments);//new \Exception(get_class($this).": No trait implements the method '".$name."'");
+//    }
    public function __isset($key)
    {
       return ! is_null($this->_getAttribute($key));

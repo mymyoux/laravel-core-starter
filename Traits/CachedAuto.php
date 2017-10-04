@@ -13,6 +13,7 @@ use DeepCopy\DeepCopy;
 trait CachedAuto
 {
 	protected static $_cached_key;
+	public $from_cache = False;
 	protected function find($id, $columns = ['*'])
 	{
 		if(is_array($id))
@@ -23,7 +24,7 @@ trait CachedAuto
 		}
 		$key = $this->getCacheKey($id);
 		$model = Cache::get($key);
-		if(!$model)
+		if(!$model) 
 		{
 			$model = parent::find($id, $columns);
 			$model->cache();
@@ -36,12 +37,23 @@ trait CachedAuto
 			{
 				$model->afterCache();
 			}
+			$model->from_cache = true;
 		}
-        if(isset($model) && method_exists($model, "prepareModel"))
+        if(isset($model) && method_exists($model, "prepare"))
         {
-        	$model->prepareModel($model);
+        	$model->prepare();
         }
         return $model;
+	}
+	public function isCached($id)
+	{
+		$key = $this->getCacheKey($id);
+		return Cache::has($key);
+	}
+
+	protected function get()
+	{
+		return parent::get();
 	}
 	public function cache()
 	{
@@ -50,8 +62,13 @@ trait CachedAuto
 			$this->beforeCache();
 		}
 		$deepCopy = new DeepCopy();
+		$deepCopy->skipUncloneable(true);
 		$object = $deepCopy->copy($this);
 		//$object = clone $this;
+		if(method_exists($object, "prehandleCache"))
+		{
+			$object->prehandleCache();
+		}
 		$object->handleCache();
 		$key = $object->getCacheKey();
 		Cache::forever($key, $object);
@@ -202,4 +219,8 @@ trait CachedAuto
 			static::$_cached_key = $instance->getTable().":%id";
 		}
 	}
+	public function initModel()
+    {
+        $a = 50;
+    }
 }

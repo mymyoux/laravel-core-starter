@@ -4,12 +4,41 @@ namespace Core\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Core\Database\Query\Builder as QueryBuilder;
-
 abstract class Model extends BaseModel
 {
+    use Editable;
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
+    private $_prepared = False;
+    
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
+    public function setRawAttributes(array $attributes, $sync = false)
+    {
+        parent::setRawAttributes($attributes, $sync);
+        $this->prepare();
+        return $this;
+    }
+    public function prepare()
+    {
+        if($this->_prepared)
+            return;
+        $this->_prepared = True;
+        $this->prepareModel();
+    }
+    protected function prepareModel()
+    {
 
+    }
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
+    {
+        $belongs = parent::belongsTo($related, $foreignKey, $ownerKey, $relation);
+        $newbelongs = new BelongsTo($belongs->getQuery(), $belongs->getParent(), $belongs->getForeignKey(), $belongs->getOwnerKey(), $belongs->getRelation());
+
+        return $newbelongs;
+	}
     public function getDateFormat()
     {
         return 'Y-m-d H:i:s.u';
@@ -45,7 +74,17 @@ abstract class Model extends BaseModel
 
         if(isset($this->primaryKey) && !is_array($this->primaryKey) && isset($data[$this->primaryKey]) && !isset($data["id"]))
             $data["id"] = $data[$this->primaryKey];
-
+        if(isset($this->pivot))
+        {
+            $d = $this->pivot->toArray();
+            foreach($d as $key=>$value)
+            {
+                if(!isset($data[$key]))
+                {
+                    $data[$key] = $value;
+                }
+            }
+        }
         return $data;
     }
 }

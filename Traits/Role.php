@@ -8,7 +8,7 @@ trait Role
 	public static $ROLE_ADMIN = "admin";
 	protected static $ROLE_CONNECTED = "user";
 	public static $ROLE_DISCONNECTED = "visitor";
-	public $roles = [];
+	public $roles = []; 
 	protected function addRole($role)
 	{
 		$this->roles[] = $role;

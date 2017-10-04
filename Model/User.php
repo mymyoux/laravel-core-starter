@@ -39,7 +39,7 @@ class User extends Model implements
     use Notifiable;
     use CachedAuto;
     use Role;
-    use PseudoTrait;
+ //   use PseudoTrait;
 
 
 
@@ -67,9 +67,9 @@ class User extends Model implements
      * @var array
      */
     protected $hidden = [
-        'deleted','temp','cgu_accepted','remember_token'
-    ];
-    public $appends = ["roles"];
+        'deleted','temp','cgu_accepted','remember_token','num_connection','last_connection'
+    ]; 
+    public $appends = [];
 
 
     /**
@@ -129,10 +129,15 @@ class User extends Model implements
             $this->addRole($role->role);
         }
     }
-    protected function prepareModel($user)
+    protected function prepareModel()
     {
-        $user->addPseudoTrait($user->type);
-        return $user;
+        if(isset($this->traits[$this->type]))
+        {
+            $cls = $this->traits[$this->type];
+            $this->mixin(new $cls);
+        }
+        //$this->addPseudoTrait($this->type);
+        return $this;
     }
     public function setRealUser($user)
     {
@@ -199,6 +204,10 @@ class User extends Model implements
     }
      public function company()
     {
-        return $this->employee->company();
+        return $this->hasMany('App\Model\CompanyModelEmployee', 'id_user','id_user');
+    }
+    public function prehandleCache()
+    {
+        $this->prepareCache();
     }
 }

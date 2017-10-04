@@ -11,6 +11,7 @@ namespace Core\Core\PseudoTrait;
 
 abstract class PseudoTrait
 {
+    //too
 	protected $subject;
 	abstract public function getName();
 	public function link($subject)
