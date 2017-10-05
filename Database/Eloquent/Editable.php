@@ -41,11 +41,11 @@ trait Editable
         if($name == "buildArray")
         {
             $this->builders_methods[] = $callback;
-        }
+        }else
         if($name == "prepareCache")
         {
             $this->_prepare_cache[] = $callback;
-        }
+        }else
         $this->methods[$name] = $callback;
     }
     public function mixin($object)
@@ -60,7 +60,18 @@ trait Editable
             $method->setAccessible(true);
             try
             {
-                if(!method_exists($method->name, $this))
+                if($method->name == "updateCompany")
+                {
+                    $method->name;
+                    try
+                    {
+                        method_exists($method->name."2", $this);
+                    }catch(\Exception $e)
+                    {
+                        $e;
+                    }
+                }
+                if(in_array($method->name,['buildArray','prepareCache']) || !method_exists($method->name, $this))
                 {
                     if($method->getNumberOfParameters())
                     {  

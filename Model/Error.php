@@ -38,6 +38,10 @@ class Error extends Model
     }
     protected function record($exception)
     {
+        if(App::isLocal())
+        {
+            return;
+        }
         if(static::isMuted())
         {
             return;

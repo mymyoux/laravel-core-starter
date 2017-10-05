@@ -38,7 +38,14 @@ abstract class Model extends BaseModel
         $newbelongs = new BelongsTo($belongs->getQuery(), $belongs->getParent(), $belongs->getForeignKey(), $belongs->getOwnerKey(), $belongs->getRelation());
 
         return $newbelongs;
-	}
+    }
+    // public function hasOne($related, $foreignKey = null, $localKey = null)
+    // {
+    //     $relation = parent::hasOne($related, $foreignKey, $localKey);
+    //     $relation = new HasOne($relation->getQuery(), $relation->getParent(), $relation->getForeignKey(), $relation->getLocalKey());
+
+    //     return $relation;
+	// }
     public function getDateFormat()
     {
         return 'Y-m-d H:i:s.u';

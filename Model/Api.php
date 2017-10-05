@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Tables\STATS_API_CALL;
 use Auth;
 use Route;
+use App;
 class Api extends Model
 {
     const CREATED_AT = 'created_time';
@@ -23,6 +24,10 @@ class Api extends Model
     }
     protected function record($request, $response)
     {
+		if(App::isLocal())
+		{
+			return;
+		}
     	$data = ["api"=>Api::API_NAME];
 
     	$user = Auth::getUser();

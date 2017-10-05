@@ -198,14 +198,14 @@ class User extends Model implements
     {
         return $this->morphMany('Core\Model\Event', 'owner');
     }
-    public function employee()
-    {
-        return $this->hasOne('App\Model\CompanyModelEmployee', 'id_user','id_user');
-    }
-     public function company()
-    {
-        return $this->hasMany('App\Model\CompanyModelEmployee', 'id_user','id_user');
-    }
+    // public function employee()
+    // {
+    //     return $this->hasOne('App\Model\CompanyModelEmployee', 'id_user','id_user');
+    // }
+    //  public function company()
+    // {
+    //     return $this->hasMany('App\Model\CompanyModelEmployee', 'id_user','id_user');
+    // }
     public function prehandleCache()
     {
         $this->prepareCache();
