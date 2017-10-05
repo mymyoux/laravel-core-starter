@@ -60,17 +60,6 @@ trait Editable
             $method->setAccessible(true);
             try
             {
-                if($method->name == "updateCompany")
-                {
-                    $method->name;
-                    try
-                    {
-                        method_exists($method->name."2", $this);
-                    }catch(\Exception $e)
-                    {
-                        $e;
-                    }
-                }
                 if(in_array($method->name,['buildArray','prepareCache']) || !method_exists($method->name, $this))
                 {
                     if($method->getNumberOfParameters())
