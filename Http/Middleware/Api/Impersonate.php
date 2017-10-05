@@ -22,7 +22,7 @@ class Impersonate
         if(isset($id_impersonate))
         {
             $user = Auth::getUser();
-            $impersonated = $user::getById($id_impersonate);
+            $impersonated = $user::find($id_impersonate);
             if(isset($impersonated) && $this->isAllowed($user, $impersonated))
             {
                 $impersonated->setRealUser($user);

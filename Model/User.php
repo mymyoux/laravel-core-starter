@@ -6,6 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Core\Model\IModel;
 use Core\Model\Event;
 use Core\Traits\Cached;
+use Core\Traits\CachedAuto;
 use DB;
 use Core\Traits\Role;
 use Illuminate\Support\Facades\Redis;
@@ -36,7 +37,7 @@ class User extends Model implements
      use Authenticatable, Authorizable, CanResetPassword;
 
     use Notifiable;
-    use Cached;
+    use CachedAuto;
     use Role;
     use PseudoTrait;
 
@@ -93,26 +94,40 @@ class User extends Model implements
     }
     public function isAdmin()
     {
+        return $this->type == "admin";
+    }
+    public function isRealAdmin()
+    {
         return $this->getRealUser()->type == "admin";
     }
     public function getType()
     {
         return $this->type;
     }
-    protected function _getById($id)
+    // protected function _getById($id)
+    // {
+    //     $user = static::find($id);
+    //     if(isset($user))
+    //     {
+    //         $user->addRole($user->type);
+    //         $user->addRole(static::$ROLE_CONNECTED);
+    //         $roles = USER_ROLE::where([USER_ROLE::id_user=>$user->id_user])->get();
+    //         foreach($roles as $role)
+    //         {
+    //             $user->addrole($role->role);
+    //         }
+    //     }
+    //     return $user;
+    // }
+    protected function beforeCache()
     {
-        $user = static::find($id);
-        if(isset($user))
+        $this->addRole($this->type);
+        $this->addRole(static::$ROLE_CONNECTED);
+        $roles = USER_ROLE::where([USER_ROLE::id_user=>$this->getKey()])->get();
+        foreach($roles as $role)
         {
-            $user->addRole($user->type);
-            $user->addRole(static::$ROLE_CONNECTED);
-            $roles = USER_ROLE::where([USER_ROLE::id_user=>$user->id_user])->get();
-            foreach($roles as $role)
-            {
-                $user->addrole($role->role);
-            }
+            $this->addRole($role->role);
         }
-        return $user;
     }
     protected function prepareModel($user)
     {
@@ -150,7 +165,7 @@ class User extends Model implements
         {
             return NULL;
         }
-        return static::getById($id_user);
+        return static::find($id_user);
     }
     protected function getAvailableTypes()
     {
@@ -161,14 +176,18 @@ class User extends Model implements
         $id_user = UserConnector::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
         if($id_user === NULL)
         {
-            $new_email = clean_email($email);
-            if($new_email != $email)
+            $id_user = User::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
+            if($id_user === NULL)
             {
-                return $this->getByEmail($new_email);
+                $new_email = clean_email($email);
+                if($new_email != $email)
+                {
+                    return $this->getByEmail($new_email);
+                }
+                return NULL;
             }
-            return NULL;
         }
-        return $this->getById($id_user);
+        return $this->find($id_user);
     }
     public function infos()
     {

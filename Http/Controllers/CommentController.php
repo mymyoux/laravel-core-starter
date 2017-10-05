@@ -108,7 +108,7 @@ class CommentController extends Controller
         else {
             if($objects[0]["type"] == User::class)
             {
-                $relationUser = User::getById($objects[0]["id"]);
+                $relationUser = User::find($objects[0]["id"]);
                 if($relationUser->isCabinetEmployee())
                 {
                     $create_state  =true;

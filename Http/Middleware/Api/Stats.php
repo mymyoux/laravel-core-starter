@@ -28,7 +28,7 @@ class Stats
         if(config('api.stats')!==True)
         {
             $user = Auth::getUser();
-            if(!isset($user) || !$user->isAdmin())
+            if(!isset($user) || !$user->isRealAdmin())
             {
                 $response = $next($request);
                 $this->logQueries();

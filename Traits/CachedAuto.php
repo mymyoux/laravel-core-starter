@@ -7,21 +7,33 @@ use Logger;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use DeepCopy\DeepCopy;
+
+
 trait CachedAuto
 {
 	protected static $_cached_key;
-	protected function  find($id, $columns = ['*'])
+	protected function find($id, $columns = ['*'])
 	{
+		if(is_array($id))
+		{
+			return array_map(function($id){
+				return $this->find($id, $columns);
+			}, $id);
+		}
 		$key = $this->getCacheKey($id);
 		$model = Cache::get($key);
 		if(!$model)
 		{
 			$model = parent::find($id, $columns);
-			$model->cache();
+
+			if ($model !== null)
+				$model->cache();
 		}
 		else
 		{
-			$this->hydrateObject($model);
+			$model->dishandleCache();
+			//$this->hydrateObject($model);
 			if(method_exists($model, "afterCache"))
 			{
 				$model->afterCache();
@@ -39,7 +51,9 @@ trait CachedAuto
 		{
 			$this->beforeCache();
 		}
-		$object = clone $this;
+		$deepCopy = new DeepCopy();
+		$object = $deepCopy->copy($this);
+		//$object = clone $this;
 		$object->handleCache();
 		$key = $object->getCacheKey();
 		Cache::forever($key, $object);
@@ -56,6 +70,10 @@ trait CachedAuto
 		{
 			$this->attributes[$key] = $this->deshydrateObject($attribute);
 		}
+	}
+	public function dishandleCache()
+	{
+		$this->hydrateObject($this);
 	}
 	public function hydrateObject($data)
 	{

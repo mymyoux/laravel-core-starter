@@ -13,7 +13,7 @@ class Action
 {
     public function add(User $user, $type, $user_action = null, $value = null)
     {
-        if ($user->isAdmin())
+        if ($user->isRealAdmin())
              return null;
 
         if (isset($user_action))
