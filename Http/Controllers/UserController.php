@@ -50,6 +50,17 @@ class UserController extends Controller
         if (Auth::user()->isImpersonated())
         {
             $result->real_user = Auth::user()->getRealUser();
+            $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->real_user->getKey()])->first();
+            
+            if (!isset($request))
+            {
+                $token = generate_token();
+                USER_LOGIN_TOKEN::insert(["id_user"=>$result->real_user->getKey(),"token"=>$token]);
+            }
+            else
+            $token = $request->token;
+
+            $result->real_user->token = $token;
         }
 
    		return $result;
@@ -63,7 +74,7 @@ class UserController extends Controller
     public function getInfos(Request $request)
     {
     	$id_user = $request->input('id_user');
-    	$user = User::getById($id_user);
+    	$user = User::find($id_user);
     	return $user;
     }
     /**
@@ -76,7 +87,7 @@ class UserController extends Controller
     public function get(Request $request)
     {
     	$id_user = $request->input('id_user');
-    	$user = User::getById($id_user);
+    	$user = User::find($id_user);
     	return $user;
     }
     /**

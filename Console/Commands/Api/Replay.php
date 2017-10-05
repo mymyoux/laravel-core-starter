@@ -50,7 +50,7 @@ class Replay extends Command
         }
         if(isset($call->id_user))
         {
-            $user = User::getById($call->id_user);
+            $user = User::find($call->id_user);
             if(!isset($user))
             {
                throw new Exception('no user with id '.$call->id_user);
@@ -58,7 +58,7 @@ class Replay extends Command
         }
         if(isset($call->id_user_impersonated))
         {
-            $impersonated = User::getById($call->id_user_impersonated);
+            $impersonated = User::find($call->id_user_impersonated);
             if(!isset($impersonated))
             {
                throw new Exception('no user with id '.$call->id_user_impersonated);

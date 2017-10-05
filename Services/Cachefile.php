@@ -76,7 +76,7 @@ class Cachefile
         {
             return $prefix.$path."?nocache=".microtime(true);
         }
-        if(Auth::check() && Auth::user()->isAdmin())
+        if(Auth::check() && Auth::isAdmin())
         {
             return $prefix.$this->cache[$path]["map"]."?".$this->cache[$path]["suffix"];
         }

@@ -10,8 +10,34 @@ class Guard extends BaseGuard
             return $this->user()->type;
         return NULL;
     }
-    public function isAdmin()
+    // public function isAdmin()
+    // {
+    //     return $this->type() == "admin";
+    // }
+    // public function isRealAdmin()
+    // {
+    //     return $this->isAdmin() || ($this->check() && $this->user()->isAdmin());
+    // }
+    public function __call($name, $params)
     {
-        return $this->type() == "admin";
+        if(starts_with($name, "is"))
+        {
+            if($this->check())
+                return $this->user()->$name(...$params);
+            return False;
+        }
+        if(starts_with($name, "get"))
+        {
+            if($this->check())
+                return $this->user()->$name(...$params);
+            return NULL;
+        }
+        throw new \Exception($name." doesn't exist");
+    }
+    public function __get($name)
+    {
+            if($this->check())
+                return $this->user()->$name;
+         return NULL;
     }
 }

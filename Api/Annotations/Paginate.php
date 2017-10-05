@@ -15,6 +15,7 @@ class Paginate extends CoreAnnotation
 	public $keys;
 	public $directions;
 	public $limit;
+	public $max;
     public function boot()
     {
     	if(isset($this->keys))
@@ -27,16 +28,16 @@ class Paginate extends CoreAnnotation
     	}
     	if(isset($this->limit))
     	{
-    		$this->limit = (int) $this->limit;
-    	}
+			$this->limit = (int) $this->limit;
+		}
     	if(isset($this->directions))
     	{
     		$this->directions = array_map(function($item){return (int)trim($item);}, explode(",", $this->directions.""));
-    	}
-
-    }
-    public function format($paginate)
-    {
+		}
+	}
+	
+	public function format($paginate)
+    {		
     	if(!isset($paginate))
     	{
     		$paginate = [];
@@ -44,6 +45,10 @@ class Paginate extends CoreAnnotation
     	if(!isset($paginate["keys"]))
     	{
     		$paginate["keys"] = $this->keys;
+		}
+		if(!isset($paginate["max"]))
+    	{
+    		$paginate["max"] = (int) $this->max;
     	}
     	if(!isset($paginate["limit"]))
     	{
@@ -61,6 +66,16 @@ class Paginate extends CoreAnnotation
     	{
     		$paginate["directions"] = array_map(function($item){return (int)trim($item);}, $paginate["directions"]);
 		}
+
+		if ($this->max)
+		{
+			if(isset($paginate["limit"]) && $paginate["limit"] === -1 || $paginate["limit"] > $this->max)
+			{
+				$this->limit = $this->max;
+				$paginate['limit'] = $this->max;
+			}
+		}
+
     	return $paginate;
     }
     public function isAllowed($key)

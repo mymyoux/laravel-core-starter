@@ -260,7 +260,7 @@ class Logger
             $this->outputs[] = $type.": ".$msg;
         }else
         {
-            if(App::isLocal() ||  (Auth::check() && Auth::getUser()->isAdmin()))
+            if(App::isLocal() ||  Auth::isRealAdmin())
             {
                 
                 $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style  .": ".$msg;

@@ -81,7 +81,7 @@ class Mail
         {
             if(is_numeric($recipient))
             {
-                $user = User::getById($recipient);
+                $user = User::find($recipient);
                 if(!isset($user))
                     return NULL;
                 return
