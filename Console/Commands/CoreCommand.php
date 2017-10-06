@@ -53,6 +53,7 @@ class CoreCommand extends Command
 	    catch (\Exception $e)
 	    {
 	    	Logger::critical( $e->getMessage() );
+	    	Logger::normal( $e->getTraceAsString() );
 	    }
 
         $this->terminated();
