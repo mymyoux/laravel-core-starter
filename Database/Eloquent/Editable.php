@@ -22,10 +22,10 @@ trait Editable
             }
             return call_user_func_array($this->methods[$name], $params);
         }
-        if(isset(static::$static_methods[$name]))
-        {
-            return static::$static_methods[$name](...$params);
-        }
+        // if(isset(static::$static_methods[$name]))
+        // {
+        //     return static::$static_methods[$name](...$params);
+        // }
         //return parent::$name(...$params);
         try
         {
