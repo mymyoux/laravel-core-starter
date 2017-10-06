@@ -6,7 +6,7 @@
             <slot name="first" v-else>
             </slot>
         </slot>
-        <slot name="remove" :text="selected_item"></slot>
+        <slot name="remove" :text="selected_item.id"></slot>
     </div>
     <input v-else spellcheck="false" :placeholder="((premessage_placeholder))" @keyup="typing($event)"  @keyup.enter="enter" @blur="blur($event)" @focus="focus()" type="text" data-focus value="" :class="[choice ? 'selection' : '']" v-model="choice" autocomplete="off">
         <ul class="list-scroll" v-show="!hidden">
