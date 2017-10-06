@@ -194,6 +194,16 @@ trait CachedAuto
 		Cache::forget($key);
 		Logger::info("forget: ".$key);
 	}
+	public static function forget($ids)
+    {
+		$ids = is_array($ids) ? $ids : func_get_args();
+		foreach($ids as $id)
+		{
+			$instance = (new static);
+			$instance->setKey($id);
+			$instance->invalidate();
+		}
+	}
 	public static function destroy($ids)
     {
 		$ids = is_array($ids) ? $ids : func_get_args();

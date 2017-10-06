@@ -24,6 +24,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 use Core\Core\PseudoTrait;
 
+use Core\Database\Eloquent\Editable;
 
 use Tables\USER_ROLE;
 use Tables\USER_LOGIN_TOKEN;
@@ -37,6 +38,7 @@ class User extends Model implements
      use Authenticatable, Authorizable, CanResetPassword;
 
     use Notifiable;
+    use Editable;
     use CachedAuto;
     use Role;
  //   use PseudoTrait;

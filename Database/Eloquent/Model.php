@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Core\Database\Query\Builder as QueryBuilder;
 abstract class Model extends BaseModel
 {
-    use Editable;
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
     private $_prepared = False;
