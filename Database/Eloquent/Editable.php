@@ -91,14 +91,15 @@ trait Editable
             return;
         }else
         {
-            if(isset(static::$static_methods[$name]))
-            {
-                if (static::$static_methods[$name] instanceof Closure) {
-                    return call_user_func_array(Closure::bind(static::$static_methods[$name], null, static::class), $params);
-                }
+            //TODO:fixme
+            // if(isset(static::$static_methods[$name]))
+            // {
+            //     if (static::$static_methods[$name] instanceof Closure) {
+            //         return call_user_func_array(Closure::bind(static::$static_methods[$name], null, static::class), $params);
+            //     }
         
-                return call_user_func_array($static_methods[$name], $params);
-            }
+            //     return call_user_func_array($static_methods[$name], $params);
+            // }
         }
         return parent::__callStatic($name, $params);
     }
