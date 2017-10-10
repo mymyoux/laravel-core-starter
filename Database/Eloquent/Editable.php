@@ -12,6 +12,7 @@ trait Editable
     private static $static_methods = [];
     private $builders_methods = [];
     private $_prepare_cache = [];
+    // static $i=0;
     public function __call($name, $params)
     {
         if(isset($this->methods[$name]))
@@ -29,10 +30,16 @@ trait Editable
         //return parent::$name(...$params);
         try
         {
-
+            //static::$i++;
+            // if(static::$i == 3 && $name =="hydrate")
+            // {
+            //     static::$i;
+            // }
             return parent::__call($name, $params);
         }catch(\Exception $e)
         {
+            // dd(["name"=>$name,"this"=>$this,"i"=>static::$i]);
+            // dd($name);
             $e;
         }
     }
