@@ -41,7 +41,7 @@ class Translate
         }, []);
         return Translation::getLocale($languages);
     }
-    public function t($key,  $type, $locale, $options = NULL)
+    public function t($key, $type, $locale, $options = NULL)
     {
         if(!isset($locale))
         {
@@ -49,5 +49,10 @@ class Translate
         }
         $locale = $this->getLocale($locale);
         return Translation::translate($key, $locale, $type, $options);
+    }
+
+    public function translate( $key, $options = null, $locale = null )
+    {
+        return Translate::t($key, $locale, null, $options);
     }
 }
