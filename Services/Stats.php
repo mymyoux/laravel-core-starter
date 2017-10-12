@@ -21,7 +21,7 @@ class Stats
 		{
 			$this->api[$uri]["annotations"] = [];
 		}
-		$this->api[$uri]["annotations"][] = $annotation->toArray();
+		$this->api[$uri]["annotations"][] = ($annotation ? $annotation->toArray() : null);
 	}
 	public function addApiCall($route)
 	{
