@@ -752,7 +752,8 @@ if (!function_exists('split_version'))
         $name = trim($name);
         if(is_numeric($name))
         {
-            return ["original"=>$name,"version"=>$name, "value"=>""];
+            return False;
+            //return ["original"=>$name,"version"=>$name, "value"=>""];
         }
         $index = -1;
         $version = "";
@@ -771,7 +772,13 @@ if (!function_exists('split_version'))
         }
         if(strlen($version))
         {
-            return ["original"=>$name, "version"=>$version, "value"=>trim(mb_substr($name, 0, mb_strlen($name)-mb_strlen($version)))];
+            $value = trim(mb_substr($name, 0, mb_strlen($name)-mb_strlen($version)));
+            //nb only
+            if(!mb_strlen($value))
+            {
+                return false;
+            }
+            return ["original"=>$name, "version"=>$version, "value"=>$value];
         }
         return False;
 
