@@ -23,14 +23,25 @@ class MySqlProcessor extends BaseMySqlProcessor
     {
         foreach($item as $key=>$value)
         {
-            if(is_numeric($value))
+            if(mb_strlen($value)<19 && is_numeric($value))
             {
                 if(ctype_digit($value))
                 {
-                    $item->$key = (int)$value;
+                    $tmp = (int)$value;
+                    if(!is_infinite($tmp))
+                    {
+                        $item->$key = $tmp;
+                    }
                 }else
                 {
-                    $item->$key = (float)$value;
+                    if(ctype_digit(str_replace(".","",$value)))
+                    {
+                        $tmp = (float)$value;
+                        if(!is_infinite($tmp))
+                        {
+                            $item->$key = $tmp;
+                        }
+                    }
                 }
             }
         }
