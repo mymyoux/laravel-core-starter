@@ -54,7 +54,7 @@ class Update extends Command
         Error::mute();
         $this->current_directory = base_path();
 
-        chdir(base_path());
+        //chdir(base_path());
         $env = config('app.env', NULL);
         //verifications
         if(!isset($env))
@@ -347,13 +347,13 @@ class Update extends Command
             //$directory = join_paths($this->current_directory, $directory);
         }
         $this->line("git pull: ".$this->getRelativePath($directory));
-        chdir($directory);
-        $result = $this->cmd("git", ["pull"]);
+        //chdir($directory);
+        $result = $this->cmd("git", ["pull"], True, $directory);
         if(!$result["success"])
         {
             throw new \Exception("Error during git pull: ".$directory);
         }
-        chdir($this->current_directory);
+        //chdir($this->current_directory);
     }
 
     public function runSupervisor()
@@ -361,7 +361,7 @@ class Update extends Command
         $this->call('supervisor:config');
         $this->call('supervisor:restart');
     }
-    protected function cmd($command, $params = NULL, $execute = True)
+    protected function cmd($command, $params = NULL, $execute = True, $dir = NULL)
     {
         if(isset($params))
         {
@@ -379,7 +379,7 @@ class Update extends Command
                2 => array("pipe", "w")    // stderr is a pipe that the child will write to
             );
 
-            $process = proc_open($command, $descriptorspec, $pipes);
+            $process = proc_open($command, $descriptorspec, $pipes, $dir);
             if (is_resource($process)) {
                 while ($s = fgets($pipes[1])) {
                    echo $s;
