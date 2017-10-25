@@ -38,6 +38,10 @@ class Error extends Model
     }
     protected function record($exception)
     {
+        if(App::isLocal())
+        {
+            return;
+        }
         if(static::isMuted())
         {
             return;
@@ -52,7 +56,6 @@ class Error extends Model
         $info["file"] = $exception->getFile();
         $info["line"] = $exception->getLine();
         $info["stack"] = $exception->getTraceAsString();
-        $exception->test = "ok";
         $info["ip"] = IP::getRequestIP();
         global $argv;
         if (App::runningInConsole())

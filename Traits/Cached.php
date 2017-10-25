@@ -21,9 +21,9 @@ trait Cached
 				Cache::forever($key, $model);
 			}
 		}
-        if(isset($model) && method_exists($this, "prepareModel"))
+        if(isset($model) && method_exists($this, "prepare"))
         {
-        	$model = $this->prepareModel($model);
+        	$model = $this->prepare();
         }
         return $model;
 	}

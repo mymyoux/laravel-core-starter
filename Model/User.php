@@ -24,6 +24,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 use Core\Core\PseudoTrait;
 
+use Core\Database\Eloquent\Editable;
 
 use Tables\USER_ROLE;
 use Tables\USER_LOGIN_TOKEN;
@@ -37,9 +38,10 @@ class User extends Model implements
      use Authenticatable, Authorizable, CanResetPassword;
 
     use Notifiable;
+    use Editable;
     use CachedAuto;
     use Role;
-    use PseudoTrait;
+ //   use PseudoTrait;
 
 
 
@@ -67,9 +69,9 @@ class User extends Model implements
      * @var array
      */
     protected $hidden = [
-        'deleted','temp','cgu_accepted','remember_token'
-    ];
-    public $appends = ["roles"];
+        'deleted','temp','cgu_accepted','remember_token','num_connection','last_connection'
+    ]; 
+    public $appends = [];
 
 
     /**
@@ -129,10 +131,15 @@ class User extends Model implements
             $this->addRole($role->role);
         }
     }
-    protected function prepareModel($user)
+    protected function prepareModel()
     {
-        $user->addPseudoTrait($user->type);
-        return $user;
+        if(isset($this->traits[$this->type]))
+        {
+            $cls = $this->traits[$this->type];
+            $this->mixin(new $cls);
+        }
+        //$this->addPseudoTrait($this->type);
+        return $this;
     }
     public function setRealUser($user)
     {
@@ -193,12 +200,16 @@ class User extends Model implements
     {
         return $this->morphMany('Core\Model\Event', 'owner');
     }
-    public function employee()
+    // public function employee()
+    // {
+    //     return $this->hasOne('App\Model\CompanyModelEmployee', 'id_user','id_user');
+    // }
+    //  public function company()
+    // {
+    //     return $this->hasMany('App\Model\CompanyModelEmployee', 'id_user','id_user');
+    // }
+    public function prehandleCache()
     {
-        return $this->hasOne('App\Model\CompanyModelEmployee', 'id_user','id_user');
-    }
-     public function company()
-    {
-        return $this->employee->company();
+        $this->prepareCache();
     }
 }
