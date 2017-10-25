@@ -894,6 +894,13 @@ if (!function_exists('array_transpose'))
         return array_map(null, ...$array);
     }
 }
+if (PHP_VERSION_ID < 70100) {
+     if (!function_exists('is_iterable')) {
+            function is_iterable($var) { 
+                return is_array($var) || $var instanceof \Traversable;
+             }
+        }
+    }
 }
 
 
