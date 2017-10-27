@@ -1,12 +1,6 @@
 <?php
 namespace
 {
-/**
- * Created by PhpStorm.
- * User: jeremy.dubois
- * Date: 27/09/2014
- * Time: 20:14
- */
 if (!function_exists('first')) 
 {
     /**
@@ -218,7 +212,18 @@ if (!function_exists('timestamp'))
         return time()*1000;
     }
 }
-
+if (!function_exists('std')) 
+{
+    /**
+     * Converts array to stdClass
+     * @param $array array Will be converted to stdClass
+     * @return stdClass
+     */
+    function std($array)
+    {
+        return (object) $array;
+    }
+}
 if (!function_exists('toArray')) 
 {
     /**

@@ -42,7 +42,11 @@ class Property
 	{
 		if(is_array($this->value))
 		{
-			return var_export($this->value, True);
+			return join("\n\t",explode("\n",var_export($this->value, True)));
+		}
+		if(is_bool($this->value))
+		{
+			return $this->value?"true":"false";
 		}
 		if(!is_string($this->value))
 		{
@@ -52,6 +56,7 @@ class Property
 		{
 			return $this->value;
 		}
+		
 		if(strtolower($this->value) == "true" || strtolower($this->value) == "false")
 		{
 			return $this->value;

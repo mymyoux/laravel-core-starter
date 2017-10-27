@@ -12,6 +12,7 @@ class ClassWriter
 	protected $classname;
 	protected $extends;
 	protected $implements;
+	protected $usesTraits;
 
 	protected $constants;
 	protected $properties;
@@ -27,6 +28,7 @@ class ClassWriter
 		$this->constants = [];
 		$this->properties = [];
 		$this->methods = [];
+		$this->usesTraits = [];
 	}
 	public function setNamespace($namespace)
 	{
@@ -36,9 +38,17 @@ class ClassWriter
 	{
 		$this->uses[] = new Uses($path, $alias);
 	}
+	public function addUseTrait($name)
+	{
+		$this->usesTraits[] = $name;
+	}
 	public function setClassName($name)
 	{
 		$this->classname = $name;
+	}
+	public function setExtends($extends)
+	{
+		$this->extends = [$extends];
 	}
 	public function addProperty($name, $visibility = "public", $static = False, $value = NULL)
 	{
@@ -101,7 +111,7 @@ class ClassWriter
 
 		//namespace
 		if(isset($this->namespace))
-			$cls.= $tab."namespace ".$this->namespace.";\n";
+			$cls.= $tab."namespace ".$this->namespace.";\n\n";
 
 		//use statements
 		if(!empty($this->uses))
@@ -110,6 +120,7 @@ class ClassWriter
 			{
 				$cls.= $tab."use ".$uses->getPath().($uses->hasAlias()?" as ".$uses->getAlias():"").";\n";
 			}
+			$cls.= "\n";
 		}
 
 		//class declaration
@@ -127,13 +138,21 @@ class ClassWriter
 			$cls.= "\n{\n";
 			$tab = $this->tab(1);
 		}
-
+		if(!empty($this->usesTraits))
+		{
+			foreach($this->usesTraits as $trait)
+			{
+				$cls.= $tab."use ".$trait.";\n";
+			}
+			$cls.="\n";
+		}
 		if(!empty($this->constants))
 		{
 			foreach($this->constants as $constant)
 			{
 				$cls.= $tab."const ".$constant->getName().($constant->hasValue()?" = ".$constant->getEscapedValue():"").";\n";
 			}
+			$cls.="\n";
 		}
 
 		if(!empty($this->properties))
@@ -142,6 +161,7 @@ class ClassWriter
 			{
 				$cls.= $tab.($property->hasVisibility()?$property->getVisibility()." ":"").($property->isStatic()?'static ':'')."$".$property->getName().($property->hasValue()?" = ".$property->getEscapedValue():"").";\n";
 			}
+			$cls.="\n";
 		}
 		if(!empty($this->methods))
 		{
@@ -150,7 +170,16 @@ class ClassWriter
 				$cls.= $tab.($method->hasVisibility()?$method->getVisibility()." ":"").($method->isStatic()?'static ':'');
 
 				$cls.= "function ".$method->getName()."(".($method->hasParams()?$method->getParams():"").")\n";
-				$cls.= $method->getBody();
+				$body = $method->getBody();
+				if(!starts_with(trim($body), "{"))
+				{
+					$body = "\t{\n\t\t".join("\n\t\t",explode("\n",$body));
+				}
+				if(!ends_with(trim($body), "}"))
+				{
+					$body = $body."\n\t}\n";;
+				}
+				$cls.= $body;
 			}
 		}
 
@@ -158,7 +187,7 @@ class ClassWriter
 		$tab = $this->tab(0);
 		if(isset($this->classname))
 		{
-			$cls.= $tab."}\n";
+			$cls.= "\n".$tab."}\n";
 		}
 		return $cls;
 	}
