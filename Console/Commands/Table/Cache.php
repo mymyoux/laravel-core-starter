@@ -77,6 +77,12 @@ class Cache extends Command
         $modules = array_map(function($item)
         {
             $item["path"] = base_path($item["path"]);
+            $item = std($item);
+            $files = File::allfiles($item->path);
+            //TODO: search all already models into exitings class => change their extends to generated
+            //TODO: generate others class into App\Model that's just extends 
+            $cls = 
+            dd($files);
             return $item;
         }
         , ModuleHelper::getModulesFromComposer());
@@ -446,6 +452,9 @@ class Cache extends Command
             $cls = $current->cls;
             $cls->write($current->path);
         }
+
+        $existing = [];
+        //File::allFiles()
         return;
         dd($models_cls);
         dd('ok');
