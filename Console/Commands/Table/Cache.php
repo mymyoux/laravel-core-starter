@@ -81,8 +81,8 @@ class Cache extends Command
             $files = File::allfiles($item->path);
             //TODO: search all already models into exitings class => change their extends to generated
             //TODO: generate others class into App\Model that's just extends 
-            $cls = 
-            dd($files);
+            // $cls = 
+            // dd($files);
             return $item;
         }
         , ModuleHelper::getModulesFromComposer());
@@ -130,7 +130,7 @@ class Cache extends Command
 
         $tables = array_map('reset', DB::select('SHOW TABLES'));
 
-        $models_folder = base_path('bootstrap/tables/models');
+        $models_folder = base_path('bootstrap/tables/Model');
         File::deleteDirectory($models_folder, True);
         if(!file_exists($models_folder))
         {
@@ -148,7 +148,7 @@ class Cache extends Command
 
             $mf = $models_folder;
             $file = $table;
-            $namespace = "Tables";
+            $namespace = 'Tables\Model';
             if(strpos($table,  "_") !== False)
             {
                 $list = explode("_", $table);
@@ -311,7 +311,6 @@ class Cache extends Command
                             }
                             $content .= ", '".$relation->referenced_columns."'";
                         }
-                        Logger::warn($table);
                         if(!isset($current->relations))
                         {
                             $current->relations = [];
@@ -446,11 +445,35 @@ class Cache extends Command
             }
         }
         //dd('what');
+        $module = $modules[0];
         foreach($tables as $table)
         {
             $current = &$models_cls[$table];
             $cls = $current->cls;
             $cls->write($current->path);
+
+            $cls_app = new ClassWriter(); 
+            $name = preg_replace("/^Tables\\\\/",$module->module,$cls->getNamespace());
+            $cls_app->setNamespace($name);
+            $cls_app->setClassName($cls->getClassName());
+            $cls_app->setExtends('\\'.$cls->getFullName());
+            $folder = $cls_app->getFullName();
+            $folder= explode('\\', $folder);
+            $folder = join('\\',array_slice($folder, 1));
+            $file = str_replace('\\','/',$folder.".php");
+            $file = join_paths($module->path, $file); 
+            if(!file_exists($file))
+            {
+                $folder = dirname($file);
+                if(!file_exists($folder))
+                {
+                    File::makeDirectory($folder, 0755, true);
+                }
+                Logger::info("Create:\t".$file);
+                //File::makeDirectory($cache_path . '/' . $directory, 0755, true);
+                $cls_app->write($file);
+            }
+            // $cls_app->
         }
 
         $existing = [];

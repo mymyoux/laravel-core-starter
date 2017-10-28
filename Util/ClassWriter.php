@@ -34,6 +34,10 @@ class ClassWriter
 	{
 		$this->namespace = $namespace;
 	}
+	public function getNamespace()
+	{
+		return $this->namespace;
+	}
 	public function addUse($path, $alias = NULL)
 	{
 		$this->uses[] = new Uses($path, $alias);
@@ -45,6 +49,14 @@ class ClassWriter
 	public function setClassName($name)
 	{
 		$this->classname = $name;
+	}
+	public function getClassName()
+	{
+		return $this->classname;
+	}
+	public function getFullName()
+	{
+		return (isset($this->namespace)?$this->namespace.'\\':"").$this->classname;
 	}
 	public function setExtends($extends)
 	{
