@@ -87,7 +87,7 @@ class Cache extends Command
         }
         , ModuleHelper::getModulesFromComposer());
 
-
+        $module = $modules[0];
 
 
         $relations = array_reduce($result, function($previous, $item)
@@ -136,7 +136,7 @@ class Cache extends Command
         {
             mkdir($models_folder, 0777);
         }
-        $extends = config('database.model.default')??'\Core\Model\CoreModel';
+        $extends = config('database.model.default')??'\Core\Database\Eloquent\Model';
         $cast = [];
         
         $cast_mapping = ["int"=>"integer","varchar"=>"string","lontext"=>"string","timestamp"=>"timestamp","text"=>"string","datetime"=>"datetime","float"=>"float","tinytext"=>"text","bigint"=>"integer","tinyint"=>"integer","date"=>"date","smallint"=>"integer"];
@@ -298,12 +298,12 @@ class Cache extends Command
                         $related = &$models_cls[$relation->REFERENCED_TABLE_NAME];
                         $content = "";
                         $foreign = False;
-                        if($relation->columns != $related->name.'_id')
+                        if(True || $relation->columns != $related->name.'_id')
                         {
                             $content .= ", '".$relation->columns."'";
                             $foreign = True;
                         }
-                        if($relation->referenced_columns != 'id')
+                        if(True || $relation->referenced_columns != 'id')
                         {
                             if(!$foreign)
                             {
@@ -319,10 +319,15 @@ class Cache extends Command
                         {
                             $related->relations = [];
                         }
+                        $name = $related->table_name;
+                        if(ends_with($name, "s"))
+                        {
+                            $name = substr($name, 0, strlen($name)-1);
+                        }
                         $current->relations[] = std(
                         [
                             "model"=>&$related,
-                            "name"=>$related->table_name,
+                            "name"=>$name,
                             "content"=>$content,
                             "foreign"=>$relation->columns,
                             "local"=>$relation->referenced_columns,
@@ -413,7 +418,7 @@ class Cache extends Command
                             }
                             if(ends_with($item->foreign, "_id"))
                             {
-                                $item->foreign = $item->name."_as_".substr($item->foreign, 0, strlen($item->foreign)-4);
+                                $item->name = $item->name."_as_".substr($item->foreign, 0, strlen($item->foreign)-3);
                             }
                         }else
                         {
@@ -424,7 +429,11 @@ class Cache extends Command
                             }
                             if(ends_with($item->foreign, "_id"))
                             {
-                                $item->foreign = substr($item->foreign, 0, strlen($item->foreign)-4);
+                                $item->name = substr($item->foreign, 0, strlen($item->foreign)-3);
+                            }
+                            if(in_array($item->name, $duplicates->duplicates))
+                            {
+                                $item->name = $item->foreign;
                             }
                         }
                         // if($item->type == "hasMany")
@@ -440,12 +449,12 @@ class Cache extends Command
                 foreach($cls->relations as $relation)
                 {
                  //   dd($relation);
-                    $current->cls->addFunction($relation->name, NULL, 'return $this->'.$relation->type.'('."'".$relation->model->fullname."'".$relation->content.');','public');
+                    $current->cls->addFunction($relation->name, NULL, 'return $this->'.$relation->type.'('."'".preg_replace("/^Tables\\\\/",$module->module,$relation->model->fullname)."'".$relation->content.');','public');
                 }
             }
         }
         //dd('what');
-        $module = $modules[0];
+        
         foreach($tables as $table)
         {
             $current = &$models_cls[$table];
