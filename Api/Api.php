@@ -113,24 +113,17 @@ class Api
     }
     protected function dispatching($params = NULL)
     {
-         $temp = Request::input();
-
+        $temp = Request::all();
         $prefix = config('api.prefix') ? config('api.prefix') . '/': '';
 
         $request = Request::create($prefix . $this->path, $this->method);
         if(isset($this->params))
         {
-            foreach($this->params as $key=>$value)
-            {
-                $request->query->set($key, $value);
-            }
+            $request->merge($this->params);
         }
         if(isset($params))
         {
-            foreach($params as $key=>$value)
-            {
-                $request->query->set($key, $value);
-            }
+            $request->merge($params);
         }
 
         //inputs
@@ -145,7 +138,8 @@ class Api
                 Auth::setUser($this->api_user);
             }
         }
-        Request::replace($request->input());
+
+        Request::replace($request->all());
         if(App::runningInConsole())
         {
             $rawresponse = app()['Illuminate\Contracts\Http\Kernel']->handle($request);
@@ -163,6 +157,7 @@ class Api
     public function response($params = NULL)
     {
         static::$data[] = [];
+        
         $rawresponse = $this->dispatching($params);
         //$api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();
