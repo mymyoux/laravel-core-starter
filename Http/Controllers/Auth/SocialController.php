@@ -116,7 +116,8 @@ class SocialController extends Controller
      */
     public function handleProviderCallback(Request $request, Response $response, $api)
     {
-        $user       = Socialite::driver($api)->user();
+        $driver = Socialite::driver($api);
+        $user       =  $driver->user();
         $manager = new Manager();
         $connector  = $manager->get($api, $user);
         $connector->setScopes($request->session()->pull('scopes'));
