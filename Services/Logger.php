@@ -150,7 +150,7 @@ class Logger
     	$this->log($message, self::LOG_INFO);
     }
 
-    public function color( $message, $color, $rc = true )
+    public function color( $message, $style, $rc = true )
     {
         if (false === $this->debug && $type < self::LOG_ERROR) return;
 
