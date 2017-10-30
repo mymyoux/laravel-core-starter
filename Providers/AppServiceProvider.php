@@ -49,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerTranslation();
         $this->registerGMap();
         $this->registerAction();
+        $this->registerCache();
     }
 
     protected function registerStats()
@@ -95,6 +96,10 @@ class AppServiceProvider extends ServiceProvider
     protected function registerGMap()
     {
         $this->app->singleton('gmap', '\Core\Services\GMap');
+    }
+    protected function registerCache()
+    {
+        $this->app->singleton('cachemanager', '\App\Services\CacheManager');
     }
 }
 
