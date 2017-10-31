@@ -10,6 +10,7 @@ use Schema;
 use ReflectionClass;
 use File;
 use Core\Util\ModuleHelper;
+use Core\Util\ClassHelper;
 use Logger;
 class Cache extends Command
 {
@@ -66,7 +67,7 @@ class Cache extends Command
 
        
 
-
+        $extendsMapping = config("database.model.mapping")??[];
         //relations
         $database = config('database.connections.mysql.database');
         Db::statement("SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO'");
@@ -87,9 +88,31 @@ class Cache extends Command
         }
         , ModuleHelper::getModulesFromComposer());
 
+        
+        $core_module = NULL;
+        foreach($modules as $module)
+        {
+            if($module->module == "Core\\")
+            {
+                $core_module = $module;
+                break;
+            }
+        }
+        //app module
         $module = $modules[0];
 
+        $core_extends = [];
 
+        if(isset($core_module))
+        {
+            $files = $this->getTableFiles($core_module, [join_paths($core_module->path,"config")]);
+            foreach($files as $file)
+            {
+                if(isset($core_extends[$file->table]))
+                    continue;
+                $core_extends[$file->table] = "\\".$file->fullname;
+            }
+        }
         $relations = array_reduce($result, function($previous, $item)
         {
             if(!isset($previous["relations"][$item->TABLE_NAME]))
@@ -131,7 +154,10 @@ class Cache extends Command
         $tables = array_map('reset', DB::select('SHOW TABLES'));
 
         $models_folder = base_path('bootstrap/tables/Model');
-        File::deleteDirectory($models_folder, True);
+        
+        //File::deleteDirectory($models_folder, True);
+        
+        
         if(!file_exists($models_folder))
         {
             mkdir($models_folder, 0777);
@@ -170,7 +196,13 @@ class Cache extends Command
             }
             $cls->setNamespace($namespace);
             $cls->setClassName($file);
-            $cls->setExtends($extends);
+            if(isset($extendsMapping[$table]))
+            {
+                $cls->setExtends($extendsMapping[$table]);
+            }else
+            {
+                $cls->setExtends($extends);
+            }
             
             //default table name
             if($table != strtolower($file)."s")
@@ -453,14 +485,90 @@ class Cache extends Command
                 }
             }
         }
-        //dd('what');
-        
+        //write classes
         foreach($tables as $table)
         {
             $current = &$models_cls[$table];
             $cls = $current->cls;
+            Logger::info("write:\t".$current->path);
             $cls->write($current->path);
 
+        }
+        //dd('what');
+
+        $files = $this->getTableFiles([$core_module, $module], [join_paths($core_module->path,"config")]); 
+        
+
+        /*File::allfiles($module->path);
+        $files = array_values(array_filter(array_map(function($item)
+        {
+            $cls = ClassHelper::getInformations($item->getRealPath());
+            try
+            {
+                return std(["cls"=>new ReflectionClass($cls->fullname), "path"=>$item->getRealPath(),"file"=>$item,"fullname"=>$cls->fullname]);
+            }catch(\Exception $e)
+            {
+                Logger::error($e);
+            }
+        },array_values(array_filter($files, function($item)
+        {
+            return $item->getExtension() == "php";
+        }))), function($item)
+        {
+            return $item->cls->hasProperty('table');  
+        }));
+        */
+        $already_written = array_map(function($item)
+        {
+            return $item->table;//cls->getDefaultProperties()["table"];
+            //return $item->getProperty('table')->getValue();
+        }, $files);
+
+        $extendsClasses = array_reduce($files, function($previous, $item)
+        {
+            //$item->parent = $item->cls->getParentClass()->getName();
+            if(!isset($previous[$item->cls->getDefaultProperties()["table"]]))
+                $previous[$item->cls->getDefaultProperties()["table"]] = $item;
+            return $previous;
+            //return $item->getProperty('table')->getValue();
+        }, []);
+
+        $extends = ["\Illuminate\Database\Eloquent\Model", "\Core\Database\Eloquent\Model", config('database.model.default')??'\Core\Database\Eloquent\Model'];
+        foreach($tables as $table)
+        {
+            $current = &$models_cls[$table];
+            $cls = $current->cls;
+            //Logger::info("write:\t".$current->path);
+           // $cls->write($current->path);
+
+            if(in_array($table, $already_written))
+            {
+                if(!isset($extendsClasses[$table]))
+                {
+                    Logger::error("not exists:\t". $table);
+                    continue;
+                }
+                if($extendsClasses[$table]->parent == $cls->getFullName() || $extendsClasses[$table]->parent == '\\'.$cls->getFullName() )
+                {
+                   // Logger::error("already changed:\t". $table);
+                    continue;
+                }
+                if(!in_array($extendsClasses[$table]->parent, $extends) && !in_array('\\'.$extendsClasses[$table]->parent, $extends))
+                {
+                    Logger::warn($extendsClasses[$table]->fullname." use custom extends \t".$extendsClasses[$table]->parent);
+                    continue;
+                }
+             
+              
+                $content = preg_replace("/extends( |\t)+([a-z0-9_-]+)/i",'extends \\'.$cls->getFullName(), $extendsClasses[$table]->file->getContents());
+                Logger::warn("Change\t".$extendsClasses[$table]->fullname." inherits from\t".$extendsClasses[$table]->parent." to\t".$cls->getFullName());
+                //file_put_contents($extendsClasses[$table]->path, $content);
+                // dd($extendsClasses[$table]->file->getContents());
+                // $newInherits = config('database.model.default')??'\Core\Database\Eloquent\Model';
+                // if($extendsClasses[$table]->parent!= $newInherits && '\\'.$extendsClasses[$table]->parent!= $newInherits)
+                 //   Logger::info("Change:\t".$table);
+                continue;
+            }
             $cls_app = new ClassWriter(); 
             $name = preg_replace("/^Tables\\\\/",$module->module,$cls->getNamespace());
             $cls_app->setNamespace($name);
@@ -480,7 +588,7 @@ class Cache extends Command
                 }
                 Logger::info("Create:\t".$file);
                 //File::makeDirectory($cache_path . '/' . $directory, 0755, true);
-                $cls_app->write($file);
+              //  $cls_app->write($file);
             }
             // $cls_app->
         }
@@ -568,6 +676,69 @@ class Cache extends Command
             unlink(join_paths($folder, $remove));
                $this->info($remove.' deleted');
         }
+    }
+    protected function getTableFiles($module, $exclude = [])
+    {
+        if(is_array($module))
+        {
+            return array_merge(...array_map(function($item) use($exclude)
+            {
+                return $this->getTableFiles($item, $exclude);
+            }, $module));
+        }
+        $files = File::allfiles($module->path);
+        $files = array_values(array_filter($files, function($item) use($exclude)
+        {
+            foreach($exclude as $path)
+            {
+                if(starts_with( $item->getRealPath(), $path))
+                {
+                    return False;
+                }
+            }
+            return True;
+        }));
+        $files = array_values(array_filter(array_map(function($item)
+        {
+            $cls = ClassHelper::getInformations($item->getRealPath());
+            try
+            {
+                return std(["cls"=>new ReflectionClass($cls->fullname), "path"=>$item->getRealPath(),"file"=>$item,"fullname"=>$cls->fullname]);
+            }catch(\Exception $e)
+            {
+                Logger::error("Ignore:\t" .$item->getRealPath());
+                return NULL;
+                
+            }
+        },array_values(array_filter($files, function($item)
+        {
+            if(!isset($item))
+                return NULL;
+            return $item->getExtension() == "php";
+        }))), function($item)
+        {
+            if(!isset($item))
+                return False;
+            if(!$item->cls->hasProperty('table')){
+                return False;
+            }
+            if($item->cls->getParentClass() == False)
+                return False;
+
+            $default = $item->cls->getDefaultProperties();            
+            if(!isset($default) || !isset($default["table"]))
+            {
+                return False;
+            }
+            return True;
+        }));
+
+        return array_map(function($item)
+        {
+            $item->table = $item->cls->getDefaultProperties()["table"];
+            $item->parent = $item->cls->getParentClass()->getName();
+            return $item;
+        }, $files);
     }
     protected function updateOwnerShip($path)
     {
