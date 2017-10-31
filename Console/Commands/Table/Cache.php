@@ -48,7 +48,7 @@ class Cache extends Command
         $start = microtime(True);
 
 
-        $reserved = ['__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
+        $reserved = ['__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'parent', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
 
         $files = [];
 
@@ -168,7 +168,7 @@ class Cache extends Command
         $extends = config('database.model.default')??'\Core\Database\Eloquent\Model';
         $cast = [];
         
-        $cast_mapping = ["int"=>"integer","varchar"=>"string","lontext"=>"string","timestamp"=>"timestamp","text"=>"string","datetime"=>"datetime","float"=>"float","tinytext"=>"text","bigint"=>"integer","tinyint"=>"integer","date"=>"date","smallint"=>"integer"];
+        $cast_mapping = ["int"=>"integer","varchar"=>"string","lontext"=>"string","timestamp"=>"datetime","text"=>"string","datetime"=>"datetime","float"=>"float","tinytext"=>"text","bigint"=>"integer","tinyint"=>"integer","date"=>"date","smallint"=>"integer"];
 
         $models_cls = [];
         foreach($tables as $table)
@@ -374,6 +374,10 @@ class Cache extends Command
                         ]);
 
                         $name = $current->table_name;
+                        if($table == "marketplace_search_candidate" && count($current->relations)==2)
+                        {
+                            ///dd($current->relations);
+                        }
                         $type = "hasMany";
                         // if(isset($structure[$relation->REFERENCED_TABLE_NAME]["uniques"][$relation->referenced_columns]))
                         // {
