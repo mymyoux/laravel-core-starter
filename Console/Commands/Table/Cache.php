@@ -47,6 +47,9 @@ class Cache extends Command
     {
         $start = microtime(True);
 
+
+        $reserved = ['__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
+
         $files = [];
 
        // $this->call('table:clear');
@@ -194,6 +197,10 @@ class Cache extends Command
             {
                 $file = substr($file, 0,-1);
             }
+            if(in_array(strtolower($file), $reserved))
+            {
+                $file.="Model";
+            }
             $cls->setNamespace($namespace);
             $cls->setClassName($file);
             if(isset($extendsMapping[$table]))
@@ -227,7 +234,7 @@ class Cache extends Command
                     //auto increment
                     if($primary->EXTRA != "auto_increment")
                     {
-                        $cls->addProperty('incrementing', 'protected', False, False);
+                        $cls->addProperty('incrementing', 'public', False, False);
                     }          
                     //not int      
                     if(strpos($primary->DATA_TYPE, "int")===False)
@@ -562,7 +569,7 @@ class Cache extends Command
               
                 $content = preg_replace("/extends( |\t)+([a-z0-9_-]+)/i",'extends \\'.$cls->getFullName(), $extendsClasses[$table]->file->getContents());
                 Logger::warn("Change\t".$extendsClasses[$table]->fullname." inherits from\t".$extendsClasses[$table]->parent." to\t".$cls->getFullName());
-                //file_put_contents($extendsClasses[$table]->path, $content);
+                file_put_contents($extendsClasses[$table]->path, $content);
                 // dd($extendsClasses[$table]->file->getContents());
                 // $newInherits = config('database.model.default')??'\Core\Database\Eloquent\Model';
                 // if($extendsClasses[$table]->parent!= $newInherits && '\\'.$extendsClasses[$table]->parent!= $newInherits)
@@ -588,7 +595,7 @@ class Cache extends Command
                 }
                 Logger::info("Create:\t".$file);
                 //File::makeDirectory($cache_path . '/' . $directory, 0755, true);
-              //  $cls_app->write($file);
+               $cls_app->write($file);
             }
             // $cls_app->
         }
