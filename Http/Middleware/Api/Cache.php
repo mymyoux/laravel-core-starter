@@ -66,19 +66,10 @@ class Cache
         if (true === $invalid)
         {
             CacheManager::invalidAPI($base_key);
-            // $redis = CacheManager::connection();
-            // $keys = $redis->sMembers($base_key);
-            // foreach ($keys as $key)
-            //     CacheManager::forget($key);
-            // CacheManager::forget($name);
         }   
         else
         {
             CacheManager::cacheAPI($base_key, $cache_key, $data);
-            // CacheManager::put( $cache_key, $data, Carbon::now()->addDays(1));
-            // // add all keys to an array in order to clear everything
-            // $redis = CacheManager::connection();
-            // $redis->sAdd($base_key, $cache_key);
         }     
         
         return $data;

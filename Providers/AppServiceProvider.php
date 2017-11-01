@@ -99,7 +99,7 @@ class AppServiceProvider extends ServiceProvider
     }
     protected function registerCache()
     {
-        $this->app->singleton('cachemanager', '\App\Services\CacheManager');
+        $this->app->singleton('cachemanager', '\Core\Services\CacheManager');
     }
 }
 
