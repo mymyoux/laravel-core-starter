@@ -119,11 +119,17 @@ class Api
         $request = Request::create($prefix . $this->path, $this->method);
         if(isset($this->params))
         {
-            $request->merge($this->params);
+            foreach($this->params as $key=>$value)
+            {
+                $request->query->set($key, $value);
+            }
         }
         if(isset($params))
         {
-            $request->merge($params);
+            foreach($params as $key=>$value)
+            {
+                $request->query->set($key, $value);
+            }
         }
 
         //inputs
