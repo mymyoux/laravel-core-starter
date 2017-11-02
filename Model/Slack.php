@@ -10,7 +10,7 @@ use App;
 use Request;
 use Illuminate\Console\Application;
 use Core\Model\Slack\Attachment;
-class Slack extends Model
+class Slack extends \Tables\Model\Slack
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

@@ -10,7 +10,7 @@ use App;
 use Request;
 use Illuminate\Console\Application;
 use Db;
-class Mail extends Model
+class Mail extends \Tables\Model\Mail
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

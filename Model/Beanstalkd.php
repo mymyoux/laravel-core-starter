@@ -5,7 +5,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class Beanstalkd extends Model
+class Beanstalkd extends \Tables\Model\Beanstalkd\Log
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

@@ -8,7 +8,7 @@ use Schema;
 use App;
 use Api;
 use App\User;
-use Tables\TEMPLATE;
+use Core\Model\Template;
 use Logger;
 use File;
 class Clear extends Command
@@ -44,7 +44,7 @@ class Clear extends Command
      */
     public function handle()
     {
-        TEMPLATE::delete();
+        Template::truncate();
         $success = File::deleteDirectory(storage_path('framework/cache/views/'), true);
     }
 }

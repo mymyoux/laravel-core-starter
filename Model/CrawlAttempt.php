@@ -5,7 +5,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class CrawlAttempt extends Model
+class CrawlAttempt extends \Tables\Model\Crawl\Attempt
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

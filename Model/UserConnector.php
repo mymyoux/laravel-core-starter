@@ -3,7 +3,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Tables\USER_CONNECTOR;
 use Core\Model\Traits\HasCompositePrimaryKey;
-class UserConnector extends Model
+class UserConnector extends \Tables\Model\User\Connector
 {
     use HasCompositePrimaryKey;
 

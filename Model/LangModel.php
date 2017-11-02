@@ -5,7 +5,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class LangModel extends Model
+class LangModel extends \Tables\Model\Lang
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

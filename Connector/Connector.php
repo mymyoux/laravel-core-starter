@@ -5,7 +5,7 @@ namespace Core\Connector;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 
-class Connector extends Model
+class Connector extends \Tables\Model\Connector
 {
     protected $table = 'connector';
     protected $primaryKey = 'id_connector';

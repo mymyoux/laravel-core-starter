@@ -7,7 +7,7 @@ use DB;
 use Core\Model\User;
 use Core\Model\User\Token\History;
 
-class One extends Model
+class One extends \Tables\Model\User\One\Token
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

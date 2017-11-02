@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Core\Model\Slack as SlackModel;
 
-class Answer extends Model
+class Answer extends \Tables\Model\Slack\Answer
 {
 
     const CREATED_AT = 'created_time';

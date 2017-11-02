@@ -6,7 +6,7 @@ use Tables\QUERY_LOG;
 use Auth;
 use Route;
 use App;
-class Query extends Model
+class Query extends \Tables\Model\Query\Log
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

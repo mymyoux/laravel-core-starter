@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use DB;
 use Core\Model\CrawlAttempt;
 
-class Crawl extends Model
+class Crawl extends \Tables\Model\Crawl
 {
 	/**
 	 * Crawl on going

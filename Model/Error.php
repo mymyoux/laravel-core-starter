@@ -9,7 +9,7 @@ use Core\Services\IP;
 use App;
 use Request;
 use Illuminate\Console\Application;
-class Error extends Model
+class Error extends \Tables\Model\Error
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

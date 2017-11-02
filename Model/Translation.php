@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Db;
 use Auth;
 use Illuminate\Database\Eloquent\Builder;
-class Translation extends Model
+class Translation extends \Tables\Model\Translate
 {
 
     const DEFAULT_LOCALE = "en";

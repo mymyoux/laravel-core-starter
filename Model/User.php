@@ -30,7 +30,7 @@ use Tables\USER_ROLE;
 use Tables\USER_LOGIN_TOKEN;
 use Tables\USER as TUSER;
 
-class User extends Model implements
+class User extends \Tables\Model\User implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract
@@ -176,7 +176,10 @@ class User extends Model implements
     }
     protected function getAvailableTypes()
     {
-        return USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return isset($item);})->values()->all();
+        return USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
+       //USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values());>toArray();
+//dd(USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return isset($item);})->values());
+  //      return USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return- isset($item);})->values()->al$
     }
     protected function getByEmail($email)
     {

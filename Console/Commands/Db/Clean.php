@@ -3,10 +3,10 @@
 namespace Core\Console\Commands\Db;
 use Db;
 use Core\Console\Commands\CoreCommand;
-use Tables\STATS_API_CALL;
-use Tables\ERROR;
-use Tables\STATS_WATCH;
-use Tables\BEANSTALKD_LOG;
+use Tables\Model\Stats\Api\Call;
+use Tables\Model\Error;
+use Tables\Model\Stats\Watch;
+use Tables\Model\Beanstalkd\Log;
 class Clean extends CoreCommand
 {
     /**
@@ -41,10 +41,10 @@ class Clean extends CoreCommand
     public function handle()
     {
         $months = 2;
-        STATS_API_CALL::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
-        BEANSTALKD_LOG::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
-        ERROR::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
-        STATS_WATCH::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Call::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Log::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Error::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Watch::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
     }
    
 }

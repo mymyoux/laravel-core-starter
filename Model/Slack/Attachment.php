@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Core\Model\Slack as SlackModel;
 
-class Attachment extends Model
+class Attachment extends \Tables\Model\Slack\Attachment
 {
 
     const CREATED_AT = 'created_time';

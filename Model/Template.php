@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Db;
 use Auth;
 use Illuminate\Database\Eloquent\Builder;
-class Template extends Model
+class Template extends \Tables\Model\Template
 {
 
 	const CREATED_AT = 'created_time';

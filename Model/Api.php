@@ -6,7 +6,7 @@ use Tables\STATS_API_CALL;
 use Auth;
 use Route;
 use App;
-class Api extends Model
+class Api extends \Tables\Model\Stats\Api\Call
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
