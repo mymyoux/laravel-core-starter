@@ -79,11 +79,11 @@ class TranslateController extends Controller
         $translates = Translation::get();
         $translates = $translates->filter(function($item)
         {
-           return preg_match("/[^ \<>=é@0-9a-zA-Z\._-]+/", $item->path, $matches)!=0;
+           return preg_match("/[^ \<>=\/é@0-9a-zA-Z\._-]+/", $item->path, $matches)!=0;
         });
         foreach($translates as &$translate )
         {
-             $translate->path = preg_replace("/[^ \<>=é@0-9a-zA-Z\._-]+/", "", $translate->path);
+             $translate->path = preg_replace("/[^ \<>=\/é@0-9a-zA-Z\._-]+/", "", $translate->path);
             Api::path("translate/edit")->param("id", $translate->getKey())->param("locale", $translate->locale)->param("path", $translate->path)->param("type", $translate->type)->param("singular", $translate->singular)->param("plurial", $translate->plurial)->send();
         }
        return 1;
@@ -141,7 +141,7 @@ class TranslateController extends Controller
         }
         $translation->locale = $request->input('locale');
         $translation->path = $request->input('path');
-        $translation->path = preg_replace("/[^ \<>=é@0-9a-zA-Z\._-]+/", "", $translation->path);
+        $translation->path = preg_replace("/[^ \<>=é\/@0-9a-zA-Z\._-]+/", "", $translation->path);
         $paths = explode(".", $translation->path);
         if(count($paths) == 1){
             $translation->path = "app.".$translation->path;
