@@ -2,18 +2,11 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Tables\QUERY_LOG;
 use Auth;
 use Route;
 use App;
 class Query extends \Tables\Model\Query\Log
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-	protected $table = QUERY_LOG::TABLE;
-	protected $primaryKey = 'id_query_log';
-
 	protected static function boot()
     {
         parent::boot();

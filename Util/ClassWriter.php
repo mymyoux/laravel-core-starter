@@ -18,6 +18,7 @@ class ClassWriter
 	protected $properties;
 
 	protected $methods;
+	protected $type = "class";
 
 
 	public function __construct()
@@ -29,6 +30,10 @@ class ClassWriter
 		$this->properties = [];
 		$this->methods = [];
 		$this->usesTraits = [];
+	}
+	public function setType($name)
+	{
+		$this->type = $name;
 	}
 	public function setNamespace($namespace)
 	{
@@ -138,7 +143,7 @@ class ClassWriter
 		//class declaration
 		if(isset($this->classname))
 		{
-			$cls.= $tab."class ".$this->classname;
+			$cls.= $tab.$this->type." ".$this->classname;
 			if(!empty($this->extends))
 			{
 				$cls.= " extends ".implode(", ", $this->extends);

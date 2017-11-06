@@ -105,4 +105,21 @@ class ClassHelper
 		$body = implode("", array_slice($source, $start, $length));
 		return ($withHeaders?$head:"").$body;
 	}
+	public static function getSubclassesOf($parent) {
+        $result = array();
+        foreach (get_declared_classes() as $class) {
+            if (is_subclass_of($class, $parent))
+                $result[] = $class;
+		}
+        return $result;
+	}
+	public static function getLastSubclassOf($parent) {
+		$result = static::getSubclassesOf($parent);
+		if(empty($result))
+			return NULL;
+		if(count($result) == 1)
+			return $result[0];
+		dd(["need to be implemented"=>$result]);
+        return $result;
+    }
 }

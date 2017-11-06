@@ -58,7 +58,7 @@ class Cache extends Command
 
        // $this->call('table:clear');
 
-        $folder = base_path('bootstrap/tables');
+        $destination_folder = $folder = base_path('bootstrap/tables');
         if(!file_exists($folder))
         {
             mkdir($folder, 0777);
@@ -199,6 +199,19 @@ class Cache extends Command
         $cast_mapping = ["int"=>"integer","varchar"=>"string","lontext"=>"string","timestamp"=>"datetime","text"=>"string","datetime"=>"datetime","float"=>"float","tinytext"=>"text","bigint"=>"integer","tinyint"=>"integer","date"=>"date","smallint"=>"integer"];
 
         $models_cls = [];
+        $model = new ReflectionClass(Table::class);
+
+        $tableCls = new ClassWriter();
+        $tableCls->setNamespace("Tables");
+        $tableCls->setClassName("TableTrait");
+        $tableCls->setType("trait");
+        
+        foreach($model->getMethods() as $method)
+        {
+            $tableCls->addMethod(Table::class, $method->name);
+        }
+        $tableCls->write(join_paths($folder, "TableTrait.php"));
+       
         foreach($tables as $table)
         {
             $cls = new ClassWriter();
@@ -340,7 +353,8 @@ class Cache extends Command
                     $cls->addProperty('casts', 'protected', False, $cast);
                 }
             }
-
+            $cls->addUseTrait('\Tables\TableTrait');
+        
             /*protected $table = TUSER::TABLE;
             protected $primaryKey = 'id_user';*/
 
@@ -574,6 +588,9 @@ class Cache extends Command
         }, []);
 
         $extends = ["\Illuminate\Database\Eloquent\Model", "\Core\Database\Eloquent\Model", config('database.model.default')??'\Core\Database\Eloquent\Model'];
+
+
+        $table_mapping = [];
         foreach($tables as $table)
         {
             $current = &$models_cls[$table];
@@ -588,9 +605,10 @@ class Cache extends Command
                     Logger::error("not exists:\t". $table);
                     continue;
                 }
+                $table_mapping[$table] = $extendsClasses[$table]->fullname;
                 if($extendsClasses[$table]->parent == $cls->getFullName() || $extendsClasses[$table]->parent == '\\'.$cls->getFullName() )
                 {
-                   // Logger::error("already changed:\t". $table);
+                    // Logger::error("already changed:\t". $table);
                     continue;
                 }
                 if(!in_array($extendsClasses[$table]->parent, $extends) && !in_array('\\'.$extendsClasses[$table]->parent, $extends))
@@ -611,6 +629,7 @@ class Cache extends Command
             }
             $cls_app = new ClassWriter(); 
             $name = preg_replace("/^Tables\\\\/",$module->module,$cls->getNamespace());
+            $table_mapping[$table] = $name;
             $cls_app->setNamespace($name);
             $cls_app->setClassName($cls->getClassName());
             $cls_app->setExtends('\\'.$cls->getFullName());
@@ -632,6 +651,28 @@ class Cache extends Command
             }
             // $cls_app->
         }
+        $table_mapping = array_map(function($item)
+        {
+            $subclass = ClassHelper::getLastSubclassOf($item);
+            if(isset($subclass))
+            {
+                return $subclass;
+            }
+            return $item;
+        }, $table_mapping);
+        $model = new ReflectionClass(General::class);
+        
+        $tableCls = new ClassWriter();
+        $tableCls->setNamespace("Tables");
+        $tableCls->setClassName("Table");
+        $tableCls->addProperty("tables","protected", True, $table_mapping);
+        
+        foreach($model->getMethods() as $method)
+        {
+            $tableCls->addMethod(General::class, $method->name);
+        }
+        $tableCls->write(join_paths($destination_folder, "Table.php"));
+
 
         $existing = [];
         //File::allFiles()
@@ -792,4 +833,5 @@ class Cache extends Command
         }
 
     }
+    
 }
