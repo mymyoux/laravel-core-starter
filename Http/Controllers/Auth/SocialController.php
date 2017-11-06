@@ -12,7 +12,7 @@ use DB;
 use App\User;
 use Core\Models\Social;
 use Core\Http\Controllers\Controller;
-use Tables\USER_LOGIN_TOKEN;
+use Core\Model\UserLoginToken;
 use URL;
 use Core\Events\SocialAddedEvent;
 use Core\Events\SocialScopeChangedEvent;
@@ -245,7 +245,8 @@ class SocialController extends Controller
     public function register($auth_user, $api)
     {
          $auth_user->save();
-         USER_LOGIN_TOKEN::insert(["id_user"=>$auth_user->id_user,"token"=>generate_token()]);
+         //TABLE:Test token inserttestcontroller
+         UserLoginToken::insert(["id_user"=>$auth_user->id_user,"token"=>generate_token()]);
     }
     public function success(Request $request, $auth_user)
     {

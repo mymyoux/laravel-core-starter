@@ -1,18 +1,9 @@
 <?php
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
-use Tables\USER_CONNECTOR;
 use Core\Model\Traits\HasCompositePrimaryKey;
 class UserConnector extends \Tables\Model\User\Connector
 {
-    use HasCompositePrimaryKey;
-
-
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-    protected $table = USER_CONNECTOR::TABLE;
-    protected $primaryKey = ['id_user','id_connector']; 
     /**
      * The attributes that are mass assignable.
      *

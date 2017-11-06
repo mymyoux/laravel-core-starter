@@ -10,8 +10,7 @@ use Api;
 use Core\Exception\ApiException;
 use \Core\Api\Paginate;
 use Core\Api\Annotations as ghost;
-use Tables\USER_LOGIN_TOKEN;
-use Tables\USER as TUSER;
+use Core\Model\UserLoginToken;
 use Illuminate\Support\Facades\Route;
   /**
    * @ghost\Role("user")
@@ -31,15 +30,16 @@ class UserController extends Controller
         {
             return null;
         }
+        //TABLE:check les inserts
    		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
         if(isset($result))
         {
-            $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->getKey()])->first();
+            $request = UserLoginToken::select('token')->where(["id_user"=>$result->getKey()])->first();
 
             if (!isset($request))
             {
                 $token = generate_token();
-                USER_LOGIN_TOKEN::insert(["id_user"=>$result->getKey(),"token"=>$token]);
+                UserLoginToken::insert(["id_user"=>$result->getKey(),"token"=>$token]);
             }
             else
             $token = $request->token;
@@ -50,12 +50,12 @@ class UserController extends Controller
         if (Auth::user()->isImpersonated())
         {
             $result->real_user = Auth::user()->getRealUser();
-            $request = USER_LOGIN_TOKEN::select('token')->where(["id_user"=>$result->real_user->getKey()])->first();
+            $request = UserLoginToken::select('token')->where(["id_user"=>$result->real_user->getKey()])->first();
             
             if (!isset($request))
             {
                 $token = generate_token();
-                USER_LOGIN_TOKEN::insert(["id_user"=>$result->real_user->getKey(),"token"=>$token]);
+                UserLoginToken::insert(["id_user"=>$result->real_user->getKey(),"token"=>$token]);
             }
             else
             $token = $request->token;
@@ -104,16 +104,16 @@ class UserController extends Controller
             {
                 $request->where(["id_user"=>$search]);
             }else {
-                if(TUSER::hasColumn('first_name'))
+                if(User::hasColumn('first_name'))
                     $request->where('first_name', 'like', '%'.$search.'%');
-                if(TUSER::hasColumn('last_name'))
+                if(User::hasColumn('last_name'))
                     $request->orWhere('last_name', 'like', '%'.$search.'%');
-                if(TUSER::hasColumn('login'))
+                if(User::hasColumn('login'))
                     $request->orWhere('login', 'like', '%'.$search.'%');
                 $request->orWhere('email', 'like', '%'.$search.'%');
                 if(strpos($search," ")!==False)
                 {
-                    if(TUSER::hasColumn('first_name') &&  TUSER::hasColumn('last_name'))
+                    if(User::hasColumn('first_name') &&  User::hasColumn('last_name'))
                     {
                         $request->orWhere(function($query) use($search)
                         {

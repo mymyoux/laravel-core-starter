@@ -26,9 +26,7 @@ use Core\Core\PseudoTrait;
 
 use Core\Database\Eloquent\Editable;
 
-use Tables\USER_ROLE;
-use Tables\USER_LOGIN_TOKEN;
-use Tables\USER as TUSER;
+use Core\Model\UserLoginToken;
 
 class User extends \Tables\Model\User implements
     AuthenticatableContract,
@@ -45,11 +43,6 @@ class User extends \Tables\Model\User implements
 
 
 
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-    protected $table = TUSER::TABLE;
-    protected $primaryKey = 'id_user';
     /**
      * The attributes that are mass assignable.
      *
@@ -57,10 +50,6 @@ class User extends \Tables\Model\User implements
      */
     protected $fillable = [
         'first_name','last_name', 'type','email','login','picture','num_connection','temp',
-    ];
-    protected $casts = [
-        'deleted' => 'boolean',
-        'temp' => 'boolean',
     ];
 
     /**
@@ -81,9 +70,9 @@ class User extends \Tables\Model\User implements
     protected static function boot()
     {
         parent::boot();
-        if (TUSER::hasColumn('deleted'))
+        if (static::hasColumn('deleted'))
         static::addGlobalScope('deleted', function (Builder $builder) {
-            $builder->where(TUSER::deleted, '=', 0);
+            $builder->where("deleted", '=', 0);
         });
     }
 
@@ -106,26 +95,12 @@ class User extends \Tables\Model\User implements
     {
         return $this->type;
     }
-    // protected function _getById($id)
-    // {
-    //     $user = static::find($id);
-    //     if(isset($user))
-    //     {
-    //         $user->addRole($user->type);
-    //         $user->addRole(static::$ROLE_CONNECTED);
-    //         $roles = USER_ROLE::where([USER_ROLE::id_user=>$user->id_user])->get();
-    //         foreach($roles as $role)
-    //         {
-    //             $user->addrole($role->role);
-    //         }
-    //     }
-    //     return $user;
-    // }
+
     protected function beforeCache()
     {
         $this->addRole($this->type);
         $this->addRole(static::$ROLE_CONNECTED);
-        $roles = USER_ROLE::where([USER_ROLE::id_user=>$this->getKey()])->get();
+        $roles = Role::where(["user_role.id_user"=>$this->getKey()])->get();
         foreach($roles as $role)
         {
             $this->addRole($role->role);
@@ -159,8 +134,8 @@ class User extends \Tables\Model\User implements
         $id_user = Cache::get($key);
         if(!$id_user)
         {
-            $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)
-            ->where(USER_LOGIN_TOKEN::token,'=',$token)
+            $token = UserLoginToken::select("id_user")
+            ->where("token",'=',$token)
             ->first();
             if(isset($token))
             {
