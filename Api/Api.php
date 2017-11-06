@@ -113,8 +113,7 @@ class Api
     }
     protected function dispatching($params = NULL)
     {
-         $temp = Request::input();
-
+        $temp = Request::all();
         $prefix = config('api.prefix') ? config('api.prefix') . '/': '';
 
         $request = Request::create($prefix . $this->path, $this->method);
@@ -145,7 +144,8 @@ class Api
                 Auth::setUser($this->api_user);
             }
         }
-        Request::replace($request->input());
+
+        Request::replace($request->all());
         if(App::runningInConsole())
         {
             $rawresponse = app()['Illuminate\Contracts\Http\Kernel']->handle($request);
@@ -163,6 +163,7 @@ class Api
     public function response($params = NULL)
     {
         static::$data[] = [];
+        
         $rawresponse = $this->dispatching($params);
         //$api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();

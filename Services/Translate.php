@@ -24,7 +24,7 @@ class Translate
     }
     public function getLocaleFromHeader()
     {
-        $language = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        $language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
         $languages = explode(";", $language);
         $languages = array_reduce($languages, function($previous, $item)
         {

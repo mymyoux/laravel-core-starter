@@ -52,15 +52,15 @@ class Param
                 }
             }
         }
-        $input = array_merge(Request::input(), Request::file());
+        $input = $request->all();
         if(!isset($input))
         {
             $input = [];
         }
         $input[$param->name] = $value;
-        /*
-        $request->query->set($param->name, $value);
-        $request->request->set($param->name, $value);*/
+
+        // need both in order to keep that working for sub API request 
+        $request->replace($input);
         Request::replace($input);
         return $next($request);
     }

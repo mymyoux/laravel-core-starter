@@ -362,7 +362,7 @@ class Paginate
         }
 
 
-        if(isset($keys) || isset($limit))
+        if(isset($keys) || isset($limit))
         {
         	$originalQuery->limit($limit);
         }
@@ -520,7 +520,7 @@ class Paginate
             $orderRequest = [];
             foreach($keys as $index=>$key)
             {
-                $orderRequest[$key] = $directions[$index];
+                $orderRequest[$key] = $directions[$index]; // bug here index undefined
             }
             foreach($orderRequest as $key=>$direction)
             {

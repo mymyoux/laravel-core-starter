@@ -6,7 +6,9 @@ use Tables\STATS_API_CALL;
 use Auth;
 use Route;
 use App;
-class Api extends \Tables\Model\Stats\Api\Call
+use Request;
+
+class Api extends Model
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
@@ -39,8 +41,8 @@ class Api extends \Tables\Model\Stats\Api\Call
     		{
     			$data["id_user_impersonated"] = $user->getKey();
     		}
-    	}
-    	$data["path"] = Route::getFacadeRoot()->current()->uri();
+		}
+		$data["path"] = $request->getPathInfo(); // Use $request path instead of route path, resolved bug sub api call
     	$data["method"] = $request->method();
     	$data["params"] = json_encode($request->all());
     	$data["value"] = method_exists($response , "getOriginalContent")?$response->getOriginalContent():$response;

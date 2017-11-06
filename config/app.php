@@ -241,6 +241,7 @@ return [
         'Stats' => Core\Facades\Stats::class,
         'Job' => Core\Facades\Job::class,
         'Logger' => Core\Facades\Logger::class,
+        'CacheManager' => Core\Facades\CacheManager::class,
         'Notification'  => \Core\Facades\Notification::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
@@ -250,6 +251,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        
         //google sheets
         'Google' => PulkitJalan\Google\Facades\Google::class,
         'Sheets' => GoogleSheets\Facades\Sheets::class,

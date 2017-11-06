@@ -30,9 +30,10 @@ class Paginate
                 }
             }
         }
-        $input = Request::input();
-        $input["paginate"] = $paginate;
-        Request::replace($input);
+
+        $request->merge(['paginate' => $paginate]);
+        Request::merge(['paginate' => $paginate]);
+        
         return $next($request);
     }
     

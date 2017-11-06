@@ -813,6 +813,8 @@ class Generate extends CoreCommand
         list($classname, $methodname) = explode("@", $path);
 
         //doc
+        if (!method_exists($classname, $methodname)) return;
+        
         $reflectedMethod = new \ReflectionMethod($classname, $methodname);
         $docs = $reflectedMethod->getDocComment();
         $docs = str_replace("/**", "", $docs);
