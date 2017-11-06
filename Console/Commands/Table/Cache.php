@@ -199,12 +199,42 @@ class Cache extends Command
         $cast_mapping = ["int"=>"integer","varchar"=>"string","lontext"=>"string","timestamp"=>"datetime","text"=>"string","datetime"=>"datetime","float"=>"float","tinytext"=>"text","bigint"=>"integer","tinyint"=>"integer","date"=>"date","smallint"=>"integer"];
 
         $models_cls = [];
+
+
+        $files = $this->getTableFiles([$core_module, $module], [join_paths($core_module->path,"config")]); 
+        $already_written = array_map(function($item)
+        {
+            return $item->table;//cls->getDefaultProperties()["table"];
+            //return $item->getProperty('table')->getValue();
+        }, $files);
+
+
+        $extendsClasses = array_reduce($files, function($previous, $item)
+        {
+            //$item->parent = $item->cls->getParentClass()->getName();
+            if(!isset($previous[$item->cls->getDefaultProperties()["table"]]))
+                $previous[$item->cls->getDefaultProperties()["table"]] = $item;
+            return $previous;
+            //return $item->getProperty('table')->getValue();
+        }, []);
+
+        $existingsTables = array_reduce($files, function($previous, $item)
+        {
+            //$item->parent = $item->cls->getParentClass()->getName();
+            $previous[$item->cls->getDefaultProperties()["table"]] = $item;
+            return $previous;
+            //return $item->getProperty('table')->getValue();
+        }, []);
         $model = new ReflectionClass(Table::class);
 
         $tableCls = new ClassWriter();
         $tableCls->setNamespace("Tables");
         $tableCls->setClassName("TableTrait");
         $tableCls->setType("trait");
+
+
+
+
         
         foreach($model->getMethods() as $method)
         {
@@ -416,10 +446,6 @@ class Cache extends Command
                         ]);
 
                         $name = $current->table_name;
-                        if($table == "marketplace_search_candidate" && count($current->relations)==2)
-                        {
-                            ///dd($current->relations);
-                        }
                         $type = "hasMany";
                         // if(isset($structure[$relation->REFERENCED_TABLE_NAME]["uniques"][$relation->referenced_columns]))
                         // {
@@ -534,7 +560,14 @@ class Cache extends Command
                 foreach($cls->relations as $relation)
                 {
                  //   dd($relation);
-                    $current->cls->addFunction($relation->name, NULL, 'return $this->'.$relation->type.'('."'".preg_replace("/^Tables\\\\/",$module->module,$relation->model->fullname)."'".$relation->content.');','public');
+                    if(isset($existingsTables[$relation->name]))
+                    {
+                        $modelName = $existingsTables[$relation->name]->fullname;
+                    }else
+                    {
+                        $modelName = preg_replace("/^Tables\\\\/",$module->module,$relation->model->fullname);
+                    }
+                    $current->cls->addFunction($relation->name, NULL, 'return $this->'.$relation->type.'('."'".$modelName."'".$relation->content.');','public');
                 }
             }
         }
@@ -550,42 +583,9 @@ class Cache extends Command
       
         //dd('what');
 
-        $files = $this->getTableFiles([$core_module, $module], [join_paths($core_module->path,"config")]); 
         
 
-        /*File::allfiles($module->path);
-        $files = array_values(array_filter(array_map(function($item)
-        {
-            $cls = ClassHelper::getInformations($item->getRealPath());
-            try
-            {
-                return std(["cls"=>new ReflectionClass($cls->fullname), "path"=>$item->getRealPath(),"file"=>$item,"fullname"=>$cls->fullname]);
-            }catch(\Exception $e)
-            {
-                Logger::error($e);
-            }
-        },array_values(array_filter($files, function($item)
-        {
-            return $item->getExtension() == "php";
-        }))), function($item)
-        {
-            return $item->cls->hasProperty('table');  
-        }));
-        */
-        $already_written = array_map(function($item)
-        {
-            return $item->table;//cls->getDefaultProperties()["table"];
-            //return $item->getProperty('table')->getValue();
-        }, $files);
-
-        $extendsClasses = array_reduce($files, function($previous, $item)
-        {
-            //$item->parent = $item->cls->getParentClass()->getName();
-            if(!isset($previous[$item->cls->getDefaultProperties()["table"]]))
-                $previous[$item->cls->getDefaultProperties()["table"]] = $item;
-            return $previous;
-            //return $item->getProperty('table')->getValue();
-        }, []);
+      
 
         $extends = ["\Illuminate\Database\Eloquent\Model", "\Core\Database\Eloquent\Model", config('database.model.default')??'\Core\Database\Eloquent\Model'];
 
