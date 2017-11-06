@@ -217,23 +217,23 @@ class Cache extends Command
         $extendsClasses = array_reduce($files, function($previous, $item)
         {
             //$item->parent = $item->cls->getParentClass()->getName();
-            if(!isset($previous[$item->cls->getDefaultProperties()["table"]]))
-                $previous[$item->cls->getDefaultProperties()["table"]] = $item;
+            if(!isset($previous[$item->table]))
+                $previous[$item->table] = $item;
             return $previous;
             //return $item->getProperty('table')->getValue();
         }, []);
+
+        
          /**
          * Table used in relationships
          */
         $existingsTables = array_reduce($files, function($previous, $item)
         {
             //$item->parent = $item->cls->getParentClass()->getName();
-            $previous[$item->cls->getDefaultProperties()["table"]] = $item;
+            $previous[$item->table] = $item;
             return $previous;
             //return $item->getProperty('table')->getValue();
         }, []);
-
-
         /**
          * TableTrait
          */
@@ -290,7 +290,8 @@ class Cache extends Command
             }
             
             //default table name
-            if($table != strtolower($file)."s")
+            //if($table != strtolower($file)."s")
+            //always put the name because subclass doesn't have necessary the same name pattern
                 $cls->addProperty('table', 'protected', False, $table);
 
             
@@ -454,10 +455,7 @@ class Cache extends Command
 
                         $name = $current->table_name;
                         $type = "hasMany";
-                        // if(isset($structure[$relation->REFERENCED_TABLE_NAME]["uniques"][$relation->referenced_columns]))
-                        // {
-                        //     $type = "hasOne";
-                        // }
+              
                         if(isset($structure[$relation->TABLE_NAME]["uniques"][$relation->columns]))
                         {
                             $type = "hasOne";
@@ -680,90 +678,7 @@ class Cache extends Command
         }
         $tableCls->write(join_paths($destination_folder, "Table.php"));
 
-
-        $existing = [];
-        //File::allFiles()
-        return;
-        dd($models_cls);
-        dd('ok');
-        //dd($tables);
-
-
-
-         //build new
-
-         $cls = new ClassWriter();
-         
-        $cls->setNamespace('Tables');
-        $cls->setClassName('Table');
-        $list = [];
-        foreach($tables as $tablename)
-        {
-            //$cls->addProperty($tablename, "public", True);
-            $cls->addConstant(strtoupper($tablename), $tablename);
-            $list[] = $tablename;
-        }
-        $cls->addProperty("_tables", "protected", True, $list);
-
-        $model = new ReflectionClass(General::class);
-        foreach($model->getMethods() as $method)
-        {
-            $cls->addMethod(General::class, $method->name);
-        }
-
-        $files[] = "Table.php";
-        $cls->write(join_paths($folder, "Table.php"));
-        $this->updateOwnerShip(join_paths($folder, "Table.php"));
-
-        $this->info('Table.php generated');
-
-        $model = new ReflectionClass(Table::class);
-
-        foreach($tables as $tablename)
-        {
-            $cls = new ClassWriter();
-            $cls->setNamespace('Tables');
-            $cls->addUse('Db');
-            $cls->setClassName(strtoupper($tablename));
-            $cls->addConstant("TABLE", $tablename);
-
-            $columns = Schema::getColumnListing($tablename);
-
-            foreach($columns as $column)
-            {
-                $cls->addConstant(strtolower($column), $tablename.".".$column);
-            }
-            $datacolumns = [];
-            foreach($columns as $column)
-            {
-                $cls->addConstant("s_".strtolower($column), $column);
-                //$this->info($tablename.".".$column);
-                $datacolumns[$column] = Schema::getColumnType($tablename, $column);
-            }
-            foreach($model->getMethods() as $method)
-            {
-                $cls->addMethod(Table::class, $method->name);
-            }
-
-            $cls->addProperty("_columns", "protected", True, $datacolumns);
-            $files[] = strtoupper($tablename).".php";
-            $export = $cls->export();
-            $path = join_paths($folder, strtoupper($tablename).".php");
-            if(!file_exists($path) || md5($export) != md5_file($path))
-            {
-                $cls->write($path);
-                $this->updateOwnerShip($path);
-                $this->info(strtoupper($tablename).'.php generated');
-            }
-        }
-        $end = microtime(True);
-
-        $to_remove = array_diff($previous, $files);
-        foreach($to_remove as $remove)
-        {
-            unlink(join_paths($folder, $remove));
-               $this->info($remove.' deleted');
-        }
+        //TODO: remove removed tables ? 
     }
     protected function getTableFiles($module, $exclude = [])
     {
@@ -775,6 +690,7 @@ class Cache extends Command
             }, $module));
         }
         $files = File::allfiles($module->path);
+        
         $files = array_values(array_filter($files, function($item) use($exclude)
         {
             foreach($exclude as $path)
@@ -786,7 +702,8 @@ class Cache extends Command
             }
             return True;
         }));
-        $files = array_values(array_filter(array_map(function($item)
+        
+        $files = array_values(array_map(function($item)
         {
             $cls = ClassHelper::getInformations($item->getRealPath());
             try
@@ -803,30 +720,56 @@ class Cache extends Command
             if(!isset($item))
                 return NULL;
             return $item->getExtension() == "php";
-        }))), function($item)
+        }))));
+        
+        
+        $files = array_map(function($item)
         {
             if(!isset($item))
-                return False;
+                return NULL;
             if(!$item->cls->hasProperty('table')){
-                return False;
+                return NULL;
             }
             if($item->cls->getParentClass() == False)
-                return False;
+            {
+                return NULL;
+            }
 
             $default = $item->cls->getDefaultProperties();            
             if(!isset($default) || !isset($default["table"]))
             {
-                return False;
+                if($item->cls->isSubclassOf('\Illuminate\Database\Eloquent\Model') && $item->cls->isInstantiable())
+                {
+                    try
+                    {
+                        $instance = new $item->fullname;
+                        if($instance->getTable() === NULL)
+                        {
+                            return NULL;
+                        }
+                        $table = $instance->getTable();
+                    }catch(\Exception $e)
+                    {
+                        Logger::error("Ignore can't instantiate:\t" .$item->path);
+                        return NULL;
+                    }
+                }else
+                {
+                    return NULL;
+                }
+            }else
+            {
+                $table = $default["table"];
             }
-            return True;
-        }));
-
-        return array_map(function($item)
-        {
-            $item->table = $item->cls->getDefaultProperties()["table"];
+            $item->table = $table;
             $item->parent = $item->cls->getParentClass()->getName();
             return $item;
         }, $files);
+
+        return array_values(array_filter($files, function($item)
+        {
+            return isset($item);
+        }));
     }
     protected function updateOwnerShip($path)
     {

@@ -8,7 +8,7 @@ use Core\Model\Event;
 use Core\Traits\Cached;
 use Core\Traits\CachedAuto;
 use DB;
-use Core\Traits\Role;
+use Core\Traits\Role as RoleTrait;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +38,7 @@ class User extends \Tables\Model\User implements
     use Notifiable;
     use Editable;
     use CachedAuto;
-    use Role;
+    use RoleTrait;
  //   use PseudoTrait;
 
 
