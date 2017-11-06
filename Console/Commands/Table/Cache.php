@@ -159,7 +159,31 @@ class Cache extends Command
 
 
         $tables = array_map('reset', DB::select('SHOW TABLES'));
-
+        $ignore = config("database.model.ignore");
+        if(!empty($ignore))
+        {
+            $tables = array_values(array_filter($tables, function($table) use($ignore)
+            {
+                foreach($ignore as $ignore_rule)
+                {
+                    if(@preg_match($ignore_rule, null) === false){
+                        //no pattern
+                        if($table == $ignore_rule)
+                        {
+                            Logger::warn("Ignore table:\t".$table);
+                            return False;
+                        }
+                    }else{
+                        if(preg_match($ignore_rule, $table) === 1)
+                        {
+                            Logger::warn("Ignore table:\t".$table);
+                            return False;
+                        }
+                    }
+                }
+                return True;
+            }));
+        }
         $models_folder = base_path('bootstrap/tables/Model');
         
         //File::deleteDirectory($models_folder, True);
@@ -509,6 +533,7 @@ class Cache extends Command
             $cls->write($current->path);
 
         }
+      
         //dd('what');
 
         $files = $this->getTableFiles([$core_module, $module], [join_paths($core_module->path,"config")]); 
