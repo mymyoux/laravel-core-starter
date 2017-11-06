@@ -23,7 +23,7 @@ use Core\Util\ModuleHelper;
 use Illuminate\Support\Facades\Redis;
 use stdClass;
 use File;
-use Tables\TEMPLATE;
+use Core\Model\Template;
 class ViewController extends Controller
 {
     const DEFAULT_EXTENSION = "ractive";
@@ -98,8 +98,8 @@ class ViewController extends Controller
         
         foreach($folders as $folder)
         {
-            $requests[] =  TEMPLATE::select('*')
-            ->where('type', '=', $folder)
+            $requests[] =  Template::
+            where('type', '=', $folder)
             ->where('path', '=', $path);
         }
         
@@ -128,7 +128,7 @@ class ViewController extends Controller
         $templates = $request->input('templates');
 
         $type = Auth::check()?Auth::type():"app";
-        $request = TEMPLATE::select('path')->where('type','=',$type)
+        $request = Template::select('path')->where('type','=',$type)
         ->where(function($request) use($templates)
         {
             foreach($templates as $template)
