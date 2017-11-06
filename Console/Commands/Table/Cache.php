@@ -202,13 +202,18 @@ class Cache extends Command
 
 
         $files = $this->getTableFiles([$core_module, $module], [join_paths($core_module->path,"config")]); 
+        /**
+         * Table with an existing class
+         */
         $already_written = array_map(function($item)
         {
             return $item->table;//cls->getDefaultProperties()["table"];
             //return $item->getProperty('table')->getValue();
         }, $files);
 
-
+        /**
+         * Table that should inherits from Tables\Model\...
+         */
         $extendsClasses = array_reduce($files, function($previous, $item)
         {
             //$item->parent = $item->cls->getParentClass()->getName();
@@ -217,7 +222,9 @@ class Cache extends Command
             return $previous;
             //return $item->getProperty('table')->getValue();
         }, []);
-
+         /**
+         * Table used in relationships
+         */
         $existingsTables = array_reduce($files, function($previous, $item)
         {
             //$item->parent = $item->cls->getParentClass()->getName();
@@ -225,23 +232,23 @@ class Cache extends Command
             return $previous;
             //return $item->getProperty('table')->getValue();
         }, []);
-        $model = new ReflectionClass(Table::class);
 
+
+        /**
+         * TableTrait
+         */
+        $model = new ReflectionClass(Table::class);
         $tableCls = new ClassWriter();
         $tableCls->setNamespace("Tables");
         $tableCls->setClassName("TableTrait");
         $tableCls->setType("trait");
-
-
-
-
-        
         foreach($model->getMethods() as $method)
         {
             $tableCls->addMethod(Table::class, $method->name);
         }
         $tableCls->write(join_paths($folder, "TableTrait.php"));
        
+
         foreach($tables as $table)
         {
             $cls = new ClassWriter();

@@ -2,11 +2,11 @@
 namespace Core\Util\ClassWriter\Body;
 class Table
 {
-	protected function getColumnList()
+	private function getColumnList()
     {
         return array_keys($this->casts);
     }
-    protected function getColumnType($name)
+    private function getColumnType($name)
     {
         if(isset($this->casts[$name]))
         {
@@ -14,7 +14,7 @@ class Table
         }
         return NULL;
     }
-    protected function hasColumn($name)
+    private function hasColumn($name)
     {
     	return isset($this->casts[$name]);
     }
