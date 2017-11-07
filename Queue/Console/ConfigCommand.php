@@ -87,7 +87,7 @@ class ConfigCommand extends CoreCommand
             [
                 "command"=>"php artisan queue:work --timeout=0 --queue=".$jobservice->getUnprefixedTube(),
                 "directory"=>base_path(),
-                "name" => $env_prefix.$jobservice->getTube(),
+                "name" => $env_prefix.str_replace('/','_',$jobservice->getTube()),
             ], 
             $job->supervisor??[]
             );
