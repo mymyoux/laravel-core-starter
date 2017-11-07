@@ -171,6 +171,11 @@ class Mail
             }
         }
         
+        if (!is_object($message))
+        {
+            $message = (object) $message;
+        }
+
         if(!isset($message->merge_language))
             $message->merge_language = 'handlebars';
 
