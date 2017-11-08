@@ -27,6 +27,10 @@ abstract class Model extends BaseModel
         $this->_prepared = True;
         $this->prepareModel();
     }
+    public function setKey($value)
+    {
+        return $this->setAttribute($this->getKeyName(), $value);
+    }
     protected function prepareModel()
     {
 
