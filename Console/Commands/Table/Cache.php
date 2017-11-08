@@ -306,7 +306,7 @@ class Cache extends Command
                     //primary key
                     $primary = first($structure[$table]["primaries"]);
                     //default id name
-                    if($primary->COLUMN_NAME != "id")
+                    if(True || $primary->COLUMN_NAME != "id")
                     {
                         $cls->addProperty('primaryKey', 'protected', False, $primary->COLUMN_NAME);
                     }  

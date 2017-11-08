@@ -36,7 +36,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-    	if(config('database.connections.mysql.database') == "forge" || !class_exists('Tables\ERROR')){
+    	if(config('database.connections.mysql.database') == "forge" ){
     	   Logger::error('Are you sure to have correctly setup your .env file ? ');
     		return;//	dd($exception);
     	}
@@ -65,7 +65,7 @@ class Handler extends ExceptionHandler
     {
         $rawexception = CoreException::convertToJsonObject($exception);
 
-        if(!(config('database.connections.mysql.database') == "forge" || !class_exists('Tables\ERROR')))
+        if(!(config('database.connections.mysql.database') == "forge"))
         {
             $rawexception["id"] = ErrorService::record($exception);
         }
