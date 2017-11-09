@@ -176,7 +176,7 @@ class User extends Model implements
     }
     protected function getAvailableTypes()
     {
-        return USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return isset($item);})->values()->all();
+        return USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
     }
     protected function getByEmail($email)
     {
