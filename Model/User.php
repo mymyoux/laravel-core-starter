@@ -152,9 +152,6 @@ class User extends \Tables\Model\User implements
     protected function getAvailableTypes()
     {
         return USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
-       //USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values());>toArray();
-//dd(USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return isset($item);})->values());
-  //      return USER::select('type')->distinct()->get()->pluck('type')->filter(function($item){return- isset($item);})->values()->al$
     }
     protected function getByEmail($email)
     {

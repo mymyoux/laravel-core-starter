@@ -17,7 +17,17 @@ class Mail
 	public function __construct(MailMandrill $mandrill)
 	{
         $this->mandrill = $mandrill;
-	}
+    }
+
+    public function setKey( $key )
+    {
+        $this->mandrill = new MailMandrill($key);
+    }
+
+    public function getMandrill()
+    {
+        return $this->mandrill;
+    }
     static public function template($template, $to, $data = NULL, $config = NULL, $send_at = NULL, $ip_pool = NULL)
     {
         $data = $data??[];
@@ -161,6 +171,11 @@ class Mail
             }
         }
         
+        if (!is_object($message))
+        {
+            $message = (object) $message;
+        }
+
         if(!isset($message->merge_language))
             $message->merge_language = 'handlebars';
 
