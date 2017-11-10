@@ -53,6 +53,6 @@ class Translate
 
     public function translate( $key, $options = null, $locale = null )
     {
-        return Translate::t($key, $locale, null, $options);
+        return Translate::t($key, null, $locale, $options);
     }
 }

@@ -732,7 +732,13 @@ if (!function_exists('array_orderby'))
             if (is_string($field)) {
                 $tmp = array();
                 foreach ($data as $key => $row)
-                    $tmp[$key] = $row[$field];
+                {
+                    if (is_array($row))
+                        $tmp[$key] = $row[$field];
+                    else
+                        $tmp[$key] = $row->$field;
+
+                }
                 $args[$n] = $tmp;
                 }
         }
