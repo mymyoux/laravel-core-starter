@@ -80,12 +80,5 @@ class Crawl extends \Tables\Model\Crawl
 
     	return $attempt;
 
-		// if(!isset($ip))
-		// {
-		// 		$ip = $this->getIP();
-		// }
-		// $this->table(CrawlTable::TABLE_ATTEMPT)->insert(array("uuid"=>$uuid,"id_crawl"=>$crawl["id_crawl"],"state"=>CrawlTable::STATE_PARSING,"ip"=>$ip,"type"=>$crawl["type"]));
-
-		// return $this->table(CrawlTable::TABLE_ATTEMPT)->lastInsertValue;
 	}
 }

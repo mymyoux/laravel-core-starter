@@ -65,7 +65,6 @@ class One extends \Tables\Model\User\One\Token
             }
 
             History::insert($result->id_user, $result->token, $result->source);
-            // $this->table(TokenTable::TABLE_ONE_SHOT_HISTORY)->insert(array("id_user"=>$result["id_user"],"token"=>$result["token"],"source"=>$result["source"]));
             DB::commit();
             // Notifications::oneToken($result);
             return $result->id_user;

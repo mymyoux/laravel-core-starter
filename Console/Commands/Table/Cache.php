@@ -238,15 +238,15 @@ class Cache extends Command
          * TableTrait
          */
         $model = new ReflectionClass(Table::class);
-        $tableCls = new ClassWriter();
-        $tableCls->setNamespace("Tables");
-        $tableCls->setClassName("TableTrait");
-        $tableCls->setType("trait");
-        foreach($model->getMethods() as $method)
-        {
-            $tableCls->addMethod(Table::class, $method->name);
-        }
-        $tableCls->write(join_paths($folder, "TableTrait.php"));
+        // $tableCls = new ClassWriter();
+        // $tableCls->setNamespace("Tables");
+        // $tableCls->setClassName("TableTrait");
+        // $tableCls->setType("trait");
+        // foreach($model->getMethods() as $method)
+        // {
+        //     $tableCls->addMethod(Table::class, $method->name);
+        // }
+        // $tableCls->write(join_paths($folder, "TableTrait.php"));
        
 
         foreach($tables as $table)
@@ -391,11 +391,8 @@ class Cache extends Command
                     $cls->addProperty('casts', 'protected', False, $cast);
                 }
             }
-            $cls->addUseTrait('\Tables\TableTrait');
+            $cls->addUseTrait('\Core\Database\TableTrait');
         
-            /*protected $table = TUSER::TABLE;
-            protected $primaryKey = 'id_user';*/
-
 
             $models_cls[$table] = std(["cls"=>$cls, "table_name"=>$table,"path"=>join_paths($mf, $file.".php"),"name"=>strtolower($file), "fullname"=>$namespace.'\\'.$file]);
         }

@@ -151,9 +151,8 @@ class VueController extends Controller
         {
             $union->union($requests[$i]);
         }
-
         $result = DB::table( DB::raw("({$union->toSql()}) as temps") )
-        ->mergeBindings($union)
+        ->mergeBindings($union->getQuery())
         ->groupBy('temps.path')->first();
         if(!isset($result))
         {
