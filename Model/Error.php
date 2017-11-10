@@ -35,7 +35,7 @@ class Error extends \Tables\Model\Error
     {
         if(App::isLocal())
         {
-            return;
+            //return;
         }
         if(static::isMuted())
         {
@@ -91,8 +91,7 @@ class Error extends \Tables\Model\Error
             /**
              * @var \Core\Service\Identity $identity
              */
-            if(method_exists(Auth::class, "getUser"))
-            $user = Auth::getUser();
+            $user = Auth::user();
             if(isset($user))
             {
                 $info["id_user"] = $user->getKey();
