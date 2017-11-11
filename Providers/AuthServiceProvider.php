@@ -5,6 +5,7 @@ namespace Core\Providers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Core\Auth\Guard;
+use Auth;
 class AuthServiceProvider extends ServiceProvider
 {
 
