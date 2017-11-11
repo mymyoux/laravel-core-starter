@@ -43,7 +43,7 @@ class Handler extends ExceptionHandler
 
         try
         {
-            if(class_exists(App) && App::runningInConsole())
+            if(class_exists('App') && App::runningInConsole())
             {
                 ErrorService::record($exception);
             }
