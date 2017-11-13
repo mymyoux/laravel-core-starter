@@ -90,17 +90,17 @@ class ErrorController extends Controller
         ->where("created_time",">=",$start)
         ->where("created_time","<=",$end)
         ->groupBy([DB::raw("UNIX_TIMESTAMP(error.created_time) DIV ".$step)]);
-        $result = $request->get();/*->map(function($item)
+        $result = $request->get()->map(function($item)
         {
-            $item->count = rand(0,100000);
+            //$item->count = rand(0,100000);
             return $item;
-        });*/
+        });
         $interval->pop();
         $times =$result->pluck('time');
         $missings = $interval->diff($times);
         foreach($missings as $missing)
         {
-            $result->push(std(["count"=>0,"time"=>$missing]));
+            $result->push(std(["count"=>0/*rand(0,100000)*/,"time"=>$missing]));
         }
         return $result->sortBy('time')->values();
     }
