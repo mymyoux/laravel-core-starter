@@ -535,7 +535,7 @@ class Paginate
 
 }
 
-use Table;
+use Tables\Table;
 class ColumnsTester
 {
 	const PATTERN = '/([^ ]+)( +(as)? +([^. ]+))?/';
