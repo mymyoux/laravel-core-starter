@@ -461,12 +461,10 @@ class Update extends Command
             }catch(\Exception $e)
             {
                 Logger::error($file. " can\'t be chown");
-                try
-                {
+               
                     Logger::info('sudo chown '.$value.' '.$file);
                     exec('sudo chown '.$value.' '.$file);
                     dd('ok');
-                }
             }
         }
     }
