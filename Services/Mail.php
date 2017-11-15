@@ -29,53 +29,25 @@ class Mail
     {
         return $this->mandrill;
     }
+    
     static public function template($template, $to, $data = NULL, $config = NULL, $send_at = NULL, $ip_pool = NULL)
     {
         $data = $data??[];
         $message = $config??[];
 
-        if ($to instanceof \App\User)
-        {
-            if ($to->hasPlace())
-            {
-                $id_place = $to->getPlaceID();
-                $language = null;
+        if (!isset($message['tags']))
+            $message['tags'] = [];
 
-                switch ($id_place)
-                {
-                    case 193:
-                        $language = 'fr';
-                    break;
-                }
+        $message['tags'][] = $template;
 
-                if (null !== $language)
-                {
-                    $template_exist = MandrillTemplateModel::getTemplate( $template, $language );
+        self::send($template, $to, $data, $message, $send_at, $ip_pool);
+    }
 
-                    if (null !== $template_exist)
-                    {
-                        $template = $template_exist->slug;
-                    }
-                }
-                else
-                {
-                    $language = 'en';
-                }
-
-                if (isset($message))
-                {
-                    if (!isset($message['tags']))
-                    {
-                        $message['tags'] = [];
-                    }
-
-                    $message['tags'][] = 'lang-' . $language;
-                }
-            }
-        }
-
+    static public function send($template, $to, $data = NULL, $message = NULL, $send_at = NULL, $ip_pool = NULL)
+    {
         return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool])->send();
     }
+
     public function forbidden($template)
     {
         return NULL;
