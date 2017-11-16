@@ -7,6 +7,7 @@ use App\User;
 use Core\Model\Mail as MailModel;
 use Logger;
 use Auth;
+use Exception;
 
 use Core\Model\Mandrill\Template as MandrillTemplateModel;
 
@@ -28,58 +29,63 @@ class Mail
     {
         return $this->mandrill;
     }
+    
     static public function template($template, $to, $data = NULL, $config = NULL, $send_at = NULL, $ip_pool = NULL)
     {
         $data = $data??[];
         $message = $config??[];
 
-        if ($to instanceof \App\User)
-        {
-            if ($to->hasPlace())
-            {
-                $id_place = $to->getPlaceID();
-                $language = null;
+        if (!isset($message['tags']))
+            $message['tags'] = [];
 
-                switch ($id_place)
-                {
-                    case 193:
-                        $language = 'fr';
-                    break;
-                }
+        $message['tags'][] = $template;
 
-                if (null !== $language)
-                {
-                    $template_exist = MandrillTemplateModel::getTemplate( $template, $language );
+        self::send($template, $to, $data, $message, $send_at, $ip_pool);
+    }
 
-                    if (null !== $template_exist)
-                    {
-                        $template = $template_exist->slug;
-                    }
-                }
-                else
-                {
-                    $language = 'en';
-                }
-
-                if (isset($message))
-                {
-                    if (!isset($message['tags']))
-                    {
-                        $message['tags'] = [];
-                    }
-
-                    $message['tags'][] = 'lang-' . $language;
-                }
-            }
-        }
-
+    static public function send($template, $to, $data = NULL, $message = NULL, $send_at = NULL, $ip_pool = NULL)
+    {
         return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool])->send();
+    }
+
+    public function forbidden($template)
+    {
+        return NULL;
+    }
+    public function isAllowed($template, $id_user, $role_email = NULL)
+    {
+        $user =   is_numeric($id_user)? User::find($id_user):$id_user;
+        if(!isset($user))
+        {
+            Logger::warn($id_user. ' no email because deleted');
+            //deleted
+            return False;
+        }
+        $id_user = $user->getKey();
+        //delete
+        if($user->deleted == 1)
+        {
+            Logger::warn($id_user . ' no email because deleted');
+            return False;
+        }
+        if($user->hasRole("no_email"))
+        {
+            Logger::warn($id_user . ' no email because role: no_email');
+            return False;
+        }
+        if(isset($role_email) && $user->hasRole($role_email))
+        {
+            Logger::warn($id_user . ' no email because role: '.$role_email);
+            return False;
+        }
+        
+        return True;
     }
     public function _sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool)
     {
         if(!isset($to) || (is_array($to) && empty($to)))
         {
-            throw Exception('no recipient for email');
+            throw new Exception('no recipient for email');
         }
 
         if(!is_array($to))
@@ -89,6 +95,7 @@ class Mail
         
         $to = array_map(function($item){ $item["email"] = clean_email($item["email"]); return $item;},array_values(array_filter(array_map(function($recipient)
         {
+            
             if(is_numeric($recipient))
             {
                 $user = User::find($recipient);
@@ -150,11 +157,24 @@ class Mail
         {
             return isset($item);
         })));
+        $role_email = $this->forbidden( $template);
 
-        
+        //remove non allowed user (deleted, no_email etc)
+        $to = array_values(array_filter($to, function($item)use($role_email, $template)
+        {
+            if(!isset($item["id_user"]))
+            {
+                return true;
+            }
+            return $this->isAllowed($template, $item["id_user"], $role_email);
+          
+        }));
+
         if(empty($to))
         {
-            throw Exception('no valid recipient for email');
+            Logger::error("no recipient left");
+            return;
+            //throw new Exception('no valid recipient for email');
         }
         if(config('services.mandrill.test') === true)
         {

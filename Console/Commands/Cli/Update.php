@@ -454,7 +454,17 @@ class Update extends Command
         $files = get_files($path, True);
         foreach($files as $file)
         {
-            chown((string)$file, $value);
+            try
+            {
+
+                chown((string)$file, $value);
+            }catch(\Exception $e)
+            {
+                Logger::error($file. " can't be chown");
+               
+                Logger::info('sudo chown '.$value.' '.$file);
+                exec('sudo chown '.$value.' '.$file);
+            }
         }
     }
 }
