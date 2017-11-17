@@ -32,6 +32,7 @@ class UserController extends Controller
         }
         //TABLE:check les inserts
    		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
+
         if(isset($result))
         {
             $request = UserLoginToken::select('token')->where(["id_user"=>$result->getKey()])->first();
@@ -63,7 +64,7 @@ class UserController extends Controller
             $result->real_user->token = $token;
         }
 
-   		return $result;
+        return $result;
     }
    /**
     * Get infos on specific user

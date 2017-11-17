@@ -132,6 +132,10 @@ trait Editable
     } 
     public function __wakeup()
     {
+        
+    }
+    public function afterCache()
+    {
         foreach($this->_mixins as $mixin)
         {
             $obj = new $mixin;

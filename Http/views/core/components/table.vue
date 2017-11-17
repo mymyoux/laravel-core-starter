@@ -86,8 +86,8 @@
             </div>
         </div>
         
-        <div v-if="list && list.models && list.models.length" v-for="item in list.models" class="table-tr table-item" :class="{'link-inside':list.config.link,deletable:list.config.deletable}" @click="liclick(item, $event)" :data-create="item._creating">
-            <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible" :class="{'link-inside':typeof column.link == 'string', 'editable':column.editable === true}" v-on:click="click(item,column, $event)">
+        <div v-if="list && list.models && list.models.length" v-for="(item, index) in list.models" class="table-tr table-item" :class="{'link-inside':list.config.link,deletable:list.config.deletable}" @click="liclick(item, $event)" :data-create="item._creating">
+            <div v-for="(column,i) in list.columns" class="table-td" v-if="column.visible && (!item.getAction || (item.getAction(item) != item.getAction(list.models[index - 1])))" :class="{'link-inside':typeof column.link == 'string', 'editable':column.editable === true}" v-on:click="click(item,column, $event)">
                 <div v-if="!column.type">
                     <div v-if="column.editable && edition && edition === item" class="edit-input">
                         <input type="text" v-model="item[column.prop]" @keyup="change(item, column, $event)" @keyup.enter="edited(item, $event)" @keyup.esc="cancel(item, $event)" :placeholder="column.title">
@@ -104,10 +104,12 @@
                         </span>
                     </div>
                 </div>
-                 <component v-else v-bind:is="column.type" :item="item" :column="column" :data="data" :alert="alert">
-
+                <div v-else>
+                 <component v-bind:is="column.type" :item="item" :column="column" :data="data" :alert="alert">
                 </component>
+                </div>
             </div>
+
             <div v-if="edition && edition === item" class="edit-save">
                 <span @click="edited(item, $event)" class="icon-check">&nbsp;</span>
                 <span @click="cancel(item, $event)" class="icon-cross2">&nbsp;</span>

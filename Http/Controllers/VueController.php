@@ -371,11 +371,16 @@ class VueController extends Controller
         {
            return Translate::t($key, $this->type, $this->locale, $params);
         }
+
         
         if(starts_with($key, '*'))
         {
             $key = substr($key, 1);
         }
+        
+        if ($context_prefix)
+            $key = '.' . $key;
+
         if($prefixKey)
         {
             if($dynamic && $quote== 1)
@@ -391,6 +396,7 @@ class VueController extends Controller
         {
             $vue .="{{";
         }
+
         $vue.="trad(".$key;
         if(strlen($params) || $context_prefix)
         {
