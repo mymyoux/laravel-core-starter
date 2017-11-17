@@ -5,7 +5,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class Cron extends \Tables\Model\Cron
+class Cron extends \Tables\Model\Cron//\Tables\Model\Cron
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

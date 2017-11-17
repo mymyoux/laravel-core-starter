@@ -8,9 +8,9 @@ use Core\Services\IP;
 use App;
 use Request;
 use Illuminate\Console\Application;
-class Error extends \Tables\Model\Error
+class Error extends \Tables\Model\Error//\Tables\Model\Error
 {
-
+    protected $table = "error";
 
     protected static $muted = False;
 
