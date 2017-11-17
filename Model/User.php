@@ -151,7 +151,7 @@ class User extends \Tables\Model\User implements
     }
     protected function getAvailableTypes()
     {
-        return USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
+        return Db::table('user')->select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
     }
     protected function getByEmail($email)
     {
