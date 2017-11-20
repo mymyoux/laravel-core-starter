@@ -640,7 +640,7 @@ class Cache extends Command
                 }
              
               
-                $content = preg_replace("/extends( |\t)+([a-z0-9_-]+)/i",'extends \\'.$cls->getFullName(), $extendsClasses[$table]->file->getContents());
+                $content = preg_replace("/extends( |\t)+([a-z0-9\\\\_-]+)/i",'extends \\'.$cls->getFullName(), $extendsClasses[$table]->file->getContents());
                 Logger::warn("Change\t".$extendsClasses[$table]->fullname." inherits from\t".$extendsClasses[$table]->parent." to\t".$cls->getFullName());
                 file_put_contents($extendsClasses[$table]->path, $content);
                 // dd($extendsClasses[$table]->file->getContents());
