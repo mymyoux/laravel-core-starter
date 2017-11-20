@@ -570,6 +570,7 @@ class Cache extends Command
                 }
             }
         }
+        $paths = [];
         //write classes
         foreach($tables as $table)
         {
@@ -577,8 +578,30 @@ class Cache extends Command
             $cls = $current->cls;
             Logger::info("write:\t".$current->path);
             $cls->write($current->path);
-
+            $paths[$table] = $current->path;
         }
+        $files = File::allfiles($models_folder);
+        $files = collect($files);
+        $to_delete = $files->filter(function($item) use($paths)
+        {
+            //remove written files
+            if(!in_array($item->getRealPath(), $paths))
+            {
+                return true;
+            }
+            return false;
+        })->filter(function($item) use($models_cls)
+        {
+            //removed subclassed classes
+           $cls = ClassHelper::getInformations($item->getRealPath());
+           return empty(ClassHelper::getSubclassesOf($cls->fullname));
+        })->each(function($item)
+        {
+            $path = $item->getRealPath();
+            Logger::warn("delete:\t".$path);
+            File::delete($path);
+        });
+        //File::allfiles()
       
         //dd('what');
 
