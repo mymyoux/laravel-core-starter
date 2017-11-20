@@ -73,11 +73,6 @@ class User extends Model implements
     ]; 
     public $appends = ['roles'];
 
-	public function getRolesAttribute()
-    {
-        return $this->attributes["roles"] = $this->roles;
-    }
-
     /**
      * Type
      * @var string
