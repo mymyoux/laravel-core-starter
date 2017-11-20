@@ -9,7 +9,7 @@
         <slot name="remove"></slot>
     </div>
     <div class="empty" v-else>
-        <input spellcheck="false" :placeholder="((premessage_placeholder))" @keyup="typing($event)"  @keydown.enter="enter($event)" @blur="blur($event)" @focus="focus()" type="text" data-focus value="" :class="[choice ? 'selection' : '']" v-model="choice" autocomplete="off">
+        <input spellcheck="false" :placeholder="((premessage_placeholder))" :tabindex="tabindex"  @keyup="typing($event)"  @keydown.enter="enter($event)" @blur="blur($event)" @focus="focus()" type="text" data-focus value="" :class="[choice ? 'selection' : '']" v-model="choice" autocomplete="off">
         <slot name="remove"></slot>
     </div>
     <ul class="list-scroll" v-show="!hidden">
