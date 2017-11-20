@@ -35,9 +35,4 @@ trait Role
 	public static function bootRole()
 	{
 	}
-
-	public function getRolesAttribute()
-    {
-        return $this->attributes["roles"] = $this->roles;
-    }
 }
