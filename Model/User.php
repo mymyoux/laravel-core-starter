@@ -62,7 +62,6 @@ class User extends \Tables\Model\User implements
     ]; 
     public $appends = ['roles'];
 
-
     /**
      * Type
      * @var string

@@ -38,6 +38,6 @@ trait Role
 
 	public function getRolesAttribute()
     {
-        return $this->attributes["roles"] = $this->roles;
+        return $this->roles;
     }
 }
