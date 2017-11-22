@@ -28,6 +28,7 @@ return [
      * Redis local cache -> avoid code cache from redis
      */
     'local_cache' => env('LOCAL_CACHE', True),
+    'sudo_user'=>env('SUDO_USER',False),
 
     /*
     |--------------------------------------------------------------------------
