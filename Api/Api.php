@@ -68,6 +68,10 @@ class Api
     {
         return count(static::$data) == 0;
     }
+    public function has($path)
+    {
+        return Route::has($path);
+    }
     public function get($path)
     {
         $this->path = $path;
@@ -153,11 +157,13 @@ class Api
         {
             $rawresponse = Route::dispatch($request);
         }
+
         Request::replace($temp);
         if(isset($temp_user))
         {
             Auth::setUser($temp_user);
         }
+
         return $rawresponse;
     }
     public function response($params = NULL)
