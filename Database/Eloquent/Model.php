@@ -4,6 +4,7 @@ namespace Core\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Core\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Expression;
 abstract class Model extends BaseModel
 {
     const CREATED_AT = 'created_time';
@@ -52,6 +53,14 @@ abstract class Model extends BaseModel
     public function getDateFormat()
     {
         return 'Y-m-d H:i:s.u';
+    }
+    public function fromDateTime($value)
+    {
+        if($value instanceof Expression)
+        {
+            return $value;
+        }
+        return parent::fromDateTime($value);
     }
 
     public function asDateTime( $value )
