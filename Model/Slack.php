@@ -9,6 +9,7 @@ use App;
 use Request;
 use Illuminate\Console\Application;
 use Core\Model\Slack\Attachment;
+use Job;
 class Slack extends \Tables\Model\Slack
 {
     const CREATED_AT = 'created_time';
@@ -45,6 +46,14 @@ class Slack extends \Tables\Model\Slack
     {
         $this->attachments = NULL;
     }
+    public function getAttachment($index)
+    {
+        return $this->attachments[$index];
+    }
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
     public function setChannel($channel)
     {
         $this->slack_channel = $this->channel = $channel;
@@ -80,13 +89,20 @@ class Slack extends \Tables\Model\Slack
     {
         $this->delete_original = True;
     }
-    public function addAttachment($attachment)
+    public function addAttachment($attachment, $index = NULL)
     {
         if(!isset($this->attachments))
         {
             $this->attachments = [];
         }
-        $this->attachments[] = $attachment;
+        if(isset($index))
+        {
+            array_splice($this->attachments, $index, 0, [$attachment]);
+            $this->attachments = array_values($this->attachments);
+        }else
+        {
+            $this->attachments[] = $attachment;
+        }
     }
     public function toSlackJSON()
     {
@@ -148,7 +164,10 @@ class Slack extends \Tables\Model\Slack
     }
     public function send()
     {
-        
+       return Job::create(\Core\Jobs\SlackInteraction::class, ["slack"=>serialize($this)])->send();
+    }
+    public function sendNow()
+    {
         $json = $this->toSlackJSON();
         if(isset($this->token))
         {
@@ -180,6 +199,7 @@ class Slack extends \Tables\Model\Slack
         if(Auth::check())
             $this->id_user = Auth::id();
        $this->saveAll();
+       return $result;
     }
     public function save(array $options = [])
     {
@@ -198,5 +218,9 @@ class Slack extends \Tables\Model\Slack
                 $attachment->original_request = json_encode($attachment->toSlackJSON());
                 $attachment->save();
             }
+    }
+    public function external()
+    {
+        return $this->morphTo();
     }
 }
