@@ -5,6 +5,8 @@ namespace Core\Database\Eloquent;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Core\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use DateTime;
+
 abstract class Model extends BaseModel
 {
     const CREATED_AT = 'created_time';
@@ -65,9 +67,17 @@ abstract class Model extends BaseModel
 
     public function asDateTime( $value )
     {
-        if (!strpos($value, '.'))
+        if (!($value instanceof Expression) && !strpos($value, '.'))
         {
             $value .= '.000';
+        }
+
+        if ($value instanceof Expression)
+        {
+            error_log('[laravel-core] value:' . $value->getValue() . ' return Carbon::now');
+
+            if (starts_with($value->getValue(), 'NOW(') || starts_with($value->getValue(), 'CURRENT_TIMESTAMP('))
+                return \Carbon\Carbon::now();
         }
 
         return parent::asDateTime($value);
