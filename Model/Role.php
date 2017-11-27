@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Core\Model\Traits\HasCompositePrimaryKey;
 
 
-class Role extends Model
+class Role extends \Tables\Model\User\Role
 {
 	use HasCompositePrimaryKey;
 

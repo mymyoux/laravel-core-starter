@@ -2,20 +2,15 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-// use Tables\ERROR as TERROR;
 use Auth;
 use Route;
 use Core\Services\IP;
 use App;
 use Request;
 use Illuminate\Console\Application;
-class Error extends Model
+class Error extends \Tables\Model\Error//\Tables\Model\Error
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-	protected $table = 'error';
-	protected $primaryKey = 'id';
+    protected $table = "error";
 
     protected static $muted = False;
 
@@ -40,7 +35,7 @@ class Error extends Model
     {
         if(App::isLocal())
         {
-            return;
+            //return;
         }
         if(static::isMuted())
         {
@@ -96,8 +91,7 @@ class Error extends Model
             /**
              * @var \Core\Service\Identity $identity
              */
-            if(method_exists(Auth::class, "getUser"))
-            $user = Auth::getUser();
+            $user = Auth::user();
             if(isset($user))
             {
                 $info["id_user"] = $user->getKey();

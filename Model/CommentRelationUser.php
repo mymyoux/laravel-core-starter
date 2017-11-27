@@ -5,7 +5,7 @@ namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class CommentRelationUser extends Model
+class CommentRelationUser extends \Tables\Model\Comment\Relation\User
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

@@ -23,18 +23,36 @@ class ClassHelper
 
 		    for (;$i<count($tokens);$i++) {
 		        if ($tokens[$i][0] === \T_CLASS) {
-		            for ($j=$i+1;$j<count($tokens);$j++) {
-		                if ($tokens[$j] === '{') {
-		                    $class = $tokens[$i+2][1];
-		                    break 2;
-		                }
-		            }
+					if(!isset($tokens[$i-1]) || (!isset($tokens[$i-1][1]) || $tokens[$i-1][1]!="::"))
+					{
+						
+						for ($j=$i+1;$j<count($tokens);$j++) {
+							if ($tokens[$j] === '{') {
+								if(isset($tokens[$i+2][1]))
+								{
+									$class = $tokens[$i+2][1];
+									break 2;
+								}else
+								{
+									dd($tokens[$i-1]);
+								}
+							}
+						}
+					}
 		        }else
 		        if ($tokens[$i][0] === \T_NAMESPACE) {
 		            for ($j=$i+1;$j<count($tokens);$j++) {
+						if ($tokens[$j] === '{') {
+							break;
+						}
 		                if ($tokens[$j] === ';') {
-		                    $namespace = join("", array_map(function($item){return $item[1];},array_slice($tokens, $i+2,$j-$i-2)));//$tokens[$i+2][1];
-		                    break;
+		                    $namespace = join("", array_map(function($item){
+								if(!isset($item[1]))
+								{
+									return "";
+								}
+								return $item[1];},array_slice($tokens, $i+2,$j-$i-2)));//$tokens[$i+2][1];
+							break;
 		                }
 		            }
 		        }
@@ -87,4 +105,21 @@ class ClassHelper
 		$body = implode("", array_slice($source, $start, $length));
 		return ($withHeaders?$head:"").$body;
 	}
+	public static function getSubclassesOf($parent) {
+        $result = array();
+        foreach (get_declared_classes() as $class) {
+            if (is_subclass_of($class, $parent))
+                $result[] = $class;
+		}
+        return $result;
+	}
+	public static function getLastSubclassOf($parent) {
+		$result = static::getSubclassesOf($parent);
+		if(empty($result))
+			return NULL;
+		if(count($result) == 1)
+			return $result[0];
+		dd(["need to be implemented"=>$result]);
+        return $result;
+    }
 }

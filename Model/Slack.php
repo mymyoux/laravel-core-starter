@@ -2,7 +2,6 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-// use Tables\ERROR as TERROR;
 use Auth;
 use Route;
 use Core\Services\IP;
@@ -10,7 +9,8 @@ use App;
 use Request;
 use Illuminate\Console\Application;
 use Core\Model\Slack\Attachment;
-class Slack extends Model
+use Job;
+class Slack extends \Tables\Model\Slack
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
@@ -45,6 +45,14 @@ class Slack extends Model
      public function removeAttachments()
     {
         $this->attachments = NULL;
+    }
+    public function getAttachment($index)
+    {
+        return $this->attachments[$index];
+    }
+    public function getAttachments()
+    {
+        return $this->attachments;
     }
     public function setChannel($channel)
     {
@@ -81,13 +89,20 @@ class Slack extends Model
     {
         $this->delete_original = True;
     }
-    public function addAttachment($attachment)
+    public function addAttachment($attachment, $index = NULL)
     {
         if(!isset($this->attachments))
         {
             $this->attachments = [];
         }
-        $this->attachments[] = $attachment;
+        if(isset($index))
+        {
+            array_splice($this->attachments, $index, 0, [$attachment]);
+            $this->attachments = array_values($this->attachments);
+        }else
+        {
+            $this->attachments[] = $attachment;
+        }
     }
     public function toSlackJSON()
     {
@@ -149,7 +164,10 @@ class Slack extends Model
     }
     public function send()
     {
-        
+       return Job::create(\Core\Jobs\SlackInteraction::class, ["slack"=>serialize($this)])->send();
+    }
+    public function sendNow()
+    {
         $json = $this->toSlackJSON();
         if(isset($this->token))
         {
@@ -181,6 +199,7 @@ class Slack extends Model
         if(Auth::check())
             $this->id_user = Auth::id();
        $this->saveAll();
+       return $result;
     }
     public function save(array $options = [])
     {
@@ -199,5 +218,9 @@ class Slack extends Model
                 $attachment->original_request = json_encode($attachment->toSlackJSON());
                 $attachment->save();
             }
+    }
+    public function external()
+    {
+        return $this->morphTo();
     }
 }

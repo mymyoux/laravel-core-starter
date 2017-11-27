@@ -4,7 +4,7 @@ namespace Core\Model\Mandrill;
 
 use Core\Database\Eloquent\Model;
 
-class Template extends Model
+class Template extends \Tables\Model\Mandrill\Template
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

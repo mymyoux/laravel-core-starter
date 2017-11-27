@@ -54,6 +54,15 @@ class Restart extends CoreCommand
             $env = "";
         }
         $group = $this->argument('group')??config('queue.supervisor.default.group', '');
-        Command::execute('supervisorctl',['restart', $env.$group.":*"]);
+
+        $sudo_user = config('app.sudo_user');
+        if($sudo_user)
+        {
+            Command::execute('sudo',['supervisorctl', 'restart', $env.$group.":*"]);
+        }else
+        {
+            Command::execute('supervisorctl',['restart', $env.$group.":*"]);
+        }
+
     }
 }

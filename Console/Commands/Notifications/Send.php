@@ -16,7 +16,6 @@ use Route;
 use Core\Util\MarkdownWriter;
 use Core\Util\Command as ExecCommand;
 use Core\Util\ClassHelper;
-use Tables\STATS_API_CALL;
 use stdClass;
 use Api;
 use Core\Api\Annotations\Paginate;

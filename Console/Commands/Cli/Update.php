@@ -28,13 +28,13 @@ class Update extends Command
         "pull"              => 1,
         "composer"          => 1,
         "migrate"           => 1,
-        "sass"           => 0,
-        "tsc"           => 0,
-        "template"           => 0,
+        "sass"              => 0,
+        "tsc"               => 0,
+        "template"          => 0,
         "cache"             => 1,
         "supervisor"        => 1,
         'cron'              => 0,
-        'doc'              => 1
+        'doc'               => 1
     ];
     /**
      * The console command description.

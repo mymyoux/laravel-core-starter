@@ -16,7 +16,7 @@ use Route;
 use Core\Util\MarkdownWriter;
 use Core\Util\Command as ExecCommand;
 use Core\Util\ClassHelper;
-use Tables\STATS_API_CALL;
+use Tables\Model\Stats\Api\Call;
 use stdClass;
 use Api;
 use Core\Api\Annotations\Paginate;
@@ -566,14 +566,14 @@ class Generate extends CoreCommand
            
 
 
-            $stats = STATS_API_CALL::where('path','=',$route->uri)
+            $stats = Call::where('path','=',$route->uri)
             ->select(Db::raw('COUNT(*) as count, COUNT(DISTINCT id_user) as id_user'))
             ->first();
 
             $doc->annotation_right('Called **'.$stats->count.'** time'.($stats->count!=1?'s':'')." by **".$stats->id_user."** loggued user".($stats->id_user!=1?'s':''));
 
              //get exemple of call & result 
-            $exemple = STATS_API_CALL::where('path','=',$route->uri)
+            $exemple = Call::where('path','=',$route->uri)
             ->where('value','not like','{"data":null%')
             ->where('value','not like','{"exception":%')
             ->whereNotNull('value')

@@ -2,7 +2,6 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-// use Tables\ERROR as TERROR;
 use Auth;
 use Route;
 use Core\Services\IP;
@@ -10,7 +9,7 @@ use App;
 use Request;
 use Illuminate\Console\Application;
 use Db;
-class Mail extends Model
+class Mail extends \Tables\Model\Mail
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

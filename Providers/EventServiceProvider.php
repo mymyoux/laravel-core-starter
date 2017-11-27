@@ -17,6 +17,8 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
          \SocialiteProviders\Manager\SocialiteWasCalled::class => [
             'SocialiteProviders\Google\GoogleExtendSocialite@handle',
+            'SocialiteProviders\Coinbase\CoinbaseExtendSocialite@handle',
+            'Core\Providers\CoinbaseServiceProvider@handle'
         ],
     ];
      protected $subscribe = [

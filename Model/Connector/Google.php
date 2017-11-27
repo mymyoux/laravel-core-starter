@@ -4,7 +4,7 @@ namespace Core\Model\Connector;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Google extends Model
+class Google extends \Tables\Model\User\Connector\Google
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

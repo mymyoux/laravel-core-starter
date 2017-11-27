@@ -34,7 +34,7 @@ class ApiResponse
             $exception = $cls::unserialize($data);
         }else
         {
-            $message = isset($data["message"])?$data["message"]:"";
+            $message = isset($data["message"]) && strlen($data["message"])?$data["message"]:$data["type"];
             $code = isset($data["code"])?$data["code"]:NULL;
            /// $exception = new $cls($message, $code);
             $exception = new CoreException($message, $code);

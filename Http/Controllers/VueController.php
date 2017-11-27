@@ -23,7 +23,7 @@ use Core\Util\ModuleHelper;
 use Illuminate\Support\Facades\Redis;
 use stdClass;
 use File;
-use Tables\TEMPLATE;
+use Core\Model\Template;
 use View;
 use \Illuminate\View\Compilers\BladeCompiler;
 use Translate;
@@ -140,8 +140,8 @@ class VueController extends Controller
         
         foreach($folders as $folder)
         {
-            $requests[] =  TEMPLATE::select('*')
-            ->where('type', '=', $folder)
+            $requests[] =  Template
+            ::where('type', '=', $folder)
             ->where('path', '=', $path)
             ->where('locale', '=', $this->locale);
         }
@@ -151,9 +151,8 @@ class VueController extends Controller
         {
             $union->union($requests[$i]);
         }
-
         $result = DB::table( DB::raw("({$union->toSql()}) as temps") )
-        ->mergeBindings($union)
+        ->mergeBindings($union->getQuery())
         ->groupBy('temps.path')->first();
         if(!isset($result))
         {
@@ -171,7 +170,7 @@ class VueController extends Controller
         $templates = $request->input('templates');
 
         $type = Auth::check() && Auth::type() ? Auth::type() : "app";
-        $request = TEMPLATE::select('path')->where('type','=',$type)
+        $request = Template::select('path')->where('type','=',$type)
         ->where(function($request) use($templates)
         {
             foreach($templates as $template)

@@ -2,26 +2,19 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Tables\STATS_API_CALL;
 use Auth;
 use Route;
 use App;
 use Request;
 
-class Api extends Model
+class Api extends \Tables\Model\Stats\Api\Call
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-	protected $table = STATS_API_CALL::TABLE;
-	protected $primaryKey = 'id_call';
-
 	const API_NAME = "v2";
 	protected static function boot()
     {
         parent::boot();
         static::addGlobalScope('api', function (Builder $builder) {
-            $builder->where(STATS_API_CALL::api, '=', Api::API_NAME);
+            $builder->where("api", '=', Api::API_NAME);
         });
     }
     protected function record($request, $response)

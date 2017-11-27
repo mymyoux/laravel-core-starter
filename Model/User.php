@@ -8,7 +8,7 @@ use Core\Model\Event;
 use Core\Traits\Cached;
 use Core\Traits\CachedAuto;
 use DB;
-use Core\Traits\Role;
+use Core\Traits\Role as RoleTrait;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,11 +26,9 @@ use Core\Core\PseudoTrait;
 
 use Core\Database\Eloquent\Editable;
 
-use Tables\USER_ROLE;
-use Tables\USER_LOGIN_TOKEN;
-use Tables\USER as TUSER;
+use Core\Model\UserLoginToken;
 
-class User extends Model implements
+class User extends \Tables\Model\User implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract
@@ -40,16 +38,11 @@ class User extends Model implements
     use Notifiable;
     use Editable;
     use CachedAuto;
-    use Role;
+    use RoleTrait;
  //   use PseudoTrait;
 
 
 
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-
-    protected $table = TUSER::TABLE;
-    protected $primaryKey = 'id_user';
     /**
      * The attributes that are mass assignable.
      *
@@ -57,10 +50,6 @@ class User extends Model implements
      */
     protected $fillable = [
         'first_name','last_name', 'type','email','login','picture','num_connection','temp',
-    ];
-    protected $casts = [
-        'deleted' => 'boolean',
-        'temp' => 'boolean',
     ];
 
     /**
@@ -80,9 +69,9 @@ class User extends Model implements
     protected static function boot()
     {
         parent::boot();
-        if (TUSER::hasColumn('deleted'))
+        if (static::hasColumn('deleted'))
         static::addGlobalScope('deleted', function (Builder $builder) {
-            $builder->where(TUSER::deleted, '=', 0);
+            $builder->where("deleted", '=', 0);
         });
     }
 
@@ -101,26 +90,12 @@ class User extends Model implements
     {
         return $this->type;
     }
-    // protected function _getById($id)
-    // {
-    //     $user = static::find($id);
-    //     if(isset($user))
-    //     {
-    //         $user->addRole($user->type);
-    //         $user->addRole(static::$ROLE_CONNECTED);
-    //         $roles = USER_ROLE::where([USER_ROLE::id_user=>$user->id_user])->get();
-    //         foreach($roles as $role)
-    //         {
-    //             $user->addrole($role->role);
-    //         }
-    //     }
-    //     return $user;
-    // }
+
     protected function beforeCache()
     {
         $this->addRole($this->type);
         $this->addRole(static::$ROLE_CONNECTED);
-        $roles = USER_ROLE::where([USER_ROLE::id_user=>$this->getKey()])->get();
+        $roles = Role::where(["user_role.id_user"=>$this->getKey()])->get();
         foreach($roles as $role)
         {
             $this->addRole($role->role);
@@ -154,8 +129,8 @@ class User extends Model implements
         $id_user = Cache::get($key);
         if(!$id_user)
         {
-            $token = USER_LOGIN_TOKEN::select(USER_LOGIN_TOKEN::id_user)
-            ->where(USER_LOGIN_TOKEN::token,'=',$token)
+            $token = UserLoginToken::select("id_user")
+            ->where("token",'=',$token)
             ->first();
             if(isset($token))
             {
@@ -171,7 +146,7 @@ class User extends Model implements
     }
     protected function getAvailableTypes()
     {
-        return USER::select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
+        return Db::table('user')->select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
     }
     protected function getByEmail($email)
     {
@@ -195,14 +170,7 @@ class User extends Model implements
     {
         return $this->morphMany('Core\Model\Event', 'owner');
     }
-    // public function employee()
-    // {
-    //     return $this->hasOne('App\Model\CompanyModelEmployee', 'id_user','id_user');
-    // }
-    //  public function company()
-    // {
-    //     return $this->hasMany('App\Model\CompanyModelEmployee', 'id_user','id_user');
-    // }
+
     public function prehandleCache()
     {
         $this->prepareCache();

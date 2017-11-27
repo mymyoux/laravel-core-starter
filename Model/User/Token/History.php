@@ -5,7 +5,7 @@ namespace Core\Model\User\Token;
 use Core\Database\Eloquent\Model;
 use DB;
 
-class History extends Model
+class History extends \Tables\Model\User\One\Token\History
 {
 	const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';

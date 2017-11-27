@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Db;
 use Auth;
 use Illuminate\Database\Eloquent\Builder;
-class Event extends Model
+class Event extends \Tables\Model\Event
 {
 	/**
 	 * traitment on going

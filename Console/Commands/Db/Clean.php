@@ -3,10 +3,11 @@
 namespace Core\Console\Commands\Db;
 use Db;
 use Core\Console\Commands\CoreCommand;
-use Tables\STATS_API_CALL;
-use Tables\ERROR;
-use Tables\STATS_WATCH;
-use Tables\BEANSTALKD_LOG;
+use Tables\Model\Stats\Api\Call;
+use Tables\Model\Error;
+use Tables\Model\Stats\Watch;
+use Tables\Model\Beanstalkd\Log;
+use App\Model\Ats\AtsApiCall;
 use Logger;
 class Clean extends CoreCommand
 {
@@ -50,6 +51,10 @@ class Clean extends CoreCommand
             $all = False;
         }
         $months = 2;
+        
+        
+        
+        
         if($day<0)
         {
             $day = 0;
@@ -67,16 +72,18 @@ class Clean extends CoreCommand
             return;
         }
         Logger::info("deleting stats_api_call");
-        STATS_API_CALL::where("created_time","<",Db::raw("NOW() - INTERVAL $day DAY"))->delete();
+        Call::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         if($all)
         {
             Logger::info("deleting beanstalkd_log");
-            BEANSTALKD_LOG::where("created_time","<",Db::raw("NOW() - INTERVAL $day DAY"))->delete();
+            Log::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         }
         Logger::info("deleting error");
-        ERROR::where("created_time","<",Db::raw("NOW() - INTERVAL $day DAY"))->delete();
+        Error::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("deleting stats_watch");
-        STATS_WATCH::where("created_time","<",Db::raw("NOW() - INTERVAL $day DAY"))->delete();
+        Watch::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Logger::info("deleting ats_api_error");
+        AtsApiCall::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("done");
     }
    

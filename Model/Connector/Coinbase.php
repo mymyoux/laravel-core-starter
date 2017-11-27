@@ -4,12 +4,12 @@ namespace Core\Model\Connector;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Github extends \Tables\Model\User\Connector\Github
+class Coinbase extends \Tables\Model\User\Connector\Coinbase
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
     
-    protected $table = 'user_connector_github';
+    protected $table = 'user_connector_coinbase';
     protected $primaryKey = 'id_user';
 
     protected $fillable = ['id_user', 'id', 'nickname', 'name', 'email', 'avatar','gender'];

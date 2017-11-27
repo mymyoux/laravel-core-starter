@@ -45,6 +45,13 @@ class Reread extends CoreCommand
      */
     public function handle()
     {
-        Command::execute('supervisorctl',['reread']);
+        $sudo_user = config('app.sudo_user');
+        if($sudo_user)
+        {
+            Command::execute('sudo',['supervisorctl','reread']);
+        }else
+        {
+            Command::execute('supervisorctl',['reread']);
+        }
     }
 }

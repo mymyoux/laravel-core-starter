@@ -60,7 +60,7 @@ class GitHubManager extends ParentGitHubManager
         $this->user_token = $token;
         $this->authenticate($this->user_token, NULL, 'http_token');
     }
-    public function getConnectionConfig($name)
+    public function getConnectionConfig(string $name = null)
     {
         if($name == "main")
         {

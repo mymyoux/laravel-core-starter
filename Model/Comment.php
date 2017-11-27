@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 
-class Comment extends Model
+class Comment extends \Tables\Model\Comment
 {
     use SoftDeletes;
 	const CREATED_AT = 'created_time';

@@ -6,7 +6,7 @@ use Core\Database\Eloquent\Model;
 use DB;
 use Core\Model\CrawlAttempt;
 
-class Crawl extends Model
+class Crawl extends \Tables\Model\Crawl
 {
 	/**
 	 * Crawl on going
@@ -80,12 +80,5 @@ class Crawl extends Model
 
     	return $attempt;
 
-		// if(!isset($ip))
-		// {
-		// 		$ip = $this->getIP();
-		// }
-		// $this->table(CrawlTable::TABLE_ATTEMPT)->insert(array("uuid"=>$uuid,"id_crawl"=>$crawl["id_crawl"],"state"=>CrawlTable::STATE_PARSING,"ip"=>$ip,"type"=>$crawl["type"]));
-
-		// return $this->table(CrawlTable::TABLE_ATTEMPT)->lastInsertValue;
 	}
 }

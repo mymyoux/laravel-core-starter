@@ -6,16 +6,20 @@ class General
 {
     public static function getTable($name)
     {
-        $name = "Tables\\".strtoupper($name);
-        return new $name();
+        if(isset(static::$tables[$name]))
+        {
+            $cls = static::$tables[$name];
+            return new $cls;
+        }
+        return NULL;
     }
 	public static function hasTable($name)
     {
-        return in_array($name, static::$_tables);
+        return isset(static::$tables[$name]);
     }
     public static function getTableList()
     {
-        return static::$_tables;
+        return array_keys(static::$tables);
     }
     public static function hasColumn($tablename, $column)
     {

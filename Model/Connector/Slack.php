@@ -4,7 +4,7 @@ namespace Core\Model\Connector;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Slack extends Model
+class Slack extends \Tables\Model\User\Connector\Slack
 {
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
