@@ -7,6 +7,7 @@ use Tables\Model\Stats\Api\Call;
 use Tables\Model\Error;
 use Tables\Model\Stats\Watch;
 use Tables\Model\Beanstalkd\Log;
+use App\Model\Ats\AtsApiCall;
 use Logger;
 class Clean extends CoreCommand
 {
@@ -81,6 +82,8 @@ class Clean extends CoreCommand
         Error::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("deleting stats_watch");
         Watch::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Logger::info("deleting ats_api_error");
+        AtsApiCall::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("done");
     }
    
