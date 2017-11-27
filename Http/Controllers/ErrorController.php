@@ -25,7 +25,7 @@ class ErrorController extends Controller
     /**
      * @ghost\Param(name="start",requirements="\d+", required=false, type="int")
      * @ghost\Param(name="end",requirements="\d+", required=false, type="int")
-     * @ghost\Paginate(allowed="last_created_time,last_updated_time,count",keys="last_created_time",directions="-1", limit=10)
+     * @ghost\Paginate(allowed="last_created_time,last_updated_time,count,time",keys="last_created_time",directions="-1", limit=10)
      * @return void
      */
     public function list(Request $request, Paginate $paginate)
