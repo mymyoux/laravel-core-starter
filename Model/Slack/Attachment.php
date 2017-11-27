@@ -56,6 +56,10 @@ class Attachment extends \Tables\Model\Slack\Attachment
     {
         $this->color = $color;
     }   
+    public function getColor()
+    {
+        return $this->color;
+    }
     public function setCallbackId($id)
     {
         $this->callback_id = $id;
@@ -101,6 +105,19 @@ class Attachment extends \Tables\Model\Slack\Attachment
             $this->actions = [];
         }
         $this->actions[] = $action;
+    }
+    public function removeAction($index)
+    {
+        if(!isset($index))
+        {
+            array_pop($this->actions);
+        }else
+        array_splice($this->actions, $index, 1);
+        $this->actions = array_values($this->actions);
+    }
+    public function removeActions()
+    {
+        $this->actions = NULL;
     }
     public function setMarkdown($text = True, $pretext = True)
     {

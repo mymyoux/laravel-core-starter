@@ -54,6 +54,14 @@ class Update extends CoreCommand
             $env = "";
         }
         $group = $this->argument('group')??config('queue.supervisor.default.group', '');
-        Command::execute('supervisorctl',['update', $env.$group]);
+
+        $sudo_user = config('app.sudo_user');
+        if($sudo_user)
+        {
+            Command::execute('sudo',['supervisorctl','update', $env.$group]);
+        }else
+        {
+            Command::execute('supervisorctl',['update', $env.$group]);
+        }
     }
 }

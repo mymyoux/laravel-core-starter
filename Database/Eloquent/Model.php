@@ -56,6 +56,14 @@ abstract class Model extends BaseModel
     {
         return 'Y-m-d H:i:s.u';
     }
+    public function fromDateTime($value)
+    {
+        if($value instanceof Expression)
+        {
+            return $value;
+        }
+        return parent::fromDateTime($value);
+    }
 
     public function asDateTime( $value )
     {

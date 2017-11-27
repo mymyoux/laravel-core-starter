@@ -15,6 +15,7 @@ use Logger;
 use Core\Util\ClassHelper;
 use Illuminate\Http\JsonResponse;
 use Core\Util\ModuleHelper;
+use App\User;
 class Api
 {
     public static $data = [[]];
@@ -112,6 +113,12 @@ class Api
     public function user($user)
     {
 
+        $this->api_user = $user;
+        return $this;
+    }
+    public function admin()
+    {
+        $user = User::getConsoleUser( 'admin' );
         $this->api_user = $user;
         return $this;
     }
