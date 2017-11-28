@@ -21,7 +21,7 @@ class Translation extends \Tables\Model\Translate
     public $hidden = ["id","missing","id_user","sync_time","created_time"];
 
 
-    private function getPluralForm($locale, $quantity)
+    protected function getPluralForm($locale, $quantity)
     {
         if(!isset($quantity))
             return "singular";
@@ -232,7 +232,7 @@ class Translation extends \Tables\Model\Translate
         });
         return $all->values();
     }
-    private function parseLocale($locale)
+    protected function parseLocale($locale)
     {
         if(!isset($locale))
         {
@@ -245,7 +245,7 @@ class Translation extends \Tables\Model\Translate
         }
         return $locale;
     }
-    private function parseKey($key)
+    protected function parseKey($key)
 	{
         $hkey = new \stdClass;
 
