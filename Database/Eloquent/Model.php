@@ -69,7 +69,9 @@ abstract class Model extends BaseModel
     {
         if (!($value instanceof Expression) && !strpos($value, '.'))
         {
-            $value .= '.000';
+            // manage case if it's only a date in datebase like 2017-01-01 instead of 2017-01-01 00:00:00
+            if (preg_match('/[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/', $value))
+                $value .= '.000';
         }
 
         if ($value instanceof Expression)
