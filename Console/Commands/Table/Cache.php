@@ -558,10 +558,9 @@ class Cache extends Command
                 // }
                 foreach($cls->relations as $relation)
                 {
-                 //   dd($relation);
-                    if(isset($existingsTables[$relation->name]))
+                    if(isset($existingsTables[$relation->model->table_name]))
                     {
-                        $modelName = $existingsTables[$relation->name]->fullname;
+                        $modelName = $existingsTables[$relation->model->table_name]->fullname;
                     }else
                     {
                         $modelName = preg_replace("/^Tables\\\\/",$module->module,$relation->model->fullname);
@@ -751,7 +750,6 @@ class Cache extends Command
             {
                 return NULL;
             }
-
             $default = $item->cls->getDefaultProperties();            
             if(!isset($default) || !isset($default["table"]))
             {
