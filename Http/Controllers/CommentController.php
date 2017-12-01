@@ -357,7 +357,6 @@ class CommentController extends Controller
                     $comment_state->created_time = date('Y-m-d H:i:s');
                     $comment_state->save();
                 }
-
                 $relation->load('objects.external');
                 $comment->relation()->associate($relation);
             }else

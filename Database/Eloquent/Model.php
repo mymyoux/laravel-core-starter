@@ -45,6 +45,15 @@ abstract class Model extends BaseModel
 
         return $newbelongs;
     }
+    protected function guessBelongsToRelation()
+    {
+        list($one, $two, $three, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+        if($three["function"] == "belongsTo")
+        {
+            return $caller['function'];
+        }
+        return $three['function'];
+    }
     // public function hasOne($related, $foreignKey = null, $localKey = null)
     // {
     //     $relation = parent::hasOne($related, $foreignKey, $localKey);
