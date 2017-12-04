@@ -79,6 +79,7 @@ class Translation extends \Tables\Model\Translate
     }
     protected function translate($key, $locale, $type, $options = NULL)
     {
+        $key = str_replace(["(",")"], "", $key);
         $translation = $this->translates($key, $locale, $type, False);
         if(!isset($translation))
             return $key;
