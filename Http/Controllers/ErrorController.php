@@ -20,6 +20,10 @@ use Core\Jobs\Test;
 use Logger;
 use Apiz;
 use Core\Model\Error;
+
+/**
+ * ghost\Role('admin')
+ */
 class ErrorController extends Controller
 {
     /**
