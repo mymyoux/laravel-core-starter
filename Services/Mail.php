@@ -81,6 +81,11 @@ class Mail
         
         return True;
     }
+    public function removeFromBlacklist($email)
+    {
+        Logger::file("remove from blacklist: ".$email);
+        $result = $this->mandrill->rejects()->delete($email);
+    }
     public function _sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool)
     {
         if(!isset($to) || (is_array($to) && empty($to)))
