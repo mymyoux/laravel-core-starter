@@ -81,6 +81,7 @@ class Mail
         
         return True;
     }
+
     public function _sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool)
     {
         if(!isset($to) || (is_array($to) && empty($to)))
@@ -256,8 +257,15 @@ class Mail
             }
             $mail->id_mandrill = $resultemail["_id"];
             $mail->save();
+
+            $this->afterSaveMail( $key, $resultemail, $template, $message );
         }
 
         return $result;
+    }
+
+    protected function afterSaveMail($key, $data, $template, $message )
+    {
+        // nothing here
     }
 }
