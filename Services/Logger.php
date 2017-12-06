@@ -152,32 +152,87 @@ class Logger
 
     public function color( $message, $style, $rc = true )
     {
-        if (false === $this->debug && $type < self::LOG_ERROR) return;
+        $begin = "";
+        if (true === $this->display_time)
+            $begin = '[' . date('Y-m-d H:i:s') . '] ' . $begin;
+        if(is_array($data))
+        {
 
-        $begin = $end = '';
+        }
+    }
+    public function file( $msg, $type = self::LOG_NONE )
+    {
+        if(is_string($type))
+        {
+            $keys = ["info","debug","warn","bg_debug","error","critical"];
+            $index = array_search($type, $keys);
+            if($index !== False)
+            {
+                $type = $index+1;
+            }
+           else {
+               $type =  self::LOG_NONE;
+           }
+        }
+        if(is_object($msg) || is_array($msg))
+        { 
+            $msg = json_encode($msg, \JSON_PRETTY_PRINT);
+        }
+        $message = $msg;
+        if (false === $this->debug && $type < self::LOG_ERROR) return;
+        $begin = $end = ''; 
+        $style = null;
+
+        switch ( $type )
+        {
+            case self::LOG_CRITICAL :
+                $style = 'error';
+                // $color 	= Color::RED;
+                $begin 	= '/!\\ ';
+            break;
+            case self::LOG_BG_DEBUG :
+                $style = 'error';
+                // $color = Color::BLUE;
+            break;
+            case self::LOG_ERROR :
+                $style = 'error';
+                // $color = Color::LIGHT_RED;
+            break;
+            case self::LOG_WARN :
+                $style = 'warning';
+                // $color = Color::YELLOW;
+            break;
+            case self::LOG_INFO :
+                $style = 'info';
+                // $color = Color::GREEN;
+            break;
+            case self::LOG_DEBUG :
+                $style = 'question';
+                // $color = Color::LIGHT_BLUE;
+            break;
+            default:
+            	// $color = Color::NORMAL;
+            break;
+        }
+
+        if ($begin !== $end)
+        {
+            if (self::LOG_CRITICAL === $type)
+                $end .= " /!\ ";
+        }
 
         if (true === $this->display_time)
             $begin = '[' . date('Y-m-d H:i:s') . '] ' . $begin;
 
-        if (true === App::runningInConsole())
-        {
-            if (true === App::runningInCron())
-            {
-                echo $begin . $message . $end . PHP_EOL;
-            }
-            else
-            {
-                $message = $style ? "<$style>$begin$message$end</$style>" : ($begin . $message . $end);
-                $this->output->writeln($message, null);
-            }
-        }
+        $stderr = fopen('php://stderr', 'w'); 
+        fwrite($stderr,$begin.$message.$end.PHP_EOL); 
+        fclose($stderr); 
     }
 
     public function debug( $message, $bg = false )
     {
     	$this->log($message, (false === $bg ? self::LOG_DEBUG : self::LOG_BG_DEBUG));
     }
-
     private function log( $msg, $type = self::LOG_NONE )
     {
         $message = $msg;
