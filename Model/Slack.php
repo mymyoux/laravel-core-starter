@@ -10,6 +10,7 @@ use Request;
 use Illuminate\Console\Application;
 use Core\Model\Slack\Attachment;
 use Job;
+use Logger;
 class Slack extends \Tables\Model\Slack
 {
     const CREATED_AT = 'created_time';
@@ -188,7 +189,12 @@ class Slack extends \Tables\Model\Slack
             try
             {
                 $result = json_decode($result);
-                $this->ts = $result->ts;
+                if(!isset($result->ts))
+                {
+                   Logger::error(json_encode($result));
+                }else {
+                    $this->ts = $result->ts;
+                }
             }catch(\Exception $e)
             {
                 dd($e);

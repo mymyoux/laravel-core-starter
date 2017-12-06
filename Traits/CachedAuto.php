@@ -16,9 +16,9 @@ trait CachedAuto
 	public $from_cache = False;
 	protected function find($id, $columns = ['*'])
 	{
-		if(is_array($id))
+		if(is_array($id) && $this->getIncrementing())
 		{
-			return array_map(function($id){
+			return array_map(function($id) use ($columns){
 				return $this->find($id, $columns);
 			}, $id);
 		}
@@ -26,7 +26,14 @@ trait CachedAuto
 		$model = Cache::get($key);
 		if(!$model) 
 		{
-			$model = parent::find($id, $columns);
+			if (!$this->getIncrementing())
+			{
+				$model = self::findComposite($id, $columns);
+			}
+			else
+			{
+				$model = parent::find($id, $columns);
+			}
 
 			if ($model !== null)
 				$model->cache();
@@ -34,7 +41,6 @@ trait CachedAuto
 		else
 		{
 			$model->dishandleCache();
-			//$this->hydrateObject($model);
 			if(method_exists($model, "afterCache"))
 			{
 				$model->afterCache();
@@ -218,7 +224,16 @@ trait CachedAuto
 	
 	protected function getCacheKey($id = NULL)
 	{
-		return str_replace("%id", isset($id)?$id:$this->getKey(), static::$_cached_key);
+		if (!$this->getIncrementing() && (is_array($id) || !$id))
+		{
+			$key = implode('-', isset($id)?$id:$this->getKey());
+		}
+		else
+		{
+			$key = isset($id)?$id:$this->getKey();
+		}
+
+		return str_replace("%id", $key, static::$_cached_key);
 	}
 	public static function bootCachedAuto()
 	{

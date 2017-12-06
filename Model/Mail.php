@@ -28,4 +28,15 @@ class Mail extends \Tables\Model\Mail
         }
         return NULL;
     }
+    protected function getIDUserFromIDMandrill($id_mandrill)
+    {
+        $mail = Mail::where(["id_mandrill"=>$id_mandrill])->first();
+        if(!isset($mail))
+            return null;
+        return $mail->id_user;
+    }
+    protected function getByMandrill($id_mandrill)
+    {
+        return Mail::where(["id_mandrill"=>$id_mandrill])->first();
+    }
 }
