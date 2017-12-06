@@ -31,20 +31,27 @@ trait HasCompositePrimaryKey
        }
        return $query;
    }
-   /**
-    * Execute a query for a single record by ID.
-    *
-    * @param  array  $ids Array of keys, like [column => value].
-    * @param  array  $columns
-    * @return mixed|static
-    */
-   public static function find($ids, $columns = ['*'])
-   {
-       $me = new self;
-       $query = $me->newQuery();
-       foreach ($me->getKeyName() as $key) {
-           $query->where($key, '=', $ids[$key]);
-       }
-       return $query->first($columns);
-   }
+   
+    public function getKey()
+    {
+        $data = [];
+        
+        foreach ($this->getKeyName() as $key) {
+            $data[ $key ] = $this->getAttribute($key);
+        }
+        
+        return $data;
+    }
+
+    protected function findComposite($ids, $columns = ['*'])
+    {
+        $i = 0;
+        $me = new self;
+        $query = $me->newQuery();
+        foreach ($me->getKeyName() as $key) {
+            $query->where($key, '=', isset($ids[$key]) ? $ids[$key] : $ids[$i]);
+            $i++;
+        }
+        return $query->first($columns);
+    }
 }
