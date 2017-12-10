@@ -4,6 +4,7 @@ namespace Core\Services;
 
 use Illuminate\Support\Facades\Cache as CacheService;
 use Carbon\Carbon;
+use Logger;
 
 class CacheManager
 {
@@ -27,7 +28,12 @@ class CacheManager
         $keys = $redis->sMembers($base_key);
         
         foreach ($keys as $key)
+        {
+            Logger::normal('api:forget cache ' . $key);
             CacheManager::forget($key);
+        }
+        
+        Logger::normal('api:forget cache ' . $base_key);
 
         CacheManager::forget($base_key);
     }
@@ -35,6 +41,7 @@ class CacheManager
     public function cacheAPI($cache_key, $base_key, $data, $days = 1)
     {
         CacheManager::put( $cache_key, $data, Carbon::now()->addDays( $days ));
+        Logger::normal('api:forget put ' . $cache_key);
         
         // add all keys to an array in order to clear everything
         $redis = CacheManager::connection();
