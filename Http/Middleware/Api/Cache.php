@@ -69,7 +69,7 @@ class Cache
         }   
         else
         {
-            CacheManager::cacheAPI($base_key, $cache_key, $data);
+            CacheManager::cacheAPI($cache_key, $base_key, $data);
         }     
         
         return $data;
