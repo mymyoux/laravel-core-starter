@@ -6,6 +6,8 @@ use Closure;
 use Core\Exception\ApiException;
 use Illuminate\Http\Response;
 use Core\Model\Api;
+use Auth;
+
 class Format
 {
     /**
@@ -30,10 +32,32 @@ class Format
     }
     public function terminate($request, $response)
     {
-        Api::record(
-            $request,
-            $response
-        );
+        if (config('api.record.insert') !== false)
+        {
+            if (config('api.record.role') !== null)
+            {
+                $user = Auth::getUser();
+                
+                if(isset($user))
+                {
+                    if ($user->getRealUser()->hasRole( config('api.record.role') ))
+                    {
+                        Api::record(
+                            $request,
+                            $response
+                        );
+                    }
+                }
+            }
+            else
+            {
+                Api::record(
+                    $request,
+                    $response
+                );
+            }
+        }
+
         return $response;
     }
 }
