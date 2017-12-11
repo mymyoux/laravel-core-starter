@@ -41,7 +41,7 @@ class CacheManager
     public function cacheAPI($cache_key, $base_key, $data, $days = 1)
     {
         CacheManager::put( $cache_key, $data, Carbon::now()->addDays( $days ));
-        Logger::normal('api:forget put ' . $cache_key);
+        Logger::normal('api:hit cache ' . $cache_key);
         
         // add all keys to an array in order to clear everything
         $redis = CacheManager::connection();
