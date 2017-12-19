@@ -17,7 +17,7 @@ trait CachedAuto
 	public $from_cache = False;
 	protected function find($id, $columns = ['*'])
 	{
-		if(is_array($id) && ($this instanceof HasCompositePrimaryKey))
+		if(is_array($id) && !($this instanceof HasCompositePrimaryKey))
 		{
 			return array_map(function($id) use ($columns){
 				return $this->find($id, $columns);
@@ -225,7 +225,7 @@ trait CachedAuto
 	
 	protected function getCacheKey($id = NULL)
 	{
-		if (!($this instanceof HasCompositePrimaryKey) && (is_array($id) || !$id))
+		if (($this instanceof HasCompositePrimaryKey) && (is_array($id) || !$id))
 		{
 			$key = implode('-', isset($id)?$id:$this->getKey());
 		}
