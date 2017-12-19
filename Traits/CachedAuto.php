@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use DeepCopy\DeepCopy;
 
+use Core\Model\Traits\HasCompositePrimaryKey;
 
 trait CachedAuto
 {
@@ -26,7 +27,7 @@ trait CachedAuto
 		$model = Cache::get($key);
 		if(!$model) 
 		{
-			if (!$this->getIncrementing())
+			if ($this instanceof HasCompositePrimaryKey)
 			{
 				$model = self::findComposite($id, $columns);
 			}
