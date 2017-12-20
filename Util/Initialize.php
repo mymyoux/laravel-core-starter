@@ -1,7 +1,7 @@
 <?php
 namespace
 {
-if (!function_exists('first')) 
+if (!function_exists('class_use_trait')) 
 {
     function class_use_trait($class, $trait)
 	{
