@@ -3,6 +3,13 @@ namespace
 {
 if (!function_exists('first')) 
 {
+    function class_use_trait($class, $trait)
+	{
+		return in_array($trait, class_uses($class));
+	}
+}
+if (!function_exists('first')) 
+{
     /**
      * Return first element of array
      * @param array $array
