@@ -176,7 +176,6 @@ class Api
     public function response($params = NULL)
     {
         static::$data[] = [];
-        
         $rawresponse = $this->dispatching($params);
         //$api_data = static::popAPIData();
         $rawresponse = $rawresponse->getOriginalContent();
