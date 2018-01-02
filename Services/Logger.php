@@ -312,6 +312,10 @@ class Logger
                      $this->output->writeln($message, null);
                 }
             }
+            if(is_object($msg) || is_array($msg))
+            { 
+                $msg = json_encode($msg, \JSON_PRETTY_PRINT);
+            }
             $this->outputs[] = $type.": ".$msg;
         }else
         {

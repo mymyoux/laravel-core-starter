@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use DeepCopy\DeepCopy;
 
+use Core\Model\Traits\HasCompositePrimaryKey;
 
 trait CachedAuto
 {
@@ -16,7 +17,7 @@ trait CachedAuto
 	public $from_cache = False;
 	protected function find($id, $columns = ['*'])
 	{
-		if(is_array($id) && $this->getIncrementing())
+		if(is_array($id) && !class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey'))
 		{
 			return array_map(function($id) use ($columns){
 				return $this->find($id, $columns);
@@ -26,7 +27,7 @@ trait CachedAuto
 		$model = Cache::get($key);
 		if(!$model) 
 		{
-			if (!$this->getIncrementing())
+			if (class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey'))
 			{
 				$model = self::findComposite($id, $columns);
 			}
@@ -224,7 +225,7 @@ trait CachedAuto
 	
 	protected function getCacheKey($id = NULL)
 	{
-		if (!$this->getIncrementing() && (is_array($id) || !$id))
+		if (class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey') && (is_array($id) || !$id))
 		{
 			$key = implode('-', isset($id)?$id:$this->getKey());
 		}
