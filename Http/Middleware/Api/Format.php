@@ -8,6 +8,8 @@ use Illuminate\Http\Response;
 use Core\Model\Api;
 use Auth;
 
+use Illuminate\Support\Collection;
+
 class Format
 {
     /**
@@ -26,6 +28,9 @@ class Format
             return $response;
         }
         if (is_array($response))
+            return ["data"=>$response];
+
+        if ($response instanceof Collection)
             return ["data"=>$response];
 
         return ["data"=>$response->getOriginalContent()];
