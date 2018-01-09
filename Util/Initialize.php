@@ -136,6 +136,47 @@ if (!function_exists('dd'))
         exit();
     }
 }
+if (!function_exists('d')) 
+{
+    /**
+     * Display data as var_dump and kill the application
+     * @param $data
+     */
+    function d(...$data)
+    {
+        $stack = debug_backtrace();
+        $line = $stack[0];
+        echo $line["file"].":".$line["line"]."\n";
+        //if call at root
+        if(count($stack)>1)
+        {
+            $line = $stack[1];
+            echo (array_key_exists("class", $line)?$line["class"]."::":"").$line["function"]."\n";
+        }
+        if (php_sapi_name() !== 'cli')
+        {
+            echo '<pre>';
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS   ,15);
+            echo '</pre>';
+        }else
+        {
+            global $argv;
+            $verbose = ["-v","-vv","-vvv","--verbose"];
+            $has_verbose = !empty(array_intersect($argv, $verbose));
+            if($has_verbose)
+            {
+                $console = new \Symfony\Component\Console\Output\ConsoleOutput();
+                $console->setVerbosity(\Symfony\Component\Console\Output\ConsoleOutput::VERBOSITY_DEBUG);
+                (new \Symfony\Component\Console\Application())->renderException(new DD(), $console);
+            //   debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS   ,15);
+            }
+        }
+
+        array_map(function ($x) {
+                (new Illuminate\Support\Debug\Dumper)->dump($x);
+            }, func_get_args());
+    }
+}
 if (!function_exists('jj')) 
 {
     /**
@@ -188,6 +229,34 @@ if (!function_exists('from_camel_case'))
         return implode('_', $ret);
     }
 }
+/**
+ *    private static _tokenCars:string[]="0123456789abcdef".split("");
+        private static _tokenCarsLength:number = Strings._tokenCars.length-1;
+        private static _syllabus:string[] = ["par","to","mon","issu","na","bac","dat","cou","lac","son","tri","rot"];
+        public static getUniqueToken(size:number = 64):string
+        { 
+            var count = Maths.randBetween(1, 3);
+            var tokens:string[] = [];
+            while(count)
+            {
+                tokens.push(Strings._syllabus[Maths.randBetween(0, Strings._syllabus.length-1)]);
+                count--;
+            }
+            tokens.push(Maths.randBetween(1, 1000)+"");
+            var token:string = tokens.join("-");
+            token+= Date.now()+"-";
+            while(token.length<size)
+            {
+                token+=Strings._tokenCars[Maths.randBetween(0,Strings._tokenCarsLength)];
+            }
+            while(token.length>size)
+            {
+                token = token.substring(1);
+            }
+            return token;
+        }
+
+ */
 if (!function_exists('generate_token')) 
 {
     /**
@@ -199,12 +268,54 @@ if (!function_exists('generate_token'))
     {
         $cars = array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
         $cars_length = sizeof($cars);
-        $token = str_replace('.','',microtime(True)."");
-        while(mb_strlen($token)<$length)
+        $syllabus = ["par","to","mon","issu","na","bac","dat","cou","lac","son","tri","rot"];
+
+        $count = rand(1, 3);
+        $tokens = [];
+        while($count)
+        {
+            $tokens[] = $syllabus[rand(0, count($syllabus)-1)];
+            $count--;
+        }
+        $tokens[] = rand(1, 1000);
+        $token = implode("-", $tokens);
+        $token.= str_replace('.','',microtime(True)."")."-";
+        while(strlen($token)<$length)
         {
             $token.= $cars[rand(0, $cars_length-1)];
         }
-    return $token;
+        while(strlen($token)>$length)
+        {
+            $token = substr($token, 1);
+        }
+        return $token;
+    //     var count = Maths.randBetween(1, 3);
+    //     var tokens:string[] = [];
+    //     while(count)
+    //     {
+    //         tokens.push(Strings._syllabus[Maths.randBetween(0, Strings._syllabus.length-1)]);
+    //         count--;
+    //     }
+    //     tokens.push(Maths.randBetween(1, 1000)+"");
+    //     var token:string = tokens.join("-");
+    //     token+= Date.now()+"-";
+    //     while(token.length<size)
+    //     {
+    //         token+=Strings._tokenCars[Maths.randBetween(0,Strings._tokenCarsLength)];
+    //     }
+    //     while(token.length>size)
+    //     {
+    //         token = token.substring(1);
+    //     }
+    //     return token;
+
+
+    //     $token = str_replace('.','',microtime(True)."");
+    //     while(mb_strlen($token)<$length)
+    //     {
+    //         $token.= $cars[rand(0, $cars_length-1)];
+    //     }
+    // return $token;
     }
 }
 
@@ -229,6 +340,22 @@ if (!function_exists('std'))
     function std($array)
     {
         return (object) $array;
+    }
+}
+if (!function_exists('precision')) 
+{
+    function precision($value, $precision, $up = true)
+    {
+        $value*=10**$precision;
+        if($up)
+        {
+            $value = ceil($value);
+        }else
+        {
+            $value = floor($value);
+        }
+        $value/=10**$precision;
+        return round($value, $precision);
     }
 }
 if (!function_exists('toArray')) 
