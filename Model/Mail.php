@@ -21,7 +21,7 @@ class Mail extends \Tables\Model\Mail
     ];
     protected function getLastRejectReason($id_user)
     {
-        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.type"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send'])->orderBy('mail_webhook.created_time','DESC')->first();
+        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.type"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_time','DESC')->first();
         if(isset($result))
         {
             return $result->type;
