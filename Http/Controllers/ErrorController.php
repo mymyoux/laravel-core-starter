@@ -22,7 +22,7 @@ use Apiz;
 use Core\Model\Error;
 
 /**
- * ghost\Role('admin')
+ * @ghost\Role("admin")
  */
 class ErrorController extends Controller
 {
