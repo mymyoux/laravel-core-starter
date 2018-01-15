@@ -21,8 +21,9 @@ use Core\Model\CommentRelationUser;
 use Core\Model\Comment;
 use App\Model\Comment\CommentStateModel;
 use App\Model\Cabinet\EmployeeModel;
+
 /**
- * @ghost\Role('admin')
+ * @ghost\Role("admin")
  */
 class CommentController extends Controller
 {

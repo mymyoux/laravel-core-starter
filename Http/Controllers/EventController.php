@@ -26,7 +26,7 @@ use Core\Model\CrawlAttempt;
 use Illuminate\Support\Facades\Redis;
 
 /**
- * @ghost\Role('user')
+ * @ghost\Role("user")
  */
 class EventController extends Controller
 {
