@@ -24,11 +24,15 @@ use Apiz;
 use Core\Model\Crawl;
 use Core\Model\CrawlAttempt;
 use Illuminate\Support\Facades\Redis;
+
+/**
+ * @ghost\Role('user')
+ */
 class EventController extends Controller
 {
     /**
      * @ghost\Api
-     *  @ghost\Paginate(allowed="id_event,created_time,updated_time",keys="created_time",directions="-1", limit=2)
+     * @ghost\Paginate(allowed="id_event,created_time,updated_time",keys="created_time",directions="-1", limit=2)
      */
     public function list(Request $request, Paginate $paginate)
     {
