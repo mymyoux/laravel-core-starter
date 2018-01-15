@@ -30,6 +30,30 @@ use Response;
 use Core\Jobs\Translation as TranslationJob;
 class TranslateController extends Controller
 {
+    /**
+     * /translate/resolve
+     * @ghost\Param(name="path", required=true)
+     * @ghost\Param(name="value", required=true)
+     * @ghost\Param(name="locale", required=true)
+     * @return JsonModel
+     */
+    public function check(Request $request)
+    {
+        $path = $request->input('path');
+        $value = $request->input('value');
+        $locale = $request->input('locale');
+
+        $translation = Translation::where('path', '=', $path)->where('singular', '=', $value)->first();
+
+        if ($translation && $translation->locale != $locale)
+        {
+            $translation = Translation::where('path', '=', $path)->where('locale', '=', $locale)->first();
+            
+            return $translation->singular;
+        }
+
+        return null;
+    }
      /**
      * /translate/resolve
      * @ghost\Param(name="key", required=true)
