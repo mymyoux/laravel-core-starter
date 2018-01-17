@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Console\Commands\Phinx;
-use Db;
+use DB;
 use Illuminate\Console\Command;
 use Core\Util\ClassWriter;
 use Schema;

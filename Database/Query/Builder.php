@@ -17,7 +17,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Db;
+use DB;
 class Builder extends BaseBuilder
 {
     public function _insert(array $values)

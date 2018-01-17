@@ -316,13 +316,14 @@ class Logger
             { 
                 $msg = json_encode($msg, \JSON_PRETTY_PRINT);
             }
-            $this->outputs[] = $type.": ".$msg;
+            if(config('stats.log'))
+                $this->outputs[] = $type.": ".$msg;
         }else
         {
             if(App::isLocal() ||  Auth::isRealAdmin())
             {
-                
-                $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style  .": ".$msg;
+                if(config('stats.log'))
+                    $this->outputs[] = (isset($this->timestamp)?'['.$this->getCurrentTime().']':"").$style  .": ".$msg;
             }
 
         }

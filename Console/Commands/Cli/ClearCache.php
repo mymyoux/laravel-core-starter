@@ -5,7 +5,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
-use Db;
+use DB;
 
 class ClearCache extends Command
 {

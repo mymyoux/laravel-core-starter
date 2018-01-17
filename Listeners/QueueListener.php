@@ -7,7 +7,7 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 
 use Core\Model\Beanstalkd;
 use Core\Queue\Jobs\FakeBeanstalkdJob;
-use Db;
+use DB;
 use App;
 use Auth;
 class QueueListener

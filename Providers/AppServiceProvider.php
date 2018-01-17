@@ -29,7 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
     protected function bootQuery()
     {
-        DB::enableQueryLog();
+        if(config('stats.sql'))
+            DB::enableQueryLog();
     }
 
     /**

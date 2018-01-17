@@ -13,7 +13,7 @@ use \Core\Api\Paginate;
 use Core\Api\Annotations as ghost;
 use App;
 use Notification;
-use Db;
+use DB;
 use Sheets;
 use Google;
 use Job;

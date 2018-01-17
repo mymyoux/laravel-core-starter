@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Console\Commands\Supervisor;
-use Db;
+use DB;
 use Core\Console\Commands\CoreCommand;
 use Core\Util\ClassWriter;
 use Core\Util\ClassWriter\Body\Table;

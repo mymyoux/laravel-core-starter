@@ -1,7 +1,7 @@
 <?php
 
 namespace Core\Console\Commands\Db;
-use Db;
+use DB;
 use Core\Console\Commands\CoreCommand;
 use Tables\Model\Stats\Api\Call;
 use Tables\Model\Error;

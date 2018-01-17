@@ -13,6 +13,10 @@ class Query extends \Tables\Model\Query\Log
     }
     protected function record($query)
     {
+        if(!config('stats.sql'))
+        {
+            return;
+        }
         $type = explode(" ", $query["query"])[0];
     	$rawsql = $this->getSql($query);
         

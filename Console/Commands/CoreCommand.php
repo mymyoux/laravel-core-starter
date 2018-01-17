@@ -2,7 +2,7 @@
 
 namespace Core\Console\Commands;
 
-use Db;
+use DB;
 use Illuminate\Console\Command;
 use Schema;
 use ReflectionClass;

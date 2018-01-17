@@ -5,7 +5,7 @@ use Core\Console\Commands\CoreCommand;
 use Symfony\Component\Console\Input\InputOption;
 use App;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
-use Db;
+use DB;
 use File;
 use Core\Model\Cron;
 use Logger;

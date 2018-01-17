@@ -8,7 +8,7 @@ use Core\Services\IP;
 use App;
 use Request;
 use Illuminate\Console\Application;
-use Db;
+use DB;
 class Mail extends \Tables\Model\Mail
 {
     const CREATED_AT = 'created_time';
