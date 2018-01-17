@@ -438,7 +438,17 @@ class Update extends Command
          $files = get_files($path, True);
         foreach($files as $file)
         {
-            chmod((string)$file, $value);
+            try
+            {
+
+                chmod((string)$file, $value);
+            }catch(\Exception $e)
+            {
+                Logger::error($file. " can't be chown");
+               
+                Logger::info('sudo chown '.$value.' '.$file);
+                exec('sudo chown '.$value.' '.$file);
+            }
         }
     }
     protected function chgrpRecursive($path, $value)
@@ -446,7 +456,17 @@ class Update extends Command
          $files = get_files($path, True);
         foreach($files as $file)
         {
-            chgrp((string)$file, $value);
+            try
+            {
+
+                chgrp((string)$file, $value);
+            }catch(\Exception $e)
+            {
+                Logger::error($file. " can't be chgrp");
+               
+                Logger::info('sudo chgrp '.$value.' '.$file);
+                exec('sudo chgrp '.$value.' '.$file);
+            }
         }
     }
     protected function chownRecursive($path, $value)
