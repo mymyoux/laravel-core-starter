@@ -39,7 +39,7 @@ class PhpRedisConnection extends BasePhpRedisConnection
         $this->_data[$key] = $value;
         return parent::set($key, $value, $expireResolution, $expireTTL, $flag);
     }
-    public function delete()
+    public function delete(...$keys)
     {
         if(!$this->use_local_cache)
         {
@@ -54,7 +54,7 @@ class PhpRedisConnection extends BasePhpRedisConnection
         }
         return $this->client->delete(...$keys);
     }
-    public function del()
+    public function del(...$keys)
     {
         if(!$this->use_local_cache)
         {

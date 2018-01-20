@@ -158,6 +158,8 @@ class SocialController extends Controller
             if(isset($email) && !isset($exist))
             {
                 $exist = UserConnector::where(['email'=>$email])->first();
+                if(!isset($exist))
+                    $exist = User::where(['email'=>$email])->first();
             }
 
 
