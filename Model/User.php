@@ -144,6 +144,14 @@ class User extends \Tables\Model\User implements
         }
         return static::find($id_user);
     }
+    protected $_api_token;
+    public function getApiTokenAttribute()
+    {
+        if(!isset($this->_api_token)){
+            $this->_api_token = DB::table('user_login_token')->where('user_login_token.id_user','=',$this->getKey())->first()->token;
+        }
+        return $this->_api_token;
+    }
     protected function getAvailableTypes()
     {
         return Db::table('user')->select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
