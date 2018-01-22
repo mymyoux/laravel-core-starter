@@ -28,16 +28,19 @@ class Format
         {
             return $response;
         }
-        if (is_array($response))
-            return ["data"=>$response];
+        // if (is_array($response))
+        //     return ["data"=>$response];
 
-        if ($response instanceof Collection)
-            return ["data"=>$response];
+        // if ($response instanceof Collection)
+        //     return ["data"=>$response];
         
-        if ($response instanceof BaseModel)
-            return ["data"=>$response];
+        // if ($response instanceof BaseModel)
+        //     return ["data"=>$response];
 
-        return ["data"=>$response->getOriginalContent()];
+        if (true === method_exists($response, 'getOriginalContent'))
+            return ["data" => $response->getOriginalContent()];
+        
+        return ['data' => $response];
     }
     public function terminate($request, $response)
     {

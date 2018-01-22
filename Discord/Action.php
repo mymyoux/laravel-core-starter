@@ -31,7 +31,7 @@ class Action
         }
 
         if (isset($data['id_user']))
-            $this->user	    =User::find($data['id_user']);
+            $this->user = User::find($data['id_user']);
     }
 
     /**
