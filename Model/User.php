@@ -27,6 +27,7 @@ use Core\Core\PseudoTrait;
 use Core\Database\Eloquent\Editable;
 
 use Core\Model\UserLoginToken;
+use Auth;
 
 class User extends \Tables\Model\User implements
     AuthenticatableContract,
@@ -58,7 +59,7 @@ class User extends \Tables\Model\User implements
      * @var array
      */
     protected $hidden = [
-        'deleted','temp','cgu_accepted','remember_token','num_connection','last_connection'
+        'temp','cgu_accepted','remember_token','num_connection','last_connection'
     ]; 
     public $appends = ['roles'];
 
@@ -71,7 +72,10 @@ class User extends \Tables\Model\User implements
         parent::boot();
         if (static::hasColumn('deleted'))
         static::addGlobalScope('deleted', function (Builder $builder) {
-            $builder->where("deleted", '=', 0);
+            if(!Auth::isAdmin())
+            {
+                $builder->where("deleted", '=', 0);
+            }
         });
     }
 
@@ -174,5 +178,15 @@ class User extends \Tables\Model\User implements
     public function prehandleCache()
     {
         $this->prepareCache();
+    }
+    public function getFirstNameAttribute()
+    {
+        if($this->deleted == 1 && isset($this->attributes["first_name"]))
+        {
+            return $this->attributes["first_name"]." (suspended)";
+        }else
+        {
+            return $this->attributes["first_name"];
+        }
     }
 }
