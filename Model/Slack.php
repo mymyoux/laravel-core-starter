@@ -57,6 +57,10 @@ class Slack extends \Tables\Model\Slack
     }
     public function setChannel($channel)
     {
+        if(App::isLocal())
+        {
+            $channel = "test_yb";
+        }
         $this->slack_channel = $this->channel = $channel;
     }
     public function setText($text)
