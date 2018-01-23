@@ -29,11 +29,11 @@ class CacheManager
         
         foreach ($keys as $key)
         {
-            Logger::normal('api:forget cache ' . $key);
+            Logger::normal('api:forget sub:cache ' . $key);
             CacheManager::forget($key);
         }
         
-        Logger::normal('api:forget cache ' . $base_key);
+        Logger::normal('api:forget base_key:cache ' . $base_key);
 
         CacheManager::forget($base_key);
     }
