@@ -9,13 +9,13 @@ class Command extends BaseCommand
 {
     protected $description = 'Munin stats';
 
-    public function __construct()
+    public function __construct( $optional = '' )
     {
         $class = get_class($this);
         $class = str_replace('App\Console\Commands\\', '', $class);
         $class = str_replace('\\', ':', $class);
         $class = strtolower($class);
-        $this->signature = $class . ' {action?}';
+        $this->signature = $class . ' {action?}' . $optional;
 
         parent::__construct();
     }
