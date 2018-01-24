@@ -59,7 +59,7 @@ class Call extends Command
         if(!isset($data->api_user)){
             $data->api_user = NULL;
         }
-        if(!isset($data->api_user) && isset($id_user))
+        if(!isset($data->api_user) && isset($id_user) && $id_user != "?")
         {
             $data->api_user = $id_user;
         }
