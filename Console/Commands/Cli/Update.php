@@ -21,7 +21,7 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--sass=d} {--tsc=d} {--template=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
+    protected $signature = 'cli:update {--pull=d} {--composer=d} {--cache=d} {--config=d} {--sass=d} {--tsc=d} {--template=d} {--supervisor=d} {--migrate=d} {--cron=d} {--doc=d} {--execute-only}';
 
     protected $defaultChoices =
     [
@@ -32,6 +32,7 @@ class Update extends Command
         "tsc"               => 0,
         "template"          => 0,
         "cache"             => 1,
+        "config"             => 1,
         "supervisor"        => 1,
         'cron'              => 0,
         'doc'               => 1
@@ -51,6 +52,7 @@ class Update extends Command
      */
     public function handle()
     {
+       
         Error::mute();
         $this->current_directory = base_path();
 
@@ -336,6 +338,10 @@ class Update extends Command
          $this->call('config:cache');
          $this->call('route:cache');
          $this->call('optimize');
+    }
+    protected function runConfig()
+    {
+        $this->call('cli:config');
     }
     protected function pullGit($directory = NULL)
     {
