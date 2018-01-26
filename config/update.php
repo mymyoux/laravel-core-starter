@@ -22,5 +22,5 @@ return [
   ],
   "table"=>"update_git",
   "project"=>"laravel",
-
+  "config"=>"storage/config.json"
 ];
