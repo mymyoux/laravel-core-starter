@@ -19,7 +19,6 @@ class Plugins extends BaseCommand
     public function handle()
     {
         $signature = $this->signature;
-        // get list of munin cron
 
         Artisan::call('list');
         $list = Artisan::output();
