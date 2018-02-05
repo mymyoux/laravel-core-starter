@@ -31,6 +31,7 @@ class ErrorController extends Controller
      * @ghost\Param(name="end",requirements="\d+", required=false, type="int")
      * @ghost\Param(name="is_api", required=false, type="boolean", default=null)
      * @ghost\Param(name="front", required=false, type="boolean", default=false)
+     * @ghost\Param(name="back", required=false, type="boolean", default=false)
      * @ghost\Paginate(allowed="last_created_time,last_updated_time,count,time",keys="last_created_time",directions="-1", limit=10)
      * @return void
      */
@@ -40,10 +41,17 @@ class ErrorController extends Controller
         ->groupBy('identifier');
 
         $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","id_user","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        ->where('error.is_api', '=', false)
         ->groupBy('identifier');
+
+        $req_api = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","id_user","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        ->where('error.is_api', '=', true)
+        ->groupBy('identifier');
+
         $start = $request->input('start');
         $end = $request->input('end');
         $is_api = $request->input('is_api');
+        $back = $request->input('back');
         $front = $request->input('front');
 
         if(isset($start))
@@ -53,7 +61,9 @@ class ErrorController extends Controller
                 $start = (int)($start/1000);
             }
             $start = date("Y-m-d H:i:s", $start);
-            $req = $req->where("error.created_time",">=",$start);
+            
+            $req->where("error.created_time",">=",$start);
+            $req_api->where("error.created_time",">=",$start);
             $javascript->where("error_javascript.created_time",">=",$start);
         }
         if(isset($end))
@@ -63,21 +73,43 @@ class ErrorController extends Controller
                 $end = (int)($end/1000);
             }
             $end = date("Y-m-d H:i:s",$end);
-            $req = $req->where("error.created_time","<=",$end);
+            
+            $req->where("error.created_time","<=",$end);
+            $req_api->where("error.created_time","<=",$start);
             $javascript->where("error_javascript.created_time","<=",$end);
         }
 
-        if (isset($is_api))
+        $request = null;
+
+        if (!$back)
         {
-           $req->where('error.is_api', '=', $is_api); 
+            if ($is_api)
+                $request = $req_api;
+            if ($front)
+                $request = $javascript;
+        }
+        else
+        {
+            $request = $req;
+        }
+
+        if (true === $is_api)
+        {
+            if ($request != $req_api)
+                $request->union($req_api);
         }
 
         if (true === $front)
         {
-            $req = $req->union($javascript);
+            if ($request != $javascript)
+                $request->union($javascript);
         }
-        $req = $paginate->apply($req);
-        return $req->get();
+
+        if (null === $request) return [];
+
+        $request = $paginate->apply($request);
+
+        return $request->get();
     }
     /**
      * @ghost\Param(name="start",requirements="\d+", required=true, type="int")
