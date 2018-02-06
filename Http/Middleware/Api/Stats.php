@@ -16,6 +16,33 @@ use Api;
 use Logger;
 class Stats
 {
+    private function getMemoryUsage( $raw = false )
+    {
+        $unit       = ['b','kb','mb','gb','tb','pb'];
+
+        if (null !== $this->memory_usage)
+            $data   = memory_get_peak_usage(true) - $this->memory_usage;
+        else
+            $data   = 0;
+
+        if (true === $raw) return $data;
+
+        if (0 === $data) return 0;
+
+        return @round($data/pow(1024,($i=floor(log($data,1024)))),2).' '.$unit[$i];
+    }
+
+    private function getCpuUsage( $raw = false )
+    {
+        if (null !== $this->cpu_usage)
+            $data   = sys_getloadavg()[0] - $this->cpu_usage;
+        else
+            $data   = 0;
+
+        if (true === $raw) return $data;
+
+        return $data;
+    }
     /**
      * Handle an incoming request.
      *
@@ -49,6 +76,9 @@ class Stats
         $time = microtime(true)-LARAVEL_START;
         $time = floor($time*1000);
 
+        $this->memory_usage   = LARAVEL_RAM;
+        $this->cpu_usage      = LARAVEL_CPU;
+
         $route = (array) Route::getFacadeRoot()->current();
         $route = ["uri"=>$route["uri"], "action"=>$route["action"]];
         if(!empty($route["action"]["middleware"]))
@@ -72,6 +102,8 @@ class Stats
             "time"      =>  $time,
             "queries"   =>  DB::getQueryLog(),
             "cache"   =>  CacheListener::getQueryLog(),
+            'ram'   => $this->getMemoryUsage(),
+            'cpu'   => $this->getCpuUsage()
         ];
         $api = StatsService::getApiStats();
         $data["stats"]["api"] = $api;

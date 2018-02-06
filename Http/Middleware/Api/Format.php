@@ -42,6 +42,7 @@ class Format
         
         return ['data' => $response];
     }
+    
     public function terminate($request, $response)
     {
         if (config('api.record.insert') !== false)
@@ -52,7 +53,18 @@ class Format
                 
                 if(isset($user))
                 {
-                    if ($user->getRealUser()->hasRole( config('api.record.role') ))
+                    $insert = false;
+                    $roles  = config('api.record.role');
+                    foreach ($roles as $role)
+                    {
+                        if ($user->getRealUser()->hasRole( $role ))
+                        {
+                            $insert = true;
+                            break;
+                        }
+                    }
+
+                    if (true === $insert)
                     {
                         Api::record(
                             $request,

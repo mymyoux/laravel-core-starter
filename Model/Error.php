@@ -8,6 +8,9 @@ use Core\Services\IP;
 use App;
 use Request;
 use Illuminate\Console\Application;
+use Core\Exception\ApiException;
+use App\Model\Error\Javascript;
+
 class Error extends \Tables\Model\Error//\Tables\Model\Error
 {
     protected $table = "error";
@@ -52,6 +55,7 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
         $info["line"] = $exception->getLine();
         $info["stack"] = $exception->getTraceAsString();
         $info["ip"] = IP::getRequestIP();
+        $info["source"] = 'laravel';
         global $argv;
         if (App::runningInConsole())
         {
@@ -86,6 +90,11 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
 
         $info["id_user"] = 0;
 
+        if ($exception instanceof ApiException)
+        {
+            $info['is_api'] = true;
+        }
+
         try
         {
             /**
@@ -116,5 +125,59 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
         // {
 
         // }
+    }
+
+
+
+    protected function recordJS($data, $hardware = NULL, $error = NULL)
+    {
+        $keys = array("id_user","session","error_name","error_message","error_url","error_line","error_column","error_stack","hardware_cordovaVersion",
+           "hardware_os","hardware_uuid","hardware_osVersion","hardware_android","hardware_blackberry","hardware_ios","hardware_mobile","hardware_windowsPhone",
+           "hardware_screenWidth","hardware_screenHeight","hardware_landscape","hardware_portrait","hardware_browser", 'hardware_cookie' ,"url","type");
+
+        if (!isset($hardware))
+        {
+            $result = Javascript::where('session',  '=', $data['session'])->whereNotNull('hardware_os')->first();
+
+             if($result)
+             {
+                $hardware = array();
+                foreach($result as $key=>$value)
+                {
+                    if(mb_substr($key, 0, 9) == "hardware_")
+                    {
+                        $hardware[mb_substr($key,9)] = $value;
+                    }
+                }
+             }
+        }
+        if(isset($hardware))
+        {
+            foreach($hardware as $key=>$value)
+            {
+                $data["hardware_".$key] = $value;
+            }
+        }
+        if(isset($error))
+        {
+            foreach($error as $key=>$value)
+            {
+                $data["error_".$key] = $value;
+            }
+        }
+
+        $error = new Javascript;
+        $values = array();
+        foreach($keys as $key)
+        {
+            if(isset($data[$key]))
+            {
+                $error->{ $key } = $data[$key];
+            }
+        }
+
+        $error->save();
+
+        return $error;
     }
 }
