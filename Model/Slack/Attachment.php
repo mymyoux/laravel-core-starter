@@ -88,6 +88,12 @@ class Attachment extends \Tables\Model\Slack\Attachment
     {
         $this->text = $text;
     }   
+
+    public function getText()
+    {
+        return $this->text;
+    }   
+
     public function setTitle($title, $link = NULL)
     {
         $this->title = $title;
