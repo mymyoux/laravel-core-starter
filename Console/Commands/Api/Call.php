@@ -23,7 +23,7 @@ class Call extends Command
      *
      * @var string
      */
-    protected $signature = 'api:call {--path=} {--id_user=?} {data?}';
+    protected $signature = 'api:call {--path=} {--id_user=} {data?}';
 
     /**
      * The console command description.
