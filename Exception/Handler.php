@@ -47,14 +47,10 @@ class Handler extends ExceptionHandler
             {
                 try
                 {
-                if(!isset($exception->already_handled))
-                {
-                    $exception->already_handled = true;  
+                    if(strpos($exception->getTraceAsString(), __FILE__)===False)
                     ErrorService::record($exception);
-                }
                 }catch(\Exception $e)
                 {
-                    ErrorService::record($exception);
                 }
             }
             parent::report($exception);
