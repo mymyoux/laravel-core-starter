@@ -45,7 +45,17 @@ class Handler extends ExceptionHandler
         {
             if(class_exists('App') && App::runningInConsole())
             {
-                ErrorService::record($exception);
+                try
+                {
+                if(!isset($exception->already_handled))
+                {
+                    $exception->already_handled = true;  
+                    ErrorService::record($exception);
+                }
+                }catch(\Exception $e)
+                {
+                    ErrorService::record($exception);
+                }
             }
             parent::report($exception);
         }catch(\Exception $e)
