@@ -15,7 +15,7 @@ class Notification
             "message"=>$message, 
             "attachments"=>$attachments, 
             "bot_name"=>$bot_name, 
-            "icon"=>$icon])->send();
+            "icon"=>$icon])->sendWeak();
     }
     /**
      * Environment allowed to send in all channels on slack
