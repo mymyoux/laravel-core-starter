@@ -28,4 +28,9 @@ class BeanstalkdQueue extends BaseBeanstalkdQueue
             );
         }
     }
+    protected function createObjectPayload($job)
+    {
+        $payload = parent::createObjectPayload($job);
+        return $payload;
+    }
 }

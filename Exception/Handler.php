@@ -48,7 +48,7 @@ class Handler extends ExceptionHandler
                 try
                 {
                     if(strpos($exception->getTraceAsString(), __FILE__)===False)
-                    ErrorService::record($exception);
+                      ErrorService::record($exception);
                 }catch(\Exception $e)
                 {
                 }

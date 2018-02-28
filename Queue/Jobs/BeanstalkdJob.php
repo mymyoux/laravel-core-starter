@@ -10,10 +10,29 @@ use Illuminate\Queue\Jobs\BeanstalkdJob as BaseBeanstalkdJob;
 
 class BeanstalkdJob extends BaseBeanstalkdJob
 {
+    protected $original_job;
     public function release($delay = 0)
     {
     	$delay = $delay || $this->getDelayRetry();
         return parent::release($delay);
+    }
+    public function getJobType()
+    {
+        return $this->getOriginalJob()->queue_type;
+    }
+    public function getOriginalJob()
+    {
+        if(!isset($this->original_job))
+        {
+            $command = $this->payload()["data"]['command'];
+            $this->original_job = unserialize($command);
+        }
+        return $this->original_job;
+    }
+    public function payload()
+    {
+        //dd($this->getRawBody());
+        return json_decode($this->getRawBody(), true);
     }
     public function getDelayRetry()
     {

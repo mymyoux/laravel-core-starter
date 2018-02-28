@@ -27,6 +27,7 @@ class QueueListener
     }
     protected function getJob($event)
     {
+        
         if(isset(static::$job) && $event->job === static::$event->job )
         {
             static::$event = $event;

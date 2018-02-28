@@ -17,6 +17,10 @@ class FakeBeanstalkdJob
 	{
 		$this->failed = true;
 	}
+	public function getJobType()
+    {
+        return $this->getOriginalJob()->queue_type;
+    }
 	public function hasFailed()
 	{
 		return $this->failed === true;
