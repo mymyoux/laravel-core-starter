@@ -85,10 +85,21 @@ abstract class Model extends BaseModel
 
         if ($value instanceof Expression)
         {
-            error_log('[laravel-core] value:' . $value->getValue() . ' return Carbon::now');
 
             if (starts_with($value->getValue(), 'NOW(') || starts_with($value->getValue(), 'CURRENT_TIMESTAMP('))
+            {
+                error_log('[laravel-core] value:' . $value->getValue() . ' return Carbon::now');
                 return \Carbon\Carbon::now();
+            }
+        }
+
+        if (is_string($value))
+        {
+            if ($value === '0000-00-00 00:00:00' || $value === '0000-00-00 00:00:00.000')
+            {
+                error_log('[laravel-core] value:' . $value . ' ' . get_class($this) . ' return Carbon::now');
+                return \Carbon\Carbon::now();
+            }
         }
 
         return parent::asDateTime($value);

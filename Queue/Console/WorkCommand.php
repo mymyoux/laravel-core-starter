@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Console\WorkCommand as BaseWorkCommand;
 use Event;
 use Logger;
+use Cache;
 class WorkCommand extends BaseWorkCommand
 {
     
@@ -58,6 +59,10 @@ class WorkCommand extends BaseWorkCommand
      */
     protected function writeOutput(Job $job, $failed)
     {
+        if($job->getJobType() == "redis" && $job->isDeletedOrReleased())
+        {
+             Cache::forget($job->getOriginalJob()->id);
+        }
         if ($failed == 'failed') {
             $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName().":".$job->getJobId());
         } else {

@@ -6,6 +6,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Core\Traits\TraitJob;
 use Core\Model\Beanstalkd;
+use Cache;
 trait Job
 {
 	use InteractsWithQueue, SerializesModels;
@@ -14,10 +15,11 @@ trait Job
 	public $data;
     public $id_user;
     public $current_tries;
+    public $queue_type;
 
 	public function __sleep()
     {
-        return ["id"];
+        return ["id","queue_type"];
     }
     /**
      * Retry delay after a fail
@@ -33,7 +35,16 @@ trait Job
      */
     public function __wakeup()
     {
-    	$dbData = Beanstalkd::find($this->id);
+         if($this->queue_type == "redis")
+         {
+            $dbData = json_decode(Cache::get($this->id));
+            if(!isset($dbData))
+            {
+                $dbData->tries = 0;
+            }
+         }else {
+             $dbData = Beanstalkd::find($this->id);
+         }
     	$this->loadDbData($dbData);
     }
     public function loadDbData($dbData)

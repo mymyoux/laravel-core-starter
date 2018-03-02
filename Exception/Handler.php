@@ -45,7 +45,13 @@ class Handler extends ExceptionHandler
         {
             if(class_exists('App') && App::runningInConsole())
             {
-                ErrorService::record($exception);
+                try
+                {
+                    if(strpos($exception->getTraceAsString(), __FILE__)===False)
+                      ErrorService::record($exception);
+                }catch(\Exception $e)
+                {
+                }
             }
             parent::report($exception);
         }catch(\Exception $e)

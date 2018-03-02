@@ -27,6 +27,8 @@ use Throwable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+//use Illuminate\Support\Facades\Redis;
+use Cache;
 class Job
 {
     const DEFAULT_TTR = 429496729;
@@ -219,6 +221,115 @@ class Job
         return $this->send(PheanstalkInterface::DEFAULT_DELAY, PheanstalkInterface::DEFAULT_PRIORITY, true);
     }
 
+    public function sendWeak($delay = PheanstalkInterface::DEFAULT_DELAY, $priority = PheanstalkInterface::DEFAULT_PRIORITY, $now = false)
+    {
+        $id = generate_token();
+        $beanstalkd = std([
+            'json'          => json_encode($this->data),
+            'queue'         => $this->tube,
+            'delay'         => $delay,
+            'id_user'       => $this->id_user,
+            'priority'      => $priority,
+            'identifier'    => $this->identifier,
+            'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING),
+            'cls' => $this->class
+            ,
+            'queue_type'=>"redis",
+            'tries'=>0
+        ]);
+
+        try
+        {
+            $class  = $this->class;
+
+            $job = new $class();
+            $job->id = $id;
+            $job->queue_type = "redis";
+            $job->queue = $this->tube;
+            $job->delay = $beanstalkd->delay;
+            if (true === $now)
+            {
+                throw new \Pheanstalk\Exception\ConnectionException("NOW", 1);
+            }
+            $id_beanstalkd  = $this->dispatch( $job );
+            Logger::info('dispatch');
+        }
+        catch (\Pheanstalk\Exception\ConnectionException $e)
+        {
+            if ($delay != PheanstalkInterface::DEFAULT_DELAY && App::runningInConsole())
+            {
+                Logger::warn('waiting for ' . $delay . ' secs...');
+                sleep( $delay );
+            }
+            // launch inline if beanstalkd down
+            $start_time = microtime(True);
+
+            //force to be iso with queue
+            $job = unserialize(serialize($job));
+            if (false === $now && !($job instanceof \Core\Jobs\Slack))
+            {
+                //check if slack infinite loop otherwise
+                $this->sendAlert($now);
+            }
+            $previous_user = Auth::user();
+
+            $fakejob = new FakeBeanstalkdJob($job);
+            $fakejob->setIsExecutedNow($now);
+            $has_error = True;
+            while($has_error && !$fakejob->hasFailed())
+            {
+                $has_error = True;
+                try {
+                    // First we will raise the before job event and determine if the job has already ran
+                    // over the its maximum attempt limit, which could primarily happen if the job is
+                    // continually timing out and not actually throwing any exceptions from itself.
+                    $fakejob->tries();
+                    if($fakejob->attempts()>1 && $now === true)
+                    {
+                        $delay = $fakejob->getDelayRetry();
+                        if($delay)
+                        {
+                            sleep($delay);
+                        }
+                    }
+
+                    $this->raiseBeforeJobEvent($fakejob);
+
+                    $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
+                        $fakejob
+                    );
+                    // Here we will fire off the job and let it process. We will catch any exceptions so
+                    // they can be reported to the developers logs, etc. Once the job is finished the
+                    // proper events will be fired to let any listeners know this job has finished.
+                    app(Dispatcher::class)->dispatchNow($job);
+
+                    $this->raiseAfterJobEvent($fakejob);
+                    $has_error = False;
+                } catch (Exception $e) {
+                    if(Auth::isRealAdmin())
+                        Logger::error($e->getMessage()."\n".$e->getFile().":".$e->getLine());
+                    $this->handleJobException($fakejob, $e);
+                } catch (Throwable $e) {
+                    if(Auth::isRealAdmin())
+                        Logger::error($e->getMessage()."\n".$e->getFile().":".$e->getLine());
+                    $this->handleJobException(
+                       $fakejob, new FatalThrowableError($e)
+                    );
+                }
+            }
+
+
+            if(isset($previous_user))
+                Auth::setUser($previous_user);
+
+            return true;
+        }
+
+        $beanstalkd->id_beanstalkd = $id_beanstalkd;
+
+        Cache::forever($id, json_encode($beanstalkd));
+        return $id_beanstalkd;
+    }
     public function send($delay = PheanstalkInterface::DEFAULT_DELAY, $priority = PheanstalkInterface::DEFAULT_PRIORITY, $now = false)
     {
         $beanstalkd = \Core\Model\Beanstalkd::create([

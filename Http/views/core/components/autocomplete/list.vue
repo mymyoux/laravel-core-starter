@@ -14,8 +14,11 @@
     </div>
     <ul class="list-scroll" v-show="!hidden">
         <li v-for="item, index in list.models" @mousedown="click(item)" :class="{selected:index==selected}">
+            <template v-if="picture">
+                <img style="height:25px;margin-right:20px;" :src="item | picture(30,30)">
+            </template>
             <slot  name="item" :text="item">
-                   {{item.name}}
+                {{item.name}}
             </slot>
         </li>
     </ul>

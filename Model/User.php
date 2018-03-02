@@ -74,7 +74,7 @@ class User extends \Tables\Model\User implements
         static::addGlobalScope('deleted', function (Builder $builder) {
             if(!Auth::isAdmin())
             {
-                $builder->where("deleted", '=', 0);
+                $builder->where("user.deleted", '=', 0);
             }
         });
     }
