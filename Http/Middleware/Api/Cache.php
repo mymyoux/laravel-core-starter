@@ -24,6 +24,7 @@ class Cache
         $keys       = $params->keys;
         $ids        = $params->ids;
         $invalid    = $params->invalid;
+        $minutes    = $params->minutes;
         $cache_key  = $name;
 
         if (is_array($ids))
@@ -69,7 +70,7 @@ class Cache
         }   
         else
         {
-            CacheManager::cacheAPI($cache_key, $base_key, $data);
+            CacheManager::cacheAPI($cache_key, $base_key, $data, $minutes);
         }     
         
         return $data;
