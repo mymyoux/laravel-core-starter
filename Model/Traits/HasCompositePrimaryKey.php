@@ -3,6 +3,7 @@ namespace Core\Model\Traits;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 trait HasCompositePrimaryKey
 {
@@ -46,12 +47,45 @@ trait HasCompositePrimaryKey
     protected function findComposite($ids, $columns = ['*'])
     {
         $i = 0;
-        $me = new self;
+        $me = (new static);
         $query = $me->newQuery();
         foreach ($me->getKeyName() as $key) {
             $query->where($key, '=', isset($ids[$key]) ? $ids[$key] : $ids[$i]);
             $i++;
         }
-        return $query->first($columns);
+
+        if (class_use_trait($this, 'Core\Traits\CachedAuto'))
+        {
+            $key = $this->getCacheKey($ids);
+            $model = Cache::get($key);
+
+            if(!$model) 
+            {
+                $model = $query->first($columns);
+
+                if ($model !== null)
+                {
+                    $model->cache();
+                }
+            }
+            else
+            {
+                $model->dishandleCache();
+                if(method_exists($model, "afterCache"))
+                {
+                    $model->afterCache();
+                }
+                $model->from_cache = true;
+            }
+            if(isset($model) && method_exists($model, "prepare"))
+            {
+                $model->prepare();
+            }
+            return $model;
+        }
+
+        $model = $query->first($columns);
+
+        return $model;
     }
 }
