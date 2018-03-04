@@ -49,6 +49,13 @@ class Cache
 
             if ($value)
             {
+                $ttl = CacheManager::ttl( $cache_key );
+
+                Api::addApiData([
+                    'expire'        => $ttl,
+                    'expire_total'  => $minutes * 60
+                ]);
+
                 return $value;
             }
         }
