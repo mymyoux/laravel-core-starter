@@ -18,6 +18,12 @@ class CacheManager
         return CacheService::{ $name }(...$arguments);
     }
 
+    // Return the TTL of the ressource in seconds
+    public function ttl($key)
+    {
+        return $this->connection()->ttl($this->getPrefix() . $key);
+    }
+
     public function invalidAPI($base_key)
     {
         if (!(CacheManager::driver()->getStore() instanceof \Illuminate\Cache\RedisStore))
