@@ -72,18 +72,18 @@ class Clean extends CoreCommand
             return;
         }
         Logger::info("deleting stats_api_call");
-        Call::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Call::where("created_time","<",DB::raw("NOW() - INTERVAL $months MONTH"))->delete();
         if($all)
         {
             Logger::info("deleting beanstalkd_log");
-            Log::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+            Log::where("created_time","<",DB::raw("NOW() - INTERVAL $months MONTH"))->delete();
         }
         Logger::info("deleting error");
-        Error::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Error::where("created_time","<",DB::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("deleting stats_watch");
-        Watch::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        Watch::where("created_time","<",DB::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("deleting ats_api_error");
-        AtsApiCall::where("created_time","<",Db::raw("NOW() - INTERVAL $months MONTH"))->delete();
+        AtsApiCall::where("created_time","<",DB::raw("NOW() - INTERVAL $months MONTH"))->delete();
         Logger::info("done");
     }
    

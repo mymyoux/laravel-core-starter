@@ -208,14 +208,14 @@ class TranslateController extends Controller
             $path = "app.".$path;
         }
 
-        $locale = Db::table('translate_locales')->where(["locale"=>$request->input('locale')])->first();
+        $locale = DB::table('translate_locales')->where(["locale"=>$request->input('locale')])->first();
         if(!isset($locale))
             return ["column"=>"locale","error"=>"locale doesn't exist"];
 
         $type = $request->input('type');
         if(isset($type))
         {
-            $type = Db::table('user')->where(["type"=>$type])->first();
+            $type = DB::table('user')->where(["type"=>$type])->first();
             if(!isset($type))
                 return ["column"=>"type","error"=>"type doesn't exist"];
 
@@ -295,7 +295,7 @@ class TranslateController extends Controller
         }
         $request = $paginate->apply($request, "translate");
         
-        $data= $request->select(["*",Db::raw("IF(path IS NULL,CONCAT(controller,'.',action,'.',`key`),path) as path")])->get()->makeVisible(['id','created_time'])->map(function($item)
+        $data= $request->select(["*",DB::raw("IF(path IS NULL,CONCAT(controller,'.',action,'.',`key`),path) as path")])->get()->makeVisible(['id','created_time'])->map(function($item)
         {
             if(!isset($item->path))
             {

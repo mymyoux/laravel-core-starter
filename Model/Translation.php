@@ -38,12 +38,12 @@ class Translation extends \Tables\Model\Translate
 
     protected function isSupportedLocale($locale)
     {
-        $localedb = Db::table('translate_locales')->where(["locale"=>$locale])->first();
+        $localedb = DB::table('translate_locales')->where(["locale"=>$locale])->first();
         return isset($localedb);
     }
     protected function getLocales()
     {
-        return Db::table('translate_locales')->get()->pluck('locale');
+        return DB::table('translate_locales')->get()->pluck('locale');
     }
     protected function getLocale($locale)
     {
@@ -154,10 +154,10 @@ class Translation extends \Tables\Model\Translate
         {
             $request->whereNull('type');
         }
-        $request->orderBy(Db::raw('locale="'.$locales[0].'"'), 'DESC');
+        $request->orderBy(DB::raw('locale="'.$locales[0].'"'), 'DESC');
         if(isset($type))
         {
-            $request->orderBy(Db::raw('type="'.$type.'"'), 'DESC');
+            $request->orderBy(DB::raw('type="'.$type.'"'), 'DESC');
         }
         if(!$all)
         {
@@ -197,7 +197,7 @@ class Translation extends \Tables\Model\Translate
             $request->where(function ($query) use($type) {
                 $query->where("type",'=',$type)
                 ->orWhereNull('type')
-                ->orderBy(Db::raw('locale="'.$locales[0].'"'), 'DESC');
+                ->orderBy(DB::raw('locale="'.$locales[0].'"'), 'DESC');
             });
             $all = $request->get();
             $all = $all->filter(function($item) use(&$keys)
@@ -212,10 +212,10 @@ class Translation extends \Tables\Model\Translate
         {
             $request->whereNull('type');
         }
-        $request->orderBy(Db::raw('locale="'.$locales[0].'"'), 'DESC');
+        $request->orderBy(DB::raw('locale="'.$locales[0].'"'), 'DESC');
         if(isset($type))
         {
-            $request->orderBy(Db::raw('type="'.$type.'"'), 'DESC');
+            $request->orderBy(DB::raw('type="'.$type.'"'), 'DESC');
         }
         if(!$all)
         {

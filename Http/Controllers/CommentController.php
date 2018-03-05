@@ -85,7 +85,7 @@ class CommentController extends Controller
 
                     $query
                         ->groupBy('comment_relation_user.id_comment_relation')
-                        ->having(Db::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
+                        ->having(DB::raw('COUNT(DISTINCT comment_relation_user.id_comment_relation_user)'),'=',count($objects))
                         ;
                 }
             });
@@ -393,7 +393,7 @@ class CommentController extends Controller
         $id_user = Auth::getUser()->id_user;
 
         $request = CommentStateModel::select("comment_state.id", "comment_state_me.read_time", "comment_state.created_time")
-            ->join('comment_state as comment_state_me', 'comment_state_me.id_user', '=', Db::raw('"' . Auth::getUser()->id_user . '"'))
+            ->join('comment_state as comment_state_me', 'comment_state_me.id_user', '=', DB::raw('"' . Auth::getUser()->id_user . '"'))
             ->where('comment_state.id_user_cabinet', '=', $id_user)
             ->where('comment_state.id_user', '!=', $id_user)
             ;

@@ -567,7 +567,7 @@ class Generate extends CoreCommand
 
 
             $stats = Call::where('path','=',$route->uri)
-            ->select(Db::raw('COUNT(*) as count, COUNT(DISTINCT id_user) as id_user'))
+            ->select(DB::raw('COUNT(*) as count, COUNT(DISTINCT id_user) as id_user'))
             ->first();
 
             $doc->annotation_right('Called **'.$stats->count.'** time'.($stats->count!=1?'s':'')." by **".$stats->id_user."** loggued user".($stats->id_user!=1?'s':''));

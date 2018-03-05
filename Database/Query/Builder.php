@@ -28,7 +28,7 @@ class Builder extends BaseBuilder
         }
         if(!isset($values["created_time"]))
         {
-            $values["created_time"] = Db::raw('NOW(3)');
+            $values["created_time"] = DB::raw('NOW(3)');
         }
 
         return $values;

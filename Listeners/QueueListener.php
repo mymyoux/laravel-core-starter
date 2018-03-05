@@ -95,7 +95,7 @@ class QueueListener
         if($job->queue_type != "redis")
         {
             Beanstalkd::where('id', '=', $job->id)
-            ->update(["state"=>Beanstalkd::STATE_EXECUTING, "tries"=>Db::raw('tries + 1')]);
+            ->update(["state"=>Beanstalkd::STATE_EXECUTING, "tries"=>DB::raw('tries + 1')]);
         }
     }
 
