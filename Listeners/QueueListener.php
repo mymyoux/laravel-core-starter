@@ -27,7 +27,6 @@ class QueueListener
     }
     protected function getJob($event)
     {
-        
         if(isset(static::$job) && $event->job === static::$event->job )
         {
             static::$event = $event;
@@ -93,8 +92,11 @@ class QueueListener
         {
             Auth::logout();
         }
-        Beanstalkd::where('id', '=', $job->id)
-        ->update(["state"=>Beanstalkd::STATE_EXECUTING, "tries"=>Db::raw('tries + 1')]);
+        if($job->queue_type != "redis")
+        {
+            Beanstalkd::where('id', '=', $job->id)
+            ->update(["state"=>Beanstalkd::STATE_EXECUTING, "tries"=>Db::raw('tries + 1')]);
+        }
     }
 
     public function handleProcessed($event)
@@ -113,8 +115,11 @@ class QueueListener
                 $state = Beanstalkd::STATE_EXECUTED_FRONT;
             }
         }
-        Beanstalkd::where('id', '=', $job->id)
-        ->update(["state"=>$state, "duration"=>$this->getDuration()]);
+        if($job->queue_type != "redis")
+        {
+            Beanstalkd::where('id', '=', $job->id)
+            ->update(["state"=>$state, "duration"=>$this->getDuration()]);
+        }
     }
     public function handleFailed($event)
     {
@@ -123,14 +128,20 @@ class QueueListener
             return $this->handleFinalFailed($event);            
         }
         $job = $this->getJob($event);
+        if($job->queue_type != "redis")
+        {
         Beanstalkd::where('id', '=', $job->id)
         ->update(["state"=>Beanstalkd::STATE_FAILED_PENDING_RETRY, "duration"=>$this->getDuration()]);
+        }
     }
     public function handleFinalFailed($event)
     {
         $job = $this->getJob($event);
-        Beanstalkd::where('id', '=', $job->id)
-        ->update(["state"=>Beanstalkd::STATE_FAILED, "duration"=>$this->getDuration()]);
+        if($job->queue_type != "redis")
+        {
+            Beanstalkd::where('id', '=', $job->id)
+            ->update(["state"=>Beanstalkd::STATE_FAILED, "duration"=>$this->getDuration()]);
+        }
     }
 
 }
