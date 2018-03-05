@@ -13,7 +13,7 @@ class Cache extends CoreAnnotation
 	public $name;
 	public $keys;
     public $invalid;
-    
+    public $minutes;
     public function boot()
     {
     	if (isset($this->keys))
@@ -29,6 +29,11 @@ class Cache extends CoreAnnotation
         if (!isset($this->name))
         {
             $this->name = 'coucou';
+        }
+
+        if (!isset($this->minutes))
+        {
+            $this->minutes = 1440;
         }
 
         if(!isset($this->invalid))
