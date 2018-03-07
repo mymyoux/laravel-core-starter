@@ -14,7 +14,7 @@ class History extends \Tables\Model\User\One\Token\History
 
     static public function insert($id_user, $token, $source)
     {
-        $history = new TokenHistoryModel;
+        $history = new History;
 
         $history->id_user = $id_user;
         $history->token = $token;
