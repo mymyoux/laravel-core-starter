@@ -94,7 +94,7 @@ class Cache extends Command
        if($increment_all != 0)
        {
            Logger::warn('increment all version by 1');
-            Template::update(["version"=>Db::raw('version + 1')]);
+            Template::update(["version"=>DB::raw('version + 1')]);
        }
     }
     private function cache($name, $type, $locale)

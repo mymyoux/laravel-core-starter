@@ -45,7 +45,7 @@ class SocialController extends Controller
         {
             
             //default scopes
-            $connector = Db::table('connector')->where(['name'=>$api])->first();
+            $connector = DB::table('connector')->where(['name'=>$api])->first();
             if(isset($connector->scopes))
             {
                 $scopes = array_map('trim', explode(',', $connector->scopes));

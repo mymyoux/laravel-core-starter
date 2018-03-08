@@ -15,19 +15,21 @@ trait CachedAuto
 {
 	protected static $_cached_key;
 	public $from_cache = False;
+
 	protected function find($id, $columns = ['*'])
 	{
-		if(is_array($id) && !class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey'))
+		if(is_array($id) && !$this->hasCompositeKey())
 		{
 			return array_map(function($id) use ($columns){
 				return $this->find($id, $columns);
 			}, $id);
 		}
+
 		$key = $this->getCacheKey($id);
 		$model = Cache::get($key);
 		if(!$model) 
 		{
-			if (class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey'))
+			if ($this->hasCompositeKey())
 			{
 				$model = self::findComposite($id, $columns);
 			}
@@ -37,7 +39,9 @@ trait CachedAuto
 			}
 
 			if ($model !== null)
+			{
 				$model->cache();
+			}
 		}
 		else
 		{
@@ -120,7 +124,16 @@ trait CachedAuto
 		{
 			if($data instanceof Serialized)
 			{
-				$tmp = $data->cls::find($data->id);
+				$cls = $data->cls;
+				$test = new $cls();
+				if ($test->hasCompositeKey())
+				{
+					$tmp = $data->cls::findComposite($data->id);
+				}
+				else
+				{
+					$tmp = $data->cls::find($data->id);
+				}
 				if(isset($data->relations))
 				{
 					$tmp->relations = $data->relations;
@@ -225,7 +238,7 @@ trait CachedAuto
 	
 	protected function getCacheKey($id = NULL)
 	{
-		if (class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey') && (is_array($id) || !$id))
+		if ($this->hasCompositeKey() && (is_array($id) || !$id))//class_use_trait($this, 'Core\Model\Traits\HasCompositePrimaryKey')
 		{
 			$key = implode('-', isset($id)?$id:$this->getKey());
 		}
@@ -250,5 +263,10 @@ trait CachedAuto
 	public function initModel()
     {
         $a = 50;
-    }
+	}
+	
+	public function hasCompositeKey()
+	{
+		return is_array($this->primaryKey);
+	}
 }

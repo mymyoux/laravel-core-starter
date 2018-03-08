@@ -18,6 +18,12 @@ class CacheManager
         return CacheService::{ $name }(...$arguments);
     }
 
+    // Return the TTL of the ressource in seconds
+    public function ttl($key)
+    {
+        return $this->connection()->ttl($this->getPrefix() . $key);
+    }
+
     public function invalidAPI($base_key)
     {
         if (!(CacheManager::driver()->getStore() instanceof \Illuminate\Cache\RedisStore))
@@ -38,9 +44,9 @@ class CacheManager
         CacheManager::forget($base_key);
     }
 
-    public function cacheAPI($cache_key, $base_key, $data, $days = 1)
+    public function cacheAPI( $cache_key, $base_key, $data, $minutes = 1440 )
     {
-        CacheManager::put( $cache_key, $data, Carbon::now()->addDays( $days ));
+        CacheManager::put( $cache_key, $data, Carbon::now()->addMinutes( $minutes ));
         Logger::normal('api:hit cache ' . $cache_key);
         
         // add all keys to an array in order to clear everything

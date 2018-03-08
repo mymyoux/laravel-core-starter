@@ -23,22 +23,21 @@ class Format
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-
+        
         if(isset($response->exception))
         {
             return $response;
         }
-        // if (is_array($response))
-        //     return ["data"=>$response];
-
-        // if ($response instanceof Collection)
-        //     return ["data"=>$response];
         
-        // if ($response instanceof BaseModel)
-        //     return ["data"=>$response];
+        if ($response instanceof \Illuminate\Http\RedirectResponse)
+        {
+            return $response;
+        }
 
         if (true === method_exists($response, 'getOriginalContent'))
+        {
             return ["data" => $response->getOriginalContent()];
+        }
         
         return ['data' => $response];
     }

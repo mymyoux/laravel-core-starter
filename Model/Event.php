@@ -64,7 +64,7 @@ class Event extends \Tables\Model\Event
 			$id_user = NULL;
 		}
 		$data = ["id_event"=>$this->getKey(), "step"=>$this->step,"result" => json_encode($result), "id_user"=>$id_user,"state"=>$state,"notification_time"=>$postpone_time];
-		Db::table('event_action')->insert($data);
+		DB::table('event_action')->insert($data);
 		foreach($data as $key=>$value)
 		{
 			if($key == "id_user")

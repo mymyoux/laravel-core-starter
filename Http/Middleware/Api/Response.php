@@ -27,6 +27,12 @@ class Response
     public function handle($request, Closure $next)
     {
         $response = $next($request);
+
+        if ($response instanceof \Illuminate\Http\RedirectResponse)
+        {
+            return $response;
+        }
+        
         if(isset($response->exception) && !($response instanceof JsonResponse))
         {
             return $response;

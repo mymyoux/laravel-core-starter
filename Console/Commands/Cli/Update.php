@@ -175,7 +175,7 @@ class Update extends Command
             return $previous;
         }, []);
         $insert["project"] = config('update.project');
-        Db::table(config('update.table'))->insert($insert);
+        DB::table(config('update.table'))->insert($insert);
     }
     protected function loadCacheFile()
     {

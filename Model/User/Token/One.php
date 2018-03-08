@@ -38,7 +38,7 @@ class One extends \Tables\Model\User\One\Token
         return true;
     }
 
-    static public function getToken($apirequest)
+    static public function getToken($token)
     {
         One::where(function($query){
             $query->where('expired_time', '<=', DB::raw('NOW()'));
@@ -53,7 +53,7 @@ class One extends \Tables\Model\User\One\Token
         {
             DB::beginTransaction();
 
-            $result = One::where('token', '=', $apirequest->input('token'))->first();
+            $result = One::where('token', '=', $token)->first();
             //no token
             if (!$result)
                 return null;

@@ -520,7 +520,7 @@ class Paginate
             $orderRequest = [];
             foreach($keys as $index=>$key)
             {
-                $orderRequest[$key] = $directions[$index]; // bug here index undefined
+                $orderRequest[$key] = isset($directions[$index]) ? $directions[$index] : $directions[0];
             }
             foreach($orderRequest as $key=>$direction)
             {

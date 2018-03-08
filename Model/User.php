@@ -158,7 +158,7 @@ class User extends \Tables\Model\User implements
     }
     protected function getAvailableTypes()
     {
-        return Db::table('user')->select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
+        return DB::table('user')->select('type')->distinct('type')->pluck('type')->filter(function($item){return isset($item);})->values()->toArray();
     }
     protected function getByEmail($email)
     {
@@ -189,12 +189,15 @@ class User extends \Tables\Model\User implements
     }
     public function getFirstNameAttribute()
     {
-        if($this->deleted == 1 && isset($this->attributes["first_name"]))
+        if (isset($this->attributes["first_name"]))
         {
-            return $this->attributes["first_name"]." (suspended)";
-        }else
-        {
-            return $this->attributes["first_name"];
+            if($this->deleted == 1)
+            {
+                return $this->attributes["first_name"]." (suspended)";
+            }else
+            {
+                return $this->attributes["first_name"];
+            }
         }
     }
 }
