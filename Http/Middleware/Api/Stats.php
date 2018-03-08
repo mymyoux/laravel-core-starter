@@ -64,6 +64,12 @@ class Stats
         }
         StatsService::addApiCall(Route::getFacadeRoot()->current());
         $response = $next($request);
+        
+        if ($response instanceof \Illuminate\Http\RedirectResponse)
+        {
+            return $response;
+        }
+
         if(isset($response->exception) && !($response instanceof JsonResponse))
         {
             return $response;

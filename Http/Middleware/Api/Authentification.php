@@ -2,10 +2,14 @@
 
 namespace Core\Http\Middleware\Api;
 
-use Closure;
 use App\User;
-use Auth;
 use Core\Exception\ApiException;
+use Core\Model\User\Token\One;
+
+use Closure;
+use Auth;
+use Api;
+
 class Authentification
 {
     /**
@@ -17,7 +21,32 @@ class Authentification
      */
     public function handle($request, Closure $next)
     {
-        $token = $request->input('api_token');
+        $token  = $request->input('api_token');
+        $rtoken = $request->input('rtoken');
+
+        if(isset($rtoken))
+        {
+            $id_user   = One::getToken($rtoken);
+
+            if(isset($id_user))
+            {
+                $user = User::find($id_user);
+                $token_impersonate = $request->input('api_token_impersonate');
+                if(!$user->isAdmin() && isset($token_impersonate))
+                {
+                    $admin = User::findByApiToken($token_impersonate);
+                    if(isset($admin) && $admin->isAdmin())
+                    {
+                        $user->setRealUser($admin);
+                    }
+                }
+                Auth::setUser($user);
+
+            }else
+            {
+                throw new ApiException('bad_token');
+            }
+        }        
         
         if(isset($token))
         {

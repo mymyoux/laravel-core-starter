@@ -20,6 +20,12 @@ class Jsonp
         //$response = $next($request);
         //$response->header('Access-Control-Allow-Origin', '*');
         $response = $next($request);
+        
+        if ($response instanceof \Illuminate\Http\RedirectResponse)
+        {
+            return $response;
+        }
+
         return static::convert($request, $response);
     }
     public static function convert($request, $response)
