@@ -17,6 +17,18 @@ use Illuminate\Support\Facades\Route;
    */
 class UserController extends Controller
 {
+    /**
+   * @ghost\Api
+   * @ghost\Role("visitor")
+   * @ghost\Middleware("\Illuminate\Session\Middleware\AuthenticateSession")
+   
+   * @return User logout
+	 */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/');
+    }
 	/**
    * Get current user info
    * @ghost\Role("visitor")
