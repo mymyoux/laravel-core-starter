@@ -12,6 +12,7 @@ abstract class Model extends BaseModel
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
     private $_prepared = False;
+    public $id; // prevent error from ->save() (do not add update ... set id = ??? where ...)
     
     public function __construct(array $attributes = [])
     {
