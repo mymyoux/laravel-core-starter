@@ -189,7 +189,7 @@ class User extends \Tables\Model\User implements
     }
     public function getFirstNameAttribute()
     {
-        if (isset($this->attributes["first_name"]))
+        if (isset($this->attributes["first_name"]) && isset($this->attributes["deleted"]))
         {
             if($this->deleted == 1)
             {
