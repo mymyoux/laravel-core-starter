@@ -15,6 +15,10 @@ trait Role
 	}
 	public function hasRole($role, $strict = false)
 	{
+		if(empty($this->roles))
+		{
+			$this->loadRoles();
+		}	
 		if($role == static::$ROLE_CONNECTED && isset($this->id_user))
 			return True;
 
@@ -31,6 +35,10 @@ trait Role
 			array_splice($thisroles, $index, 1);
 			$this->roles = array_values($this->roles);
 		}
+	}
+	protected function loadRoles()
+	{
+		//add roles
 	}
 	public static function bootRole()
 	{

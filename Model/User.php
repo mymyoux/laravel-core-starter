@@ -97,6 +97,10 @@ class User extends \Tables\Model\User implements
 
     protected function beforeCache()
     {
+        $this->loadRoles();
+    }
+    protected function loadRoles()
+	{
         $this->addRole($this->type);
         $this->addRole(static::$ROLE_CONNECTED);
         $roles = Role::where(["user_role.id_user"=>$this->getKey()])->get();
@@ -104,7 +108,7 @@ class User extends \Tables\Model\User implements
         {
             $this->addRole($role->role);
         }
-    }
+	}
     protected function prepareModel()
     {
         if(isset($this->traits[$this->type]))
