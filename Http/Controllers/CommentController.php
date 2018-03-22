@@ -385,12 +385,13 @@ class CommentController extends Controller
 
     /**
      * Get notification for a cabinet
+     * @ghost\Role("user")
      * @ghost\Api
      * @return  array
      */
     public function notification(Request $request)
     {
-        $id_user = Auth::getUser()->id_user;
+        $id_user = Auth::id();
 
         $request = CommentStateModel::select("comment_state.id", "comment_state_me.read_time", "comment_state.created_time")
             ->join('comment_state as comment_state_me', 'comment_state_me.id_user', '=', DB::raw('"' . Auth::getUser()->id_user . '"'))

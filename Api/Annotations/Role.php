@@ -3,7 +3,7 @@ namespace Core\Api\Annotations;
 use Core\Exception\Exception;
 use Core\Exception\ApiException;
 use Core\Traits\Role as RoleTrait;
-
+use Logger;
 /**
  *
  * @Annotation
@@ -49,7 +49,8 @@ class Role extends CoreAnnotation
 		if(!isset($this->roles))
         {
         	$this->roles = [];
-        }
+		}
+		
     	if(!isset($user))
     	{
     		if(!empty($this->needed) && (count($this->needed) > 1 || $this->needed[0] != RoleTrait::$ROLE_DISCONNECTED))
@@ -70,9 +71,9 @@ class Role extends CoreAnnotation
     	{
     		foreach($this->needed as $role)
 	    	{
-	    		if(!$user->hasRole($role))
+				if(!$user->hasRole($role))
 	    		{
-
+					
 	    			return False;
 	    		}
 	    	}
@@ -95,7 +96,7 @@ class Role extends CoreAnnotation
 	    		{
 	    			return True;
 	    		}
-	    	}
+			}
 	    	return False;
     	}
     	return True;
