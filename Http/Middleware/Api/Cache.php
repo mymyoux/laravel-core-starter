@@ -38,7 +38,12 @@ class Cache
         if (is_array($keys))
         {
             foreach ($keys as $key)
-                $cache_key .= '-' . $request->input( $key );
+            {
+                $value = $request->input( $key );
+                if (false === $value)
+                    $value = 0;
+                $cache_key .= '-' . $value;
+            }
         }
 
         $cache_key  = slug($cache_key);
