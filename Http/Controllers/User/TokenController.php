@@ -29,13 +29,15 @@ class TokenController extends Controller
     /**
     * Get infos on specific user
     * @ghost\Param(name="token",required=true,type="string")
+    * @ghost\Param(name="data",required=false,type="boolean",default=false)
     * @warning We will limit this access
     * @return User user
     */
     public function get(Request $request)
     {
-    	$token  = $request->input('token');
-        $data   = One::getToken($token);
+    	$token      = $request->input('token');
+    	$with_data  = $request->input('data');
+        $data       = One::getToken($token, $with_data);
         
     	return $data;
     }
