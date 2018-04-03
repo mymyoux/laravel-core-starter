@@ -26,6 +26,8 @@ class ArtisanServiceProvider extends BaseArtisanServiceProvider
         'Optimize' => 'command.optimize',
         'PackageDiscover' => 'command.package.discover',
         'Preset' => 'command.preset',
+        'QueueReplay' => 'command.queue.replay',
+        'QueueConfig' => 'command.queue.config',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
