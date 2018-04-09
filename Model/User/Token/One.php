@@ -38,7 +38,7 @@ class One extends \Tables\Model\User\One\Token
         return true;
     }
 
-    static public function getToken($token)
+    static public function getToken($token, $data = false)
     {
         One::where(function($query){
             $query->where('expired_time', '<=', DB::raw('NOW()'));
@@ -67,7 +67,11 @@ class One extends \Tables\Model\User\One\Token
             History::insert($result->id_user, $result->token, $result->source);
             DB::commit();
             // Notifications::oneToken($result);
-            return $result->id_user;
+
+            if (!$data)
+                return $result->id_user;
+
+            return $result;
         }
         catch(\Exception $e)
         {
