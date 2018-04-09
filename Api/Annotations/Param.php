@@ -121,6 +121,10 @@ class Param extends CoreAnnotation
      */
     public $array = false;
     /**
+     * @var boolean flag missing model when using type
+     */
+    public $flag_missing = True;
+    /**
      * @var mixed
      */
     public $value;
@@ -133,6 +137,14 @@ class Param extends CoreAnnotation
      * @var mixed
      */
     public $default;
+    /**
+     * @var mixed option for type=class
+     */
+    public $option;
+    /**
+     * @var mixed option for type=class
+     */
+    public $prop;
     /**
      * @param $value
      * @param $request

@@ -138,4 +138,25 @@ abstract class Model extends BaseModel
         }
         return $data;
     }
+    protected function onRouteParam($id, $param)
+    {
+        $model =  self::find($id);
+        if(isset($model))
+        {
+            if($model instanceof \Illuminate\Database\Eloquent\Collection)
+            {
+                $model->each(function($item) use ($param)
+                {
+                    $this->validateRouteParam($item, $param);
+                });
+            }else
+            {
+                $this->validateRouteParam($model, $param);
+            }
+        }
+        return $model;
+    }
+    protected function validateRouteParam($model, $param)
+    {
+    }
 }
