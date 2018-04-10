@@ -25,6 +25,71 @@ class Param
         Stats::addAPIAnnotation($route, $param);
 
         $param->value = $request->input($param->name);
+
+
+        if(isset($param->type))
+        {
+            if(class_exists($param->type))
+            {
+                if(!isset($param->prop))
+                {
+                    if(starts_with($param->name, "id_"))
+                    {
+                        $param->prop = substr($param->name, 3);
+                    }else if(ends_with($param->name, "_id")){
+                        $param->prop = substr($param->name, 0, -3);
+                    }
+                    if($param->array)
+                    {
+                        $param->prop = str_plural($param->prop);
+                    }
+                }
+                if(isset($request->{$param->prop}))
+                {
+                    $model = $request->{$param->prop};
+                    if(is_array($model))
+                    {
+                        $model = collect($model);
+                    }
+                    if($model instanceof \Illuminate\Database\Eloquent\Collection)
+                    {
+
+                        $param->value = $model->map(function($item)
+                        {
+                            return $item->getKey();
+                        })->toArray();
+                    }
+                    else
+                    {
+                        $param->value = $model->getKey();
+                    }
+                }
+                //TODO:allow to pass model to id_user instead of user too 
+                // if(isset($request->{$param->name}))
+                // {
+                //     $model = $request->{$param->name};
+                //     if(is_array($model))
+                //     {
+                //         $model = collect($model);
+                //     }
+                //     if($model instanceof \Illuminate\Database\Eloquent\Collection)
+                //     {
+
+                //         $param->value = $model->map(function($item)
+                //         {
+                //             return $item instanceof Model?$item->getKey():$item;
+                //         })->toArray();
+                        
+                //     }
+                //     else
+                //     {
+                //         $param->value = $model->getKey();
+                //     }
+                // }
+            }
+        }
+
+
         $value = $param->validate($param->value);
         if(!isset($value) && isset($param->default))
         {
@@ -37,16 +102,21 @@ class Param
             if(class_exists($param->type))
             {
                 $cls = $param->type;
-                if(!isset($value))
+                if(isset($model))
                 {
-                    $model = NULL;
-                }else
-                {
-                    $model = $cls::onRouteParam($value, $param);
-                }
-                if(isset($value) && ($param->flag_missing || $param->required) && !isset($model))
-                {
-                    throw new ApiException($param->name . " model linked not found", 10);
+                    $model = $cls::onRouteParam($model, $param);
+                }else {
+                    if(!isset($value))
+                    {
+                        $model = NULL;
+                    }else
+                    {
+                        $model = $cls::onRouteParam($value, $param);
+                    }
+                    if(isset($value) && ($param->flag_missing || $param->required) && !isset($model))
+                    {
+                        throw new ApiException($param->name . " model linked not found", 10);
+                    }
                 }
                 if($param->array)
                 { 
@@ -57,19 +127,19 @@ class Param
                         throw new ApiException($param->name . " model linked not found - ".implode(",", $missing), 10);
                     }
                 }
-                if(!isset($param->prop))
-                {
-                    if(starts_with($param->name, "id_"))
-                    {
-                        $param->prop = substr($param->name, 3);
-                    }else if(ends_with($param->name, "_id")){
-                        $param->prop = substr($param->name, 0, -3);
-                    }
-                    if($param->array)
-                    {
-                        $param->prop.="s";
-                    }
-                }
+                // if(!isset($param->prop))
+                // {
+                //     if(starts_with($param->name, "id_"))
+                //     {
+                //         $param->prop = substr($param->name, 3);
+                //     }else if(ends_with($param->name, "_id")){
+                //         $param->prop = substr($param->name, 0, -3);
+                //     }
+                //     if($param->array)
+                //     {
+                //         $param->prop = str_plural($param->prop);
+                //     }
+                // }
                 //$request->attributes->add([ $param->prop  => $model]);
                 $param->type = "int";
             }
@@ -104,7 +174,7 @@ class Param
 
         if(isset($param->prop))
         {
-            if(isset($input[$param->prop]))
+            if(isset($input[$param->prop]) && $input[$param->prop]!==$model)
             {
                 throw new ApiException($param->prop." already exists");
             }
