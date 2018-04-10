@@ -33,11 +33,11 @@ class Format
         {
             return $response;
         }
-
         if (true === method_exists($response, 'getOriginalContent'))
         {
             return ["data" => $response->getOriginalContent()];
         }
+     
         
         return ['data' => $response];
     }

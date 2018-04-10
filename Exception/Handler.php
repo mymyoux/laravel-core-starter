@@ -78,8 +78,9 @@ class Handler extends ExceptionHandler
         }
 
         $allowed_ip = config('app.ip_debug')??[];
-        if(!Auth::isAdmin() && !config('app.debug') && !in_array(App::ip(), $allowed_ip) )
+        if((!Auth::check() || !Auth::user()->isAdmin()) && !config('app.debug') && !in_array(App::ip(), $allowed_ip) )
         {
+            //remove extra data
             $rawexception = [
                 "message"=>$rawexception["message"],
                 "fatal"=>$rawexception["fatal"],

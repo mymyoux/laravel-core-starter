@@ -42,8 +42,9 @@ class Response
         {
             $data = $response->getOriginalContent();
         }
-
+        
         $this->addData( $data );
+        
 
         return $data;
     }
