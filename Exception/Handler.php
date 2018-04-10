@@ -10,6 +10,7 @@ use Core\Exception\Exception as CoreException;
 use Core\Http\Middleware\Api\Jsonp;
 use Core\Model\Error as ErrorService;
 use App;
+use Auth;
 class Handler extends ExceptionHandler
 {
     /**
@@ -75,6 +76,16 @@ class Handler extends ExceptionHandler
         {
             $rawexception["id"] = ErrorService::record($exception);
         }
+
+        $allowed_ip = config('app.ip_debug')??[];
+        if(!Auth::isAdmin() && !config('app.debug') && !in_array(App::ip(), $allowed_ip) )
+        {
+            $rawexception = [
+                "message"=>$rawexception["message"],
+                "fatal"=>$rawexception["fatal"],
+                "code"=>$rawexception["code"]];
+        }
+
         return Jsonp::convert($request, ["exception"=>$rawexception]);
     }
 
