@@ -69,6 +69,10 @@ class Api
     {
         return count(static::$data) == 0;
     }
+    public function isFrontCall()
+    {
+        return count(static::$data) <= 1 && !App::runningInConsole();
+    }
     public function has($path)
     {
         return Route::has($path);
