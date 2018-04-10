@@ -140,8 +140,35 @@ abstract class Model extends BaseModel
     }
     protected function onRouteParam($id, $param)
     {
-        $model = static::find($id);
-
+        if($id instanceof Model)
+        {
+            $model = $id;
+        }else
+        if($id instanceof \Illuminate\Database\Eloquent\Collection)
+        {
+            $model = $id->map(function($item)
+            {
+                if($item instanceof Model)
+                {
+                    return $item;
+                }
+                return static::find($item);
+            });
+        }else
+        if(is_array($id))
+        {
+            $model = collect(array_map(function($item)
+            {
+                if($item instanceof Model)
+                {
+                    return $item;
+                }
+                return static::find($item);
+            }, $id));
+        }else
+        {
+            $model = static::find($id);
+        }
         if(isset($model))
         {
             if($model instanceof \Illuminate\Database\Eloquent\Collection)
