@@ -140,7 +140,8 @@ abstract class Model extends BaseModel
     }
     protected function onRouteParam($id, $param)
     {
-        $model =  self::find($id);
+        $model = static::find($id);
+
         if(isset($model))
         {
             if($model instanceof \Illuminate\Database\Eloquent\Collection)
