@@ -152,7 +152,7 @@ abstract class Model extends BaseModel
                 {
                     return $item;
                 }
-                return self::find($item);
+                return static::find($item);
             });
         }else
         if(is_array($id))
@@ -163,11 +163,11 @@ abstract class Model extends BaseModel
                 {
                     return $item;
                 }
-                return self::find($item);
+                return static::find($item);
             }, $id));
         }else
         {
-            $model =  self::find($id);
+            $model = static::find($id);
         }
         if(isset($model))
         {
