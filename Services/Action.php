@@ -11,7 +11,7 @@ use Core\Model\Action as ActionModel;
 
 class Action
 {
-    public function add(User $user, $type, $user_action = null, $value = null)
+    public function add(User $user, $type, $user_action = null, $value = null, $id_external = NULL)
     {
         if ($user->isRealAdmin())
              return null;
@@ -34,6 +34,7 @@ class Action
         $action->type           = $type;
         $action->id_user_action = $id_user_action;
         $action->value          = $value;
+        $action->external_id          = $id_external;
         if($user->isImpersonated())
         {
            $action->id_real_user = (int) $user->getRealUser()->getKey();
