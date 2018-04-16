@@ -75,7 +75,7 @@ class ErrorController extends Controller
             $end = date("Y-m-d H:i:s",$end);
             
             $req->where("error.created_time","<=",$end);
-            $req_api->where("error.created_time","<=",$start);
+            $req_api->where("error.created_time","<=",$end);
             $javascript->where("error_javascript.created_time","<=",$end);
         }
 
