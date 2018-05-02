@@ -4,7 +4,7 @@ namespace Core\Model\Connector;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Twitter extends Model
+class Twitter extends \Tables\Model\Connector\Twitter
 {
     protected $table = 'connector_twitter';
     protected $primaryKey = 'id_user';

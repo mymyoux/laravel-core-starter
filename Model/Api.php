@@ -42,7 +42,7 @@ class Api extends \Tables\Model\Stats\Api\Call
     	$data["success"] = is_array($data["value"]) && !isset($data["value"]["exception"]);
     	if(isset($data["value"]["exception"]))
     	{
-    		$data["id_error"] = $data["value"]["exception"]["id"];
+    		$data["id_error"] = $data["value"]["exception"]["id"]??NULL;
     		if(!isset($data["value"]["exception"]["api"]))
     		{
     			$data["error_type"] = 0;

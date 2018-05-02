@@ -160,17 +160,20 @@ class VueController extends Controller
         }
         return $result->version;
     }
+
     /**
      * Tests versions of given paths 
-     *  @ghost\Param(name="templates",array=true,required=true)
+     * @ghost\Param(name="templates",array=true,required=true)
+     * @ghost\Param(name="locale",required=true)
      *  @return array List of expired paths
      */
     public function getExpired(Request $request)
     {
-        $templates = $request->input('templates');
-
-        $type = Auth::check() && Auth::type() ? Auth::type() : "app";
-        $request = Template::select('path')->where('type','=',$type)
+        $templates  = $request->input('templates');
+        $locale     = $request->input('locale');
+        $type       = Auth::check() && Auth::type() ? Auth::type() : "app";
+        $request    = Template::select('path')->where('type','=',$type)
+        ->where('locale', '=', $locale)
         ->where(function($request) use($templates)
         {
             foreach($templates as $template)
@@ -191,9 +194,9 @@ class VueController extends Controller
             
         });
 
-       $results = $request
-        ->get()->pluck('path')->all();
-        return $results;
+        $results = $request->get()->pluck('path')->unique()->all();
+
+        return array_values($results);
     }
     protected function getPaths()
     {
