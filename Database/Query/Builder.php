@@ -26,8 +26,9 @@ class Builder extends BaseBuilder
         {
             return array_map(function($item){return $this->_insert($item);}, $values);
         }
-        if(!isset($values["created_time"]))
+        if(!isset($values["created_time"]) && !isset($values["created_at"]))
         {
+            
             $values["created_time"] = DB::raw('NOW(3)');
         }
 

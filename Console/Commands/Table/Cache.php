@@ -364,11 +364,11 @@ class Cache extends Command
                         }
                     }
                 }
-                if(isset($created_at) && $created_at != "created_at")
+                if(isset($created_at))
                 {
                     $cls->addConstant('CREATED_AT', $created_at);
                 }
-                if(isset($updated_at) && $updated_at != "updated_at")
+                if(isset($updated_at))
                 {
                     $cls->addConstant('UPDATED_AT', $updated_at);
                 }
