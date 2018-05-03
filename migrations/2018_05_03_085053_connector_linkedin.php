@@ -14,7 +14,7 @@ class ConnectorLinkedin extends Migration
     public function up()
     {
         Schema::create('connector_linkedin', function (Blueprint $table) {
-            $table->integer('id_user')->unsigned();
+            $table->integer('user_id')->unsigned();
             $table->string('id', 128);
 
             $table->longText('headline')->nullable();
@@ -25,9 +25,11 @@ class ConnectorLinkedin extends Migration
 
             $table->timestamps();
 
-            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
-            $table->primary('id_user');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->primary('user_id');
         });
+
+        DB::unprepared('INSERT INTO connectors VALUES(NULL, "linkedin", 1, NOW(), NOW());');
     }
 
     /**
@@ -38,5 +40,6 @@ class ConnectorLinkedin extends Migration
     public function down()
     {
         Schema::drop('connector_linkedin');
+        DB::unprepared('delete from connectors where name = "linkedin";');
     }
 }
