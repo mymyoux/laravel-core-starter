@@ -409,6 +409,7 @@ class Cache extends Command
                     if(strpos($relation->columns, ",")===False)
                     {
                         $related = &$models_cls[$relation->REFERENCED_TABLE_NAME];
+                        if (!$related) continue;
                         $content = "";
                         $foreign = False;
                         if(True || $relation->columns != $related->name.'_id')

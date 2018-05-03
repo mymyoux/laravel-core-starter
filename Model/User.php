@@ -103,7 +103,7 @@ class User extends \Tables\Model\User implements
 	{
         $this->addRole($this->type);
         $this->addRole(static::$ROLE_CONNECTED);
-        $roles = Role::where(["user_role.id_user"=>$this->getKey()])->get();
+        $roles = Role::where(["user_role.user_id"=>$this->getKey()])->get();
         foreach($roles as $role)
         {
             $this->addRole($role->role);
@@ -137,7 +137,7 @@ class User extends \Tables\Model\User implements
         $id_user = Cache::get($key);
         if(!$id_user)
         {
-            $token = UserLoginToken::select("id_user")
+            $token = UserLoginToken::select("user_id")
             ->where("token",'=',$token)
             ->first();
             if(isset($token))
@@ -156,7 +156,7 @@ class User extends \Tables\Model\User implements
     public function getApiTokenAttribute()
     {
         if(!isset($this->_api_token)){
-            $this->_api_token = DB::table('user_login_token')->where('user_login_token.id_user','=',$this->getKey())->first()->token;
+            $this->_api_token = DB::table('user_login_token')->where('user_login_token.user_id','=',$this->getKey())->first()->token;
         }
         return $this->_api_token;
     }
@@ -166,10 +166,10 @@ class User extends \Tables\Model\User implements
     }
     protected function getByEmail($email)
     {
-        $id_user = UserConnector::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
+        $id_user = ConnectorUser::where(["email"=>$email])->select("user_id")->pluck('user_id')->first();
         if($id_user === NULL)
         {
-            $id_user = User::where(["email"=>$email])->select("id_user")->pluck('id_user')->first();
+            $id_user = User::where(["email"=>$email])->select("user_id")->pluck('user_id')->first();
             if($id_user === NULL)
             {
                 $new_email = clean_email($email);

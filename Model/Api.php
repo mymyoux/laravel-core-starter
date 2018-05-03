@@ -28,11 +28,11 @@ class Api extends \Tables\Model\Stats\Api\Call
     	$user = Auth::getUser();
     	if(isset($user))
     	{
-    		$data["id_user"] = $user->getRealUser()->getKey();
+    		$data["user_id"] = $user->getRealUser()->getKey();
 
     		if($user->isImpersonated())
     		{
-    			$data["id_user_impersonated"] = $user->getKey();
+    			$data["user_id_impersonated"] = $user->getKey();
     		}
 		}
 		$data["path"] = $request->getPathInfo(); // Use $request path instead of route path, resolved bug sub api call

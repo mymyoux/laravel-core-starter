@@ -14,10 +14,7 @@ class Comment extends \Tables\Model\Comment
 
     protected $dates = ['deleted_at'];
 
-    protected $table = 'comment';
-    protected $primaryKey = 'id_comment';
-
-    protected $fillable = ['comment','id_comment_relation','id_user'];
+    protected $fillable = ['comment','comment_relation_id','user_id'];
     public function relation()
     {
         return $this->belongsTo(CommentRelation::class, 'id_comment_relation','id_comment_relation');

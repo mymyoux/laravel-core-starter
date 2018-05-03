@@ -6,8 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Battlenet extends Model
 {
-    protected $table = 'connector_battlenet';
-    protected $primaryKey = 'id_user';
-
-    protected $fillable = ['id_user', 'nickname', 'name', 'email', 'avatar', 'id'];
+    protected $fillable = ['user_id', 'nickname', 'name', 'email', 'avatar', 'id'];
 }

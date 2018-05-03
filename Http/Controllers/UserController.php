@@ -47,12 +47,12 @@ class UserController extends Controller
 
         if(isset($result))
         {
-            $request = UserLoginToken::select('token')->where(["id_user"=>$result->getKey()])->first();
+            $request = UserLoginToken::select('token')->where(["user_id"=>$result->getKey()])->first();
 
             if (!isset($request))
             {
                 $token = generate_token();
-                UserLoginToken::insert(["id_user"=>$result->getKey(),"token"=>$token]);
+                UserLoginToken::insert(["user_id"=>$result->getKey(),"token"=>$token]);
             }
             else
             $token = $request->token;
@@ -63,12 +63,12 @@ class UserController extends Controller
         if (Auth::user()->isImpersonated())
         {
             $result->real_user = Auth::user()->getRealUser();
-            $request = UserLoginToken::select('token')->where(["id_user"=>$result->real_user->getKey()])->first();
+            $request = UserLoginToken::select('token')->where(["user_id"=>$result->real_user->getKey()])->first();
             
             if (!isset($request))
             {
                 $token = generate_token();
-                UserLoginToken::insert(["id_user"=>$result->real_user->getKey(),"token"=>$token]);
+                UserLoginToken::insert(["user_id"=>$result->real_user->getKey(),"token"=>$token]);
             }
             else
             $token = $request->token;
@@ -115,7 +115,7 @@ class UserController extends Controller
         {
             if(is_numeric($search))
             {
-                $request->where(["id_user"=>$search]);
+                $request->where(["id"=>$search]);
             }else {
                 if(User::hasColumn('first_name'))
                     $request->where('first_name', 'like', '%'.$search.'%');

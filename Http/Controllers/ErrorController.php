@@ -37,14 +37,14 @@ class ErrorController extends Controller
      */
     public function list(Request $request, Paginate $paginate)
     {
-        $javascript = DB::table('error_javascript')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascript.created_time) as last_created_time"),"error_url","type","session","error_message","id_user","id_user",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascript.updated_time) as last_updated_time"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
+        $javascript = DB::table('error_javascript')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascript.created_time) as last_created_time"),"error_url","type","session","error_message","user_id","user_id",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascript.updated_time) as last_updated_time"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
         ->groupBy('identifier');
 
-        $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","id_user","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","user_id","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
         ->where('error.is_api', '=', false)
         ->groupBy('identifier');
 
-        $req_api = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","id_user","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        $req_api = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","user_id","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
         ->where('error.is_api', '=', true)
         ->groupBy('identifier');
 
@@ -141,7 +141,7 @@ class ErrorController extends Controller
         $interval = collect($interval);
 
    
-        $request = Error::select([DB::raw("(UNIX_TIMESTAMP(error.created_time) DIV $step)*$step as time"),DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","id_user","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",
+        $request = Error::select([DB::raw("(UNIX_TIMESTAMP(error.created_time) DIV $step)*$step as time"),DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(error.created_time) as last_created_time"),"url","type","code","message","user_id","id_real_user","file","line",DB::raw("MAX(error.updated_time) as last_updated_time"),"ip",
         DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
         ->where("created_time",">=",$start)
         ->where("created_time","<=",$end)
@@ -176,9 +176,9 @@ class ErrorController extends Controller
         $error = $request->input('error');
         $hardware = $request->input('hardware');
         
-        $id_user = Auth::check() ? Auth::user()->getKey() : null;
+        $user_id = Auth::check() ? Auth::user()->getKey() : null;
         $type = Auth::check() ? Auth::type() : null;
-        $data = array("url"=>$url,"id_user"=>$id_user,"session"=>$session,"type"=>$type);
+        $data = array("url"=>$url,"user_id"=>$user_id,"session"=>$session,"type"=>$type);
 
 
         $log = Error::recordJS($data, $hardware, $error);

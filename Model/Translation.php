@@ -14,9 +14,6 @@ class Translation extends \Tables\Model\Translate
     const UPDATED_AT = 'updated_time';
 
 
-    protected $table = 'translate';
-    protected $primaryKey = 'id';
-
     protected $fillable = ['controller','action','key','singular','plurial','locale','type','missing','id_user'];
     public $hidden = ["id","missing","id_user","sync_time","created_time"];
 

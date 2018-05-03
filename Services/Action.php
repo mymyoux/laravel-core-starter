@@ -28,31 +28,27 @@ class Action
             $id_user_action = null;
         }
 
-        $action = new ActionModel;
-
-        $action->id_user        = $user->getKey();
+        $action                 = new ActionModel;
+        $action->user_id        = $user->getKey();
         $action->type           = $type;
-        $action->id_user_action = $id_user_action;
+        $action->user_id_action = $id_user_action;
         $action->value          = $value;
-        $action->external_id          = $id_external;
-        if($user->isImpersonated())
+        $action->external_id    = $id_external;
+
+        if ($user->isImpersonated())
         {
-           $action->id_real_user = (int) $user->getRealUser()->getKey();
+           $action->user_id_real = (int) $user->getRealUser()->getKey();
         }
 
 
         $action->save();
 
-        // if(isset($id_user_action) && !isset($user_action))
-        // {
-        //     $user_action = $this->sm->get("UserTable")->getUser($id_user_action);
-        // }
-        // $this->sm->get("Notifications")->addAction($user, $action, $user_action, $value);
+        return $action;
     }
 
     public function del( $id_action )
     {
-        $action = ActionModel::where('id_action', '=', $id_action)->first();
+        $action = ActionModel::find($id_action);
 
         if (null === $action)
             return false;

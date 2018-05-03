@@ -12,9 +12,7 @@ class Role extends \Tables\Model\User\Role
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
 
-	protected $table = 'user_role';
-	protected $primaryKey = ['id_user', 'role'];
     protected $fillable = [
-        'role','id_user'
+        'role','user_id'
     ];
 }

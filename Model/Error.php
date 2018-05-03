@@ -13,8 +13,6 @@ use App\Model\Error\Javascript;
 
 class Error extends \Tables\Model\Error//\Tables\Model\Error
 {
-    protected $table = "error";
-
     protected static $muted = False;
 
     public static function mute()
@@ -88,7 +86,7 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
             $info["post"] = "error";
         }
 
-        $info["id_user"] = 0;
+        $info["user_id"] = null;
 
         if ($exception instanceof ApiException)
         {
@@ -103,8 +101,8 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
             $user = Auth::user();
             if(isset($user))
             {
-                $info["id_user"] = $user->getKey();
-                $info["id_real_user"] = $user->getRealUser()->getKey();
+                $info["user_id"] = $user->getKey();
+                $info["user_id_real"] = $user->getRealUser()->getKey();
             }
         }catch(\Exception $e)
         {
@@ -131,7 +129,7 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
 
     protected function recordJS($data, $hardware = NULL, $error = NULL)
     {
-        $keys = array("id_user","session","error_name","error_message","error_url","error_line","error_column","error_stack","hardware_cordovaVersion",
+        $keys = array("user_id","session","error_name","error_message","error_url","error_line","error_column","error_stack","hardware_cordovaVersion",
            "hardware_os","hardware_uuid","hardware_osVersion","hardware_android","hardware_blackberry","hardware_ios","hardware_mobile","hardware_windowsPhone",
            "hardware_screenWidth","hardware_screenHeight","hardware_landscape","hardware_portrait","hardware_browser", 'hardware_cookie' ,"url","type");
 

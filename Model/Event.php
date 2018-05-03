@@ -30,9 +30,6 @@ class Event extends \Tables\Model\Event
     const UPDATED_AT = 'updated_time';
 
 
-    protected $table = 'event';
-    protected $primaryKey = 'id_event';
-
     protected $fillable = ['external_id','external_type','type','state','data','result','owner_id','owner_type'];
 	public function owner()
     {

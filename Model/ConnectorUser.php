@@ -2,7 +2,7 @@
 namespace Core\Model;
 use Core\Database\Eloquent\Model;
 use Core\Model\Traits\HasCompositePrimaryKey;
-class UserConnector extends \Tables\Model\User\Connector
+class ConnectorUser extends \Tables\Model\Connector\User
 {
     /**
      * The attributes that are mass assignable.
@@ -10,7 +10,7 @@ class UserConnector extends \Tables\Model\User\Connector
      * @var array
      */
     protected $fillable = [
-        'id','id_user','id_connector','access_token','refresh_token','expires_in','scopes','email'
+        'id','user_id','connector_id','access_token','refresh_token','expires_in','scopes','email'
     ];
 
     
@@ -43,8 +43,8 @@ class UserConnector extends \Tables\Model\User\Connector
     }
     public static function getByConnectorName($id_user, $connector_name)
     {
-        return static::leftJoin("connector","connector.id_connector","=","user_connector.id_connector")
-        ->where("id_user","=",$id_user)
+        return static::leftJoin("connector","connector.connector_id","=","user_connector.connector_id")
+        ->where("user_id","=",$id_user)
         ->where("connector.name","=",$connector_name)->first();
     }
 }

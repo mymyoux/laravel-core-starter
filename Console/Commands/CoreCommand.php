@@ -40,14 +40,15 @@ class CoreCommand extends Command
     {
         parent::__construct();
 
-        $this->initCron();
-        $this->storeUsage();
+        
     }
 
     public function handle()
     {
     	try
     	{
+            $this->initCron();
+            $this->storeUsage();
 	    	$this->start();
 	    }
 	    catch (\Exception $e)
@@ -96,7 +97,7 @@ class CoreCommand extends Command
         }
 
         $log = CronLog::create([
-        	'cron_id'       => $cron->cron_id,
+        	'cron_id'       => $cron->getKey(),
             'status'        => Cron::STATE_PROCESSING
     	]);
 

@@ -6,11 +6,12 @@ use Socialite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Core\Connector\Manager;
-use Core\Model\UserConnector;
+use Core\Model\ConnectorUser;
 use Auth;
 use DB;
 use App\User;
 use Core\Models\Social;
+use Core\Connector\Connector;
 use Core\Http\Controllers\Controller;
 use Core\Model\UserLoginToken;
 use URL;
@@ -45,7 +46,7 @@ class SocialController extends Controller
         {
             
             //default scopes
-            $connector = DB::table('connector')->where(['name'=>$api])->first();
+            $connector = Connector::where(['name'=>$api])->first();
             if(isset($connector->scopes))
             {
                 $scopes = array_map('trim', explode(',', $connector->scopes));
@@ -77,7 +78,7 @@ class SocialController extends Controller
             return redirect($redirect);
         }
         $scopes = explode(",", $scopes);
-        $connector = UserConnector::leftJoin('connector','connector.id_connector','=','user_connector.id_connector')->where('id_user', '=', Auth::id())->where('connector.name', '=', $api)->first();
+        $connector = ConnectorUser::leftJoin('connector','connector.connector_id','=','user_connector.connector_id')->where('user_id', '=', Auth::id())->where('connector.name', '=', $api)->first();
         if(!$connector)
         {
             return redirect($redirect);    
@@ -145,7 +146,7 @@ class SocialController extends Controller
         $exist = $class::where('id', $user->id)->first();
         if ($exist && Auth::check())
         {
-            if ($exist->id_user != Auth::id())
+            if ($exist->user_id != Auth::id())
             {
                 // cant
                 return redirect($url_redirect);
@@ -157,7 +158,7 @@ class SocialController extends Controller
             $email = $connector->getEmail();
             if(isset($email) && !isset($exist))
             {
-                $exist = UserConnector::where(['email'=>$email])->first();
+                $exist = ConnectorUser::where(['email'=>$email])->first();
                 if(!isset($exist))
                     $exist = User::where(['email'=>$email])->first();
             }
@@ -172,23 +173,23 @@ class SocialController extends Controller
             else
             {
                 
-                $auth_user = User::find($exist->id_user);
+                $auth_user = User::find($exist->user_id);
             }
 
             $this->success($request, $auth_user);
         }
-        $exist = UserConnector::where('id_user', '=', Auth::id())->where('id_connector', '=', $connector->getConnector()->id_connector)->first();
+        $exist = ConnectorUser::where('user_id', '=', Auth::id())->where('connector_id', '=', $connector->getConnector()->getKey())->first();
         if (null === $exist)
         {
             
-            $exist = UserConnector::firstOrCreate([
-                'id_user'       => Auth::id(),
-                'id_connector'  => $connector->getConnector()->id_connector,
+            $exist = ConnectorUser::firstOrCreate([
+                'user_id'       => Auth::id(),
+                'connector_id'  => $connector->getConnector()->getKey(),
                 'access_token'  => $connector->getAccessToken(),
                 'refresh_token' => $connector->getRefreshToken(),
                 'expires_in'    => $connector->getExpiresIn(),
                 'scopes'        => $connector->getScopes()!=NULL?implode(",", $connector->getScopes()):NULL,
-                'email'=> $connector->getEmail()
+                'email'         => $connector->getEmail()
             ]);
             event(new SocialAddedEvent($exist));
         }
@@ -207,11 +208,11 @@ class SocialController extends Controller
                 event(new SocialScopeChangedEvent($exist, array_diff($new_scopes, $last_scope), array_diff($last_scope, $new_scopes)));
         }
 
-        $informations   = $class::where('id_user', '=', Auth::id())->first();
+        $informations   = $class::where('user_id', '=', Auth::id())->first();
         $data           = $connector->toArray();
         if (null === $informations)
         {
-            $data['id_user']    = Auth::id();
+            $data['user_id']    = Auth::id();
             // var_dump($class);
             $class::create( $data );
         }
@@ -248,10 +249,10 @@ class SocialController extends Controller
     {
          $auth_user->save();
          //TABLE:Test token inserttestcontroller
-         UserLoginToken::insert(["id_user"=>$auth_user->id_user,"token"=>generate_token()]);
+         UserLoginToken::insert(["user_id"=>$auth_user->getKey(),"token"=>generate_token()]);
     }
     public function success(Request $request, $auth_user)
     {
-         Auth::loginUsingId($auth_user->id_user);
+         Auth::loginUsingId($auth_user->getKey());
     }
 }

@@ -219,7 +219,7 @@ class Api
         }
         if(isset($data["api_user"]) && !is_numeric($data["api_user"]))
         {
-            $data["api_user"] = $this->api_user->id_user;
+            $data["api_user"] = $this->api_user->getKey();
         }
         $data["add_params"] = $params;
         return Job::create(ApiJob::class, clean_array($data))->send();

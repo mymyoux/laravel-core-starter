@@ -252,7 +252,7 @@ class Mail
             {
                 if(isset( $to[$key]["id_user"]))
                 {
-                    $mail->id_user = $to[$key]["id_user"];
+                    $mail->user_id = $to[$key]["id_user"];
                 }
             }
             $mail->status = $resultemail["status"];
