@@ -39,7 +39,8 @@ class Jsonp
         {
             $response = Response::json($response);
         }
-        $response = $response->header('Access-Control-Allow-Origin', '*');
+        $response = $response->header('Access-Control-Allow-Origin', config("app.origin")??'*');
+        $response = $response->header('Access-Control-Allow-Credentials', 'true');
         return $response;
     }
 }
