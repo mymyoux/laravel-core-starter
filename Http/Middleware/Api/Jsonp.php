@@ -35,11 +35,11 @@ class Jsonp
         {
             $response = Response::json($response)->setCallback($callback);
             //if(!$response = $response->header('Access-Control-Allow-Origin'))
-            $response = $response->header('Access-Control-Allow-Origin', '*');
         }else
         {
             $response = Response::json($response);
         }
+        $response = $response->header('Access-Control-Allow-Origin', '*');
         return $response;
     }
 }
