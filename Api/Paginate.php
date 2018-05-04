@@ -253,6 +253,8 @@ class Paginate
             $apidata["previous"] = $previous;
 
 		}
+		$apidata["keys"] = $this->keys;
+		$apidata["directions"] = $this->directions;
 		$apidata["limit"] = $this->limit;
 		$query->apidata = $apidata;
 		Api::addApiData(["paginate"=>$apidata]);
