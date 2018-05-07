@@ -4,7 +4,7 @@ namespace Core\Http\Middleware\Api;
 
 use Closure;
 use Response;
-
+use Request;
 class Jsonp
 {
     /**
@@ -16,6 +16,19 @@ class Jsonp
      */
     public function handle($request, Closure $next)
     {
+
+   
+        $input = $request->all();
+        if(isset($input["__type"]) && $input["__type"] == "json")
+        {
+            foreach($input as $key=>$value)
+            {
+                $input[$key] = json_decode($value, True);
+            }
+            $request->replace($input);
+            Request::replace($input);
+        }
+
      //   header("Access-Control-Allow-Origin: *");
         //$response = $next($request);
         //$response->header('Access-Control-Allow-Origin', '*');

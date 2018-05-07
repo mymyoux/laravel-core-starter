@@ -10,7 +10,7 @@ use Auth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model as BaseModel;
-
+use Request;
 class Format
 {
     /**
@@ -22,6 +22,7 @@ class Format
      */
     public function handle($request, Closure $next)
     {
+    
         $response = $next($request);
         
         if(isset($response->exception))

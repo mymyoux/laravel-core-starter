@@ -36,7 +36,7 @@ class Paginate
 		if(!$this->_initialized)
 		{
 			$paginate = $this->request->input("paginate");
-			$this->keys = $paginate["keys"];
+			$this->keys = 	$paginate["keys"];
 			
 				if(isset($paginate["next"]))
 					$this->next = $paginate["next"];
@@ -276,15 +276,15 @@ class Paginate
 	public function apply(&$request, $mapping = NULL, $havingOnly = NULL)
 	{
 		$originalQuery = method_exists($request, "getQuery")?$request->getQuery():$request;
-
+		
 		// if(!isset($originalQuery->processor) || !method_exists($originalQuery->processor, "setSelectListener"))
 		// {
-		// 	$originalQuery->processor = new \Core\Api\Paginate\Processor();
+			// 	$originalQuery->processor = new \Core\Api\Paginate\Processor();
 			
-		// }
-		//$originalQuery->processor->setSelectListener($this);
-
-		$paginate = $this->request->input("paginate");
+			// }
+			//$originalQuery->processor->setSelectListener($this);
+			
+			$paginate = $this->request->input("paginate");
 		//$request->limit($paginate["limit"]);
 
 		$next= NULL;
@@ -374,10 +374,9 @@ class Paginate
 
          	if(isset($keys) || isset($limit))
        	 	{
-	            if(isset($next) || isset($previous))
+	            if(!empty($next) || !empty($previous))
 	            {
-	            	$data = isset($next)?$next:$previous;
-
+	            	$data = !empty($next)?$next:$previous;
 	                $first = True;
 	                foreach($keys as $index=>$key)
 	                {
