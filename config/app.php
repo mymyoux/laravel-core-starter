@@ -24,6 +24,7 @@ return [
     */
 
     'env' => env('APP_ENV', NULL),
+    'config_file'=>env('CONFIGURATION_PATH',NULL),
     /**
      * Redis local cache -> avoid code cache from redis
      */
