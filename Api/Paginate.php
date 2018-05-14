@@ -166,8 +166,8 @@ class Paginate
 					{
 						if (!isset($item->$key)) continue;
 						
-						$direction = $this->direction[$index];
-						if($direction<0)
+						$direction = $this->directions[$index];
+						if($direction>0)
 						{
 							if($item->$key<=$this->previous[$index])
 							{
@@ -194,15 +194,15 @@ class Paginate
 				});
 			}else
 			{
-
+				
 				$data = array_values(array_filter($data, function($item) use($keys)
 				{
 					foreach($keys as $index=>$key)
 					{
 						if (!isset($item->$key)) continue;
 						
-						$direction = $this->direction[$index];
-						if($direction<0)
+						$direction = $this->directions[$index];
+						if($direction>0)
 						{
 							if($item->$key<=$this->previous[$index])
 							{
@@ -228,7 +228,7 @@ class Paginate
 					return false;
 				}));
 			}
-        }
+		}
         if(!empty($data))
         {
             $previous = [];
