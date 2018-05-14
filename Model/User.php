@@ -142,7 +142,7 @@ class User extends \Tables\Model\User implements
             ->first();
             if(isset($token))
             {
-                $id_user = $token->id_user;
+                $id_user = $token->user_id;
                 Cache::forever($key, $id_user);
             }
         }
