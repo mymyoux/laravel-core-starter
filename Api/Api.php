@@ -176,15 +176,7 @@ class Api
         Request::replace($temp);
         if(isset($temp_user))
         {
-            if (!$temp_user->getKey())
-            {
-                // do that to unset auth::check() because no user temp (visitor)
-                Auth::logout();
-            }
-            else
-            {
-                Auth::setUser($temp_user);
-            }
+            Auth::setUser($temp_user);
         }
 
         return $rawresponse;
