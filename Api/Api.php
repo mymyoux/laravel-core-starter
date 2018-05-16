@@ -116,7 +116,6 @@ class Api
     }
     public function user($user)
     {
-
         $this->api_user = $user;
         return $this;
     }
@@ -151,6 +150,11 @@ class Api
         if(isset($this->api_user))
         {
             $temp_user = Auth::getUser();
+            // there was a bug when being a visitor, call an api/my/call with a user
+            // the visitor was this user during all the new calls (because temp_user was null)
+            if (null === $temp_user)
+                $temp_user = new User;
+
             if(is_numeric($this->api_user))
             {
                 Auth::loginUsingId($this->api_user);
@@ -172,7 +176,15 @@ class Api
         Request::replace($temp);
         if(isset($temp_user))
         {
-            Auth::setUser($temp_user);
+            if (!$temp_user->getKey())
+            {
+                // do that to unset auth::check() because no user temp (visitor)
+                Auth::logout();
+            }
+            else
+            {
+                Auth::setUser($temp_user);
+            }
         }
 
         return $rawresponse;
