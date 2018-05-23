@@ -1,6 +1,7 @@
 <?php
 namespace Core\Model;
 use Core\Traits\CachedAuto;
+use CacheManager;
 
 class UserLoginToken extends \Tables\Model\User\Login\Token
 {
@@ -11,9 +12,12 @@ class UserLoginToken extends \Tables\Model\User\Login\Token
         $class = new UserLoginToken();
         $token = $class->find($user->getKey());
 
-        $token->token = generate_token();
+        $key = str_replace("%token", $token->token, "user-token:%token");
+        CacheManager::forget($key);
 
+        $token->token = generate_token();
         $token->save();
+        $user->invalidate();
 
         return $token;
     }
@@ -25,7 +29,6 @@ class UserLoginToken extends \Tables\Model\User\Login\Token
 
         if ($token->updated_time->diffInSeconds(\Carbon\Carbon::now()->subSeconds($seconds), false) >= 0)
         {
-            $user->invalidate();
             return self::renew($user);
         }
 
