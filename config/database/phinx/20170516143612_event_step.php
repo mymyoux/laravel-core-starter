@@ -39,7 +39,7 @@ class EventStep extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-        $this->table('event')
+        $this->table('events')
         ->addColumn('step', 'string', ['limit'=>50,'null' => true])
         ->update();
     }

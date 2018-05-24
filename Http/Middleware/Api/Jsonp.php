@@ -7,6 +7,28 @@ use Response;
 use Request;
 class Jsonp
 {
+    protected function decode($input)
+    {
+        foreach($input as $key=>$value)
+        {
+           
+            
+            if(is_string($value) && (starts_with($value, "[") || starts_with($value, "{") || starts_with($value, '"')) )
+            {
+                $tmp = json_decode($value, True);
+                if($tmp !== False)
+                {
+                    $input[$key] = $tmp;
+                }
+            }
+            if(is_array($input[$key]))
+            {
+                
+                $input[$key] = $this->decode($input[$key]);
+            }
+        }
+        return $input;
+    }
     /**
      * Handle an incoming request.
      *
@@ -17,21 +39,13 @@ class Jsonp
     public function handle($request, Closure $next)
     {
 
-   
         $input = $request->all();
-        if(isset($input["__type"]) && $input["__type"] == "json")
-        {
-            foreach($input as $key=>$value)
-            {
-                $input[$key] = json_decode($value, True);
-            }
-            $request->replace($input);
-            Request::replace($input);
-        }
 
-     //   header("Access-Control-Allow-Origin: *");
-        //$response = $next($request);
-        //$response->header('Access-Control-Allow-Origin', '*');
+        $input = $this->decode($input);
+        $request->replace($input);
+        Request::replace($input);
+
+        
         $response = $next($request);
         
         if ($response instanceof \Illuminate\Http\RedirectResponse)

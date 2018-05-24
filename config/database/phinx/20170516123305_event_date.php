@@ -39,7 +39,7 @@ class EventDate extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-        $this->table('event')
+        $this->table('events')
         ->addColumn('notification_time', 'timestamp', ['null' => true])
         ->update();
 

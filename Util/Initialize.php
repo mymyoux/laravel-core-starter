@@ -207,7 +207,7 @@ if (!function_exists('jj'))
 
         $result["data"] = $data;
         header('Content-Type: application/json');
-        echo  json_encode($result);
+        echo  json_encode($result, \JSON_PRETTY_PRINT);
         exit();
     }
 }
