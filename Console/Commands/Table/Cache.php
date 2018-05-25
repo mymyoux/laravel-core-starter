@@ -391,7 +391,7 @@ class Cache extends Command
             $cls->addUseTrait('\Core\Database\TableTrait');
         
 
-            $models_cls[$table] = std(["cls"=>$cls, "table_name"=>$table,"path"=>join_paths($mf, $file.".php"),"name"=>strtolower($file), "fullname"=>$namespace.'\\'.$file]);
+            $models_cls[$table] = std(["cls"=>$cls, "table_name"=>$table,"path"=>join_paths($mf, $file.".php"),"name"=>strtolower($file), "fullname"=>$namespace.'\\'.$file, 'columns'=>array_map(function($item){return $item->COLUMN_NAME;}, $structure[$table]["columns"])]);
         }
 
         //relations
@@ -498,10 +498,10 @@ class Cache extends Command
                         $previous->exists[] = $item->name;
                     }
                     return $previous;
-                }, std(["duplicates"=>[], "exists"=>[]]));
+                }, std(["duplicates"=>[], "exists"=>$current->columns]));
                /* if(!empty($duplicates->duplicates))
                 {*/
-                    $cls->relations = array_map(function($item) use($duplicates, $current)
+                    $cls->relations = array_map(function($item) use($duplicates, $current, $table)
                     {
                         if(starts_with($item->name, $current->table_name."_"))
                         {
@@ -520,6 +520,7 @@ class Cache extends Command
                         {
                             return $item;
                         }
+                   
                         if($item->type != "belongsTo")
                         {
                             if(starts_with($item->foreign, "id_"))
@@ -546,6 +547,14 @@ class Cache extends Command
                             {
                                 $item->name = $item->foreign;
                             }
+                            if(in_array($item->name, $current->columns))
+                            {
+                                if(mb_strpos($item->name, '_') !== False)
+                                {
+                                   $item->name = str_replace('_','',$item->name );
+                                }
+                            }
+                            //$item->name .='2';
                         }
                         // if($item->type == "hasMany")
                         // {
