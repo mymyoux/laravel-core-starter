@@ -35,7 +35,7 @@ class Job
     private $data;
     private $class;
     private $identifier = null;
-    private $id_user = null;
+    private $user_id = null;
 
     use DispatchesJobs;
 
@@ -48,7 +48,7 @@ class Job
         $user = Auth::getUser();
         if(isset($user))
         {
-            $this->id_user = $user->id_user;
+            $this->user_id = $user->getKey();
         }
     }
     public function getTube()
@@ -73,10 +73,10 @@ class Job
     {
         if(is_numeric($user))
         {
-            $this->id_user = $user;
+            $this->user_id = $user;
             return $this;
         }
-        $this->id_user = $user->id_user;
+        $this->user_id = $user->getKey();
         return $this;
     }
     public function data($data)
@@ -161,8 +161,8 @@ class Job
         $request = \Core\Model\Beanstalkd::where('queue', '=', $this->tube)
             ->whereIn("state", [Beanstalkd::STATE_CREATED, Beanstalkd::STATE_RETRYING, Beanstalkd::STATE_PENDING, Beanstalkd::STATE_FAILED_PENDING_RETRY ]);
 
-        if (isset($this->id_user))
-            $request->where('id_user', '=', $this->id_user);
+        if (isset($this->user_id))
+            $request->where('user_id', '=', $this->user_id);
 
         if(isset($this->identifier))
             $request->where('identifier', '=', $this->identifier);
@@ -228,7 +228,7 @@ class Job
             'json'          => json_encode($this->data),
             'queue'         => $this->tube,
             'delay'         => $delay,
-            'id_user'       => $this->id_user,
+            'user_id'       => $this->user_id,
             'priority'      => $priority,
             'identifier'    => $this->identifier,
             'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING),
@@ -336,7 +336,7 @@ class Job
             'json'          => json_encode($this->data),
             'queue'         => $this->tube,
             'delay'         => $delay,
-            'id_user'       => $this->id_user,
+            'user_id'       => $this->user_id,
             'priority'      => $priority,
             'identifier'    => $this->identifier,
             'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING),
