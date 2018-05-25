@@ -23,7 +23,6 @@ class Format
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        
         if(isset($response->exception))
         {
             return $response;
@@ -33,6 +32,8 @@ class Format
         {
             return $response;
         }
+        if($response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse)
+            return $response;
         if (true === method_exists($response, 'getOriginalContent'))
         {
             return ["data" => $response->getOriginalContent()];

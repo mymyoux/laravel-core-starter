@@ -65,7 +65,7 @@ class Stats
         StatsService::addApiCall(Route::getFacadeRoot()->current());
         $response = $next($request);
         
-        if ($response instanceof \Illuminate\Http\RedirectResponse)
+        if ($response instanceof \Illuminate\Http\RedirectResponse || $response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse)
         {
             return $response;
         }
