@@ -59,7 +59,7 @@ class User extends \Tables\Model\User implements
      * @var array
      */
     protected $hidden = [
-        'temp','cgu_accepted','remember_token','num_connection','last_connection'
+        'temp','cgu_accepted','remember_token','num_connection','last_connection','password','token','interface_locale','ip','manual_country_code','country_code'
     ]; 
     public $appends = ['roles'];
 
@@ -193,9 +193,21 @@ class User extends \Tables\Model\User implements
     }
     public function getFirstNameAttribute()
     {
-        if (isset($this->attributes["first_name"]) && isset($this->attributes["deleted"]))
+        $deleted = False;
+        if(isset($this->attributes["deleted"]))
         {
             if($this->deleted == 1)
+            {
+                $deleted = True;
+            }
+        }else
+        if(isset($this->attributes["deleted_at"]))
+        {
+            $deleted = True;
+        }
+        if (isset($this->attributes["first_name"]))
+        {
+            if($deleted)
             {
                 return $this->attributes["first_name"]." (suspended)";
             }else
@@ -203,5 +215,6 @@ class User extends \Tables\Model\User implements
                 return $this->attributes["first_name"];
             }
         }
+        return NULL;
     }
 }
