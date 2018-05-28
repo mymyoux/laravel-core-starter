@@ -166,10 +166,10 @@ class User extends \Tables\Model\User implements
     }
     protected function getByEmail($email)
     {
-        $id_user = ConnectorUser::where(["email"=>$email])->select("user_id")->pluck('user_id')->first();
+        $id_user = ConnectorUser::where(["email"=>$email])->select("user_id")->pluck('id')->first();
         if($id_user === NULL)
         {
-            $id_user = User::where(["email"=>$email])->select("user_id")->pluck('user_id')->first();
+            $id_user = User::where(["email"=>$email])->select("id")->pluck('id')->first();
             if($id_user === NULL)
             {
                 $new_email = clean_email($email);

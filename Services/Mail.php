@@ -98,7 +98,6 @@ class Mail
         {
             $to = [$to];
         }
-        
         $to = array_map(function($item){ $item["email"] = clean_email($item["email"]); return $item;},array_values(array_filter(array_map(function($recipient)
         {
             
@@ -112,7 +111,7 @@ class Mail
                     "email"=>$user->email,
                     "name"=>$user->login??$user->first_name,
                     "type"=>"to",
-                    "id_user"=>$user->id_user
+                    "id_user"=>$user->getKey()
                 ];
             }
             if(is_string($recipient))
@@ -129,7 +128,7 @@ class Mail
                     "email"=>$recipient,
                     "name"=>$user->login??$user->first_name,
                     "type"=>"to",
-                    "id_user"=>$user->id_user
+                    "id_user"=>$user->getKey()
                 ];
             }
 
@@ -163,6 +162,7 @@ class Mail
         {
             return isset($item);
         })));
+        
         $role_email = $this->forbidden( $template);
 
         //remove non allowed user (deleted, no_email etc)

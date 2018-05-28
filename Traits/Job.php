@@ -50,7 +50,7 @@ trait Job
     public function loadDbData($dbData)
     {
         $this->data  = json_decode($dbData->json, False);
-        $this->id_user = $dbData->id_user;
+        $this->id_user = $dbData->user_id;
         $this->current_tries = $dbData->tries;
         //unserialization
         $this->unserializeData($this->data);

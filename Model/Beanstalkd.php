@@ -29,5 +29,5 @@ class Beanstalkd extends \Tables\Model\Beanstalkd\Log
     const STATE_DELETED = "deleted";
 
 
-    protected $fillable = ['id_beanstalkd', 'id_user', 'identifier', 'delay', 'json', 'state', 'tries', 'duration', 'priority', 'queue','cls'];
+    protected $fillable = ['id_beanstalkd', 'user_id', 'identifier', 'delay', 'json', 'state', 'tries', 'duration', 'priority', 'queue','cls'];
 }

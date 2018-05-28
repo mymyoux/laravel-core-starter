@@ -115,7 +115,6 @@ class ReplayCommand extends CoreCommand
             try
             {
                 $request = \Core\Model\Beanstalkd::where('id', '=', $id);
-
                 if ($queue_type !== null)
                     $request->where('queue', '=', $queue_type);
 
@@ -145,18 +144,17 @@ class ReplayCommand extends CoreCommand
                     $result->queue = $queue;
                 }
 
-                $user = isset($result->id_user) ? User::find( $result->id_user ) : NULL;
-
+                $user = isset($result->user_id) ? User::find( $result->user_id ) : NULL;
                 $result->state      = Beanstalkd::STATE_REPLAYING;
                 $result->tries++;
                 $result->save();
-
+                
                 Logger::normal("replay job: ".$id);
                 $class        = $result->cls;
-
-                if(isset($result->id_user))
+                
+                if(isset($result->user_id))
                 {
-                    Auth::loginUsingId($result->id_user);
+                    Auth::loginUsingId($result->user_id);
                 }else
                 {
                     Auth::logout();
