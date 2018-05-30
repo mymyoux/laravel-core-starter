@@ -47,7 +47,7 @@ class UserController extends Controller
 
         if(isset($result))
         {
-            $request = UserLoginToken::select('token')->where(["user_id"=>$result->getKey()])->first();
+            $request = UserLoginToken::find($result->getKey());
 
             if (!isset($request))
             {
@@ -63,7 +63,7 @@ class UserController extends Controller
         if (Auth::user()->isImpersonated())
         {
             $result->real_user = Auth::user()->getRealUser();
-            $request = UserLoginToken::select('token')->where(["user_id"=>$result->real_user->getKey()])->first();
+            $request = UserLoginToken::find($result->real_user->getKey());
             
             if (!isset($request))
             {
