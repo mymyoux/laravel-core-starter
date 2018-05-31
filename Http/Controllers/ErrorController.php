@@ -37,7 +37,7 @@ class ErrorController extends Controller
      */
     public function list(Request $request, Paginate $paginate)
     {
-        $javascript = DB::table('error_javascripts')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascript.created_time) as last_created_time"),"error_url","type","session","error_message","user_id","user_id",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascript.updated_time) as last_updated_time"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
+        $javascript = DB::table('error_javascripts')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascripts.created_time) as last_created_time"),"error_url","type","session","error_message","user_id","user_id",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascripts.updated_time) as last_updated_time"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
         ->groupBy('identifier');
 
         $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_time) as last_created_time"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
@@ -64,7 +64,7 @@ class ErrorController extends Controller
             
             $req->where("errors.created_time",">=",$start);
             $req_api->where("errors.created_time",">=",$start);
-            $javascript->where("error_javascript.created_time",">=",$start);
+            $javascript->where("error_javascripts.created_time",">=",$start);
         }
         if(isset($end))
         {
@@ -76,7 +76,7 @@ class ErrorController extends Controller
             
             $req->where("errors.created_time","<=",$end);
             $req_api->where("errors.created_time","<=",$end);
-            $javascript->where("error_javascript.created_time","<=",$end);
+            $javascript->where("error_javascripts.created_time","<=",$end);
         }
 
         $request = null;
