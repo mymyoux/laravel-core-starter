@@ -7,7 +7,9 @@ use Core\Model\Traits\HasCompositePrimaryKey;
 
 class Role extends \Tables\Model\User\Role
 {
-	use HasCompositePrimaryKey;
+    use HasCompositePrimaryKey;
+    
+	protected $primaryKey = ['user_id', 'role'];
 
     const CREATED_AT = 'created_time';
     const UPDATED_AT = 'updated_time';
