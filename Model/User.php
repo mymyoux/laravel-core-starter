@@ -217,4 +217,30 @@ class User extends \Tables\Model\User implements
         }
         return NULL;
     }
+
+    static public function getSessionTokenName()
+    {
+        return config('session.cookie') . '_api_token';
+    }
+
+    static public function getSessionToken()
+    {
+        $name = self::getSessionTokenName();
+
+        if (isset($_COOKIE[$name]))
+            return $_COOKIE[$name];
+
+        return null;
+    }
+
+    static public function setSessionToken( $token, $time = 60 * 60 * 24 * 30 )
+    {
+        $name = self::getSessionTokenName();
+        setcookie($name, $token, time() + $time, '/');
+    }
+
+    static public function destroySessionToken()
+    {
+         setcookie(self::getSessionTokenName(), '', time()-3600, '/');
+    }
 }

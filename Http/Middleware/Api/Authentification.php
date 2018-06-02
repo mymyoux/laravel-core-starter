@@ -48,6 +48,16 @@ class Authentification
             }
         }        
         
+        if (!isset($token))
+        {
+            $session_token = User::getSessionToken();
+            
+            if ($session_token)
+            {
+                $token = $session_token;
+            }
+        }
+
         if(isset($token))
         {
             $user = User::findByApiToken($token);
@@ -67,6 +77,12 @@ class Authentification
 
             }else
             {
+                $session_token = User::getSessionToken();
+                if (isset($session_token) && $token === $session_token)
+                {
+                    User::destroySessionToken();
+                }
+        
                 throw new ApiException('bad_token');
             }
         }
