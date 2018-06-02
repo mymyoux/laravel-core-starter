@@ -48,7 +48,7 @@ class Authentification
             }
         }        
         
-        if (!isset($token))
+        if (!isset($token) && !Auth::check())
         {
             $session_token = User::getSessionToken();
             
