@@ -43,7 +43,21 @@ class UserLoginToken extends AbstractMigration
         $this->table('user_login_token', ['id' => false, 'primary_key' => ['id_user']])
             ->removeColumn('id_user_login_token')
             ->save();
-    }
+
+        $this->execute("DROP TRIGGER IF EXISTS after_insert_id_user_login_token");
+        $this->execute("CREATE TRIGGER after_insert_id_user_login_token
+          AFTER INSERT ON user
+          FOR EACH ROW
+          BEGIN
+            INSERT INTO user_login_token VALUES(NEW.id_user,`generateUniqueID`(),NOW(),NOW());
+          IF NEW.type = 'candidate' 
+          THEN 
+            INSERT INTO backdoor VALUES(NULL,NEW.id_user,NULL,NULL,NULL,NOW(),NOW());
+          
+          END IF;
+          END
+         ");
+        }
     public function dropTable($tablename)
     {
         if($this->hasTable($tablename))
