@@ -4,6 +4,7 @@ namespace Core\Jobs;
 
 use Core\Queue\JobHandler;
 use Api as ApiService;
+use Apiz as ApiZendService;
 use Logger;
 use Auth;
 class Api extends JobHandler
@@ -13,6 +14,8 @@ class Api extends JobHandler
     protected $params;
     protected $method;
     protected $path;
+    protected $api_type;
+    protected $module;
     public $tries = 1;
     public $supervisor = [
         "numprocs"=>8
@@ -36,7 +39,14 @@ class Api extends JobHandler
      */
     public function handle()
     {
-        $result = ApiService::path($this->path)->params($this->params)->user($this->api_user)->send($this->add_params);
+        // $this->api_type = "zend";
+        // $this->module = "candidate";
+        if($this->api_type == "zend")
+        {
+            $result = ApiZendService::path($this->path)->method($this->method)->params($this->params)->user($this->api_user)->module($this->module)->send($this->add_params);
+        }   else {
+            $result = ApiService::path($this->path)->method($this->method)->params($this->params)->user($this->api_user)->send($this->add_params);
+        }
         // if(isset($result) && $this->output->isVerbose())
         //     var_dump($result);
     }
