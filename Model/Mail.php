@@ -28,6 +28,17 @@ class Mail extends \Tables\Model\Mail
         }
         return NULL;
     }
+
+    protected function noEmailSince($id_user)
+    {
+        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.*"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_time','DESC')->first();
+        if(isset($result))
+        {
+            return $result->created_time;
+        }
+        return NULL;
+    }
+
     protected function getIDUserFromIDMandrill($id_mandrill)
     {
         $mail = Mail::where(["id_mandrill"=>$id_mandrill])->first();
