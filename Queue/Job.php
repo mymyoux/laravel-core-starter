@@ -232,9 +232,8 @@ class Job
             'priority'      => $priority,
             'identifier'    => $this->identifier,
             'state'         => ($delay <= 0 ? Beanstalkd::STATE_CREATED : Beanstalkd::STATE_PENDING),
-            'cls' => $this->class
-            ,
-            'queue_type'=>"redis",
+            'cls'           => $this->class,
+            'queue_type'    =>"redis",
             'tries'=>0
         ]);
 
@@ -266,6 +265,9 @@ class Job
 
             //force to be iso with queue
             $job = unserialize(serialize($job));
+            // for sendWeak Now
+            $job->loadDbData($beanstalkd);            
+
             if (false === $now && !($job instanceof \Core\Jobs\Slack))
             {
                 //check if slack infinite loop otherwise
