@@ -11,6 +11,8 @@ class Cron extends \Tables\Model\Cron//\Tables\Model\Cron
     const UPDATED_AT = 'updated_time';
 
     const STATE_PROCESSING = 'processing';
+    const STATE_OK = 'ok';
+    const STATE_KO = 'ko';
 
     protected $table = 'cron';
     protected $primaryKey = 'cron_id';
