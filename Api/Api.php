@@ -58,7 +58,7 @@ class Api
     }
 
     protected $path;
-    protected $method;
+    protected $method = "GET";
     protected $params;
     protected $api_user;
 	public function __construct()
@@ -97,7 +97,8 @@ class Api
     }
     public function method($method)
     {
-        $this->method = $method;
+        if(isset($method))
+            $this->method = $method;
         return $this;
     }
     public function params($params)
