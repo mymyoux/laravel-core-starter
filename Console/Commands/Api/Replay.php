@@ -66,7 +66,7 @@ class Replay extends Command
             $impersonated->setImpersonate($user);
             $user = $impersonated;
         }
-        $result = Api::user($user)->get($call->path)->params(json_decode($call->params))->response();
+        $result = Api::user($user)->get($call->path)->params(json_decode($call->params, True))->response();
 
         $keys = array_keys(array_filter(get_object_vars($result), function($item){return isset($item);}));
         $keys[] = "exit";
