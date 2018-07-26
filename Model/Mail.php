@@ -51,7 +51,7 @@ class Mail extends \Tables\Model\Mail
         return Mail::where(["id_mandrill"=>$id_mandrill])->first();
     }
 
-    protected function scopeFilterByType($filter, $types, $id_user = NULL, $date = NULL)
+    public function scopeFilterByType($filter, $types, $id_user = NULL, $date = NULL)
     {
         if(!is_string($types))
         {
