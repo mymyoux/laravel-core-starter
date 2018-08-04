@@ -17,6 +17,7 @@ use Core\Model\UserLoginToken;
 use URL;
 use Core\Events\SocialAddedEvent;
 use Core\Events\SocialScopeChangedEvent;
+use Core\Model\Connector\Manual;
 class SocialController extends Controller
 {
     //user:email,public_repo,repo,read:org
@@ -117,8 +118,14 @@ class SocialController extends Controller
      */
     public function handleProviderCallback(Request $request, Response $response, $api)
     {
-        $driver = Socialite::driver($api);
-        $user       =  $driver->user();
+        if($api == 'manual')
+        {
+            $user       =  std($request->all());
+        }else
+        {
+            $driver = Socialite::driver($api);
+            $user       =  $driver->user();
+        }
         $manager = new Manager();
         $connector  = $manager->get($api, $user);
         $connector->setScopes($request->session()->pull('scopes'));
@@ -142,8 +149,21 @@ class SocialController extends Controller
         // echo '<pre>';
         // var_dump($connector);
         // var_dump($user);
-
-        $exist = $class::where('id', $user->id)->first();
+        if($api == 'manual')
+        {
+            $exist = $class::where('email', $user->email)->first();
+            if(!Auth::check())
+            {
+                if(!password_verify($data->password, $exists->password))
+                {
+                    //bad password
+                    return redirect($url_redirect);
+                }
+            }
+        }else
+        {
+            $exist = $class::where('id', $user->id)->first();
+        }
         if ($exist && Auth::check())
         {
             if ($exist->user_id != Auth::id())
@@ -207,7 +227,6 @@ class SocialController extends Controller
             if($last_scope != $new_scopes)
                 event(new SocialScopeChangedEvent($exist, array_diff($new_scopes, $last_scope), array_diff($last_scope, $new_scopes)));
         }
-
         $informations   = $class::where('user_id', '=', Auth::id())->first();
         $data           = $connector->toArray();
         if (null === $informations)
@@ -222,11 +241,28 @@ class SocialController extends Controller
             {
                 $informations->{ $key } = $value;
             }
-
             $informations->save();
         }
-        
         return redirect($url_redirect);
+    }
+    public function loginManual(Request $request)
+    {
+        $data = std($request->all());
+        
+        $rawuser = Manual::where('email','=',$data->email)->first();
+
+        if(!isset($rawuser))
+        {
+            return redirect('/', ['error'=>'no_email','error_type'=>'login']);
+        }
+        if(!password_verify($data->password, $rawuser->password))
+        {
+            //bad password
+            return redirect('/', ['error'=>'bad_password','error_type'=>'login']);
+        }
+        $this->success($request, $rawuser->user);
+        return redirect('/');
+
     }
     protected function createUser($connector)
     {

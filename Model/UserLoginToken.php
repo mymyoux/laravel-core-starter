@@ -6,6 +6,7 @@ use CacheManager;
 class UserLoginToken extends \Tables\Model\User\Login\Token
 {
     use CachedAuto;
+    protected $primaryKey = 'user_id';
 
     static public function renew( $user )
     {

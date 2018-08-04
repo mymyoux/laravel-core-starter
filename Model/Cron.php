@@ -11,6 +11,8 @@ class Cron extends \Tables\Model\Cron
     const UPDATED_AT = 'updated_time';
 
     const STATE_PROCESSING = 'processing';
+    const STATE_OK = 'ok';
+    const STATE_KO = 'ko';
 
     protected $fillable = ['name', 'platform', 'status', 'last_execution_time', 'last_launch_date', 'crontab_config', 'user', 'cmd', 'server_log', 'options', 'directory'];
 }

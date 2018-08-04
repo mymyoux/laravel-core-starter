@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 use Phinx\Db\Adapter\MysqlAdapter;
-class TemplateLocale extends AbstractMigration
+class UserTable extends AbstractMigration
 {
     /**
      * Change Method.
@@ -29,6 +29,7 @@ class TemplateLocale extends AbstractMigration
     public function migrate()
     {
         $this->rollback();
+    
 
     }
     public function rollback()
@@ -39,9 +40,22 @@ class TemplateLocale extends AbstractMigration
     // /!\ during rollback: changing then rollback
     public function changing()
     {
-        $this->table('template')
-        ->addColumn('locale','string',['limit'=>10,'null'=>true])
+        $this->table('users')
+        ->addColumn('username', 'string', ['limit' => 100, 'null' => true,'after'=>'id'])
         ->update();
+
+        
+        if(!$this->isRollback() && $this->hasTable('connector_manual'))
+             $this->dropTable('connector_manual');
+        $this->table('connector_manual', ['id' => false, 'primary_key' => ['id']])
+        ->addColumn('id', 'integer', ['limit' => 11, 'null' => false, 'signed' => false,'identity'=>true])
+        ->addColumn('user_id', 'integer', ['limit' => 11, 'null' => false, 'signed' => false])
+        ->addColumn('email', 'string', ['limit' => 200])
+        ->addColumn('password', 'string', ['limit' => 200])
+        ->addColumn('created_at', 'timestamp', ['null' => true, 'precision' => 3])
+        ->addColumn('updated_at', 'timestamp', ['null' => true, 'precision' => 3, 'default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
+        ->addForeignKey('user_id', 'users', 'id', $this->actions)
+        ->create(); 
     }
     public function dropTable($tablename)
     {

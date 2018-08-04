@@ -37,14 +37,13 @@ class UserController extends Controller
 	 */
     public function me(Request $request)
     {
-   		$user = Auth::user();
+           $user = Auth::user();
         if(!isset($user))
         {
             return null;
         }
         //TABLE:check les inserts
    		$result = Api::get('user/get-infos')->send(["id_user"=>$user->getKey().""]);
-
         if(isset($result))
         {
             $request = UserLoginToken::find($result->getKey());

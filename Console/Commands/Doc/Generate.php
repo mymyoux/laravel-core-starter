@@ -673,12 +673,20 @@ class Generate extends CoreCommand
                         return $middleware;
                     }, array_values(array_filter($route->action["middleware"], function($item){return $item!="api";})));
                 
-                //show middlewares
-                $doc->title("Middlewares", 3);
-                $doc->table(["class"=>array_map(function($item)
-                    {
-                        return $item->class;
-                    },$middlewares)]);      
+                    
+                $filtered_middleware = array_values(array_filter($middlewares, function($item)
+                {
+                    return isset($item->instance) && !($item->instance instanceof Param) && !($item->instance instanceof Paginate) && !($item->instance instanceof Role);
+                }));
+                if(!empty($filtered_middleware))
+                {
+                    //show middlewares
+                    $doc->title("Middlewares", 3);
+                    $doc->table(["class"=>array_map(function($item)
+                        {
+                            return $item->class;
+                        },$filtered_middleware)]);      
+                }
 
 
                 $params = array_values(array_filter($middlewares, function($item)
@@ -706,20 +714,20 @@ class Generate extends CoreCommand
                     ]);    
                 }     
 
-                if(!empty($paginate))
-                {
-                    $param = new stdClass();
-                    $param->name = "paginate";
-                    $param->requirements = "api syntax";
-                    $param->default = $paginate[0]->instance->keys[0];
-                    $param->required = "false";
-                    $param->array = "true";
-                    $param->type = "";
+                // if(!empty($paginate))
+                // {
+                //     $param = new stdClass();
+                //     $param->name = "paginate";
+                //     $param->requirements =join($paginate[0]->instance->allowed,", ");
+                //     $param->default = $paginate[0]->instance->keys[0];
+                //     $param->required = "false";
+                //     $param->array = "true";
+                //     $param->type = "";
 
-                    $temp = new stdClass();
-                    $temp->instance = $param;
-                    $params[] = $temp;
-                }
+                //     $temp = new stdClass();
+                //     $temp->instance = $param;
+                //     $params[] = $temp;
+                // }
 
 
                 //show params list
@@ -728,7 +736,7 @@ class Generate extends CoreCommand
                     $doc->title("Parameters", 3);
                     $doc->table(["name"=>array_map(function($item)
                     {
-                        return "**`".$item->instance->name."`**";
+                        return "**`".$item->instance->name.($item->instance->array?'[]':'')."`**";
                     },$params),
                     "requirements" => array_map(function($item)
                     {
@@ -746,10 +754,10 @@ class Generate extends CoreCommand
                     {
                         return $item->instance->required == "true" || $item->instance->required === true?'**true**':$item->instance->required;
                     },$params),
-                    "array" => array_map(function($item)
-                    {
-                        return $item->instance->array;
-                    },$params)
+                    // "array" => array_map(function($item)
+                    // {
+                    //     return $item->instance->array;
+                    // },$params)
 
                     ]);    
                 }      

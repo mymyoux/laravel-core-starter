@@ -60,7 +60,6 @@ class Jsonp
         if(isset($callback))
         {
             $response = Response::json($response)->setCallback($callback);
-            //if(!$response = $response->header('Access-Control-Allow-Origin'))
         }else
         {
             $response = Response::json($response);

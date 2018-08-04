@@ -3,9 +3,10 @@
 namespace Core\Services;
 
 use Auth;
-Use Job;
+use Job;
 use App;
 use Core\Jobs\Slack;
+
 class Notification
 {
     public function sendNotification($channel, $message, $attachments = [], $bot_name = 'Bot Name', $icon = ':robot_face:')

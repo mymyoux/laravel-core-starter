@@ -26,6 +26,17 @@ class Mail extends \Tables\Model\Mail
         }
         return NULL;
     }
+
+    protected function noEmailSince($id_user)
+    {
+        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.*"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_time','DESC')->first();
+        if(isset($result))
+        {
+            return $result->created_time;
+        }
+        return NULL;
+    }
+
     protected function getIDUserFromIDMandrill($id_mandrill)
     {
         $mail = Mail::where(["id_mandrill"=>$id_mandrill])->first();
@@ -36,5 +47,40 @@ class Mail extends \Tables\Model\Mail
     protected function getByMandrill($id_mandrill)
     {
         return Mail::where(["id_mandrill"=>$id_mandrill])->first();
+    }
+
+    public function scopeFilterByType($filter, $types, $id_user = NULL, $date = NULL)
+    {
+        if(!is_string($types))
+        {
+            $types = implode('-', $types);
+        }
+        $filter->where("type","=",$types);
+        if(isset($id_user))
+        {
+            $filter->where("id_user","=",$id_user);
+        }
+        if(isset($date))
+        {
+            //TODO:test this + maybe authorize use of carbon instead of php date
+            $filter->where(DB::raw('DATE_FORMAT(created_time, "%Y-%m-%d")'),'=', date('Y-m-d', strtotime($date)));
+        }
+
+        return $filter;
+
+        // if (null !== $date)
+        //     $where->and->expression('DATE_FORMAT(tp.created_time, "%Y-%m-%d") = "' . date('Y-m-d', strtotime($date)) . '"', []);
+
+        // $request = $this->select([ 'tp' => self::TABLE ])
+        //             ->where( $where )
+        //             ->order('created_time DESC');
+
+        // $result = $this->execute($request);
+
+        // $data = $result->current();
+
+        // if (!$data) return null;
+        // return $data;
+        //  */
     }
 }

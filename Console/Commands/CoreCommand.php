@@ -47,16 +47,18 @@ class CoreCommand extends Command
     {
     	try
     	{
-            $this->initCron();
-            $this->storeUsage();
-	    	$this->start();
+            $this->start();
+            
+            $this->cron_object->status = Cron::STATE_OK;
 	    }
 	    catch (\Exception $e)
 	    {
 	    	Logger::critical( $e->getMessage() );
-	    	Logger::normal( $e->getTraceAsString() );
-	    }
-
+            Logger::normal( $e->getTraceAsString() );
+            
+            $this->cron_object->status = Cron::STATE_KO;
+        }
+        
         $this->terminated();
     }
 
@@ -76,14 +78,14 @@ class CoreCommand extends Command
     protected function initCron()
     {
     	$name = $this->signature;
-        $cron = Cron::where('name', '=', $name)->first(); //$this->modelCron->findByName( $name );
+        $cron = Cron::where('name', '=', $name)->first();
 
         if (null === $cron)
         {
             $cron = Cron::create([
                 'name'              => $name,
-                'status'            => 'processing',
-                'last_launch_date'  => date('Y-m-d H:i:s'),
+                'status'            => Cron::STATE_PROCESSING,
+                'last_launch_date'  => DB::raw('NOW()'),
                 'directory' 		=> base_path() . '/'
             ]);
 
@@ -92,34 +94,28 @@ class CoreCommand extends Command
         else
         {
         	$cron->status 			= Cron::STATE_PROCESSING;
-        	$cron->last_launch_date = date('Y-m-d H:i:s');
+        	$cron->last_launch_date = DB::raw('NOW()');
         	$cron->save();
         }
 
-        $log = CronLog::create([
-        	'cron_id'       => $cron->getKey(),
-            'status'        => Cron::STATE_PROCESSING
-    	]);
-
         $this->cron_object  = $cron;
-        $this->log_object   = $log;
 
         return $cron;
     }
 
-    public function updateLog( array $options, $save = false )
-    {
-        foreach ($options as $key => $value)
-        {
-            $this->log_object->{ $key } =  $value;
-        }
+    // public function updateLog( array $options, $save = false )
+    // {
+    //     foreach ($options as $key => $value)
+    //     {
+    //         $this->log_object->{ $key } =  $value;
+    //     }
 
-        if (true === $save)
-        {
-        	$this->cron_object->save();
-        	$this->log_object->save();
-        }
-    }
+    //     if (true === $save)
+    //     {
+    //     	$this->cron_object->save();
+    //     	$this->log_object->save();
+    //     }
+    // }
 
     private function getMemoryUsage( $raw = false )
     {
@@ -163,7 +159,9 @@ class CoreCommand extends Command
 
     public function terminated()
     {
-        Logger::normal('');
+        $this->cron_object->last_execution_time = $this->getExecutionTime(true);
+
+        $this->cron_object->save();
 
         Logger::setDebug( true );
 
@@ -171,29 +169,29 @@ class CoreCommand extends Command
         Logger::info( '[LOAD] ' . $this->getCpuUsage() );
         Logger::info( '[TIME] ' . $this->getExecutionTime() );
 
-        $options = [
-            'ram'               => $this->getMemoryUsage( true ),
-            'load'              => $this->getCpuUsage( true ),
-            'execution_time'    => $this->getExecutionTime( true ),
-            'errors'            => Logger::getMetric('error'),
-            'warnings'          => Logger::getMetric('warn'),
-            'critical'          => Logger::getMetric('critical'),
-            'insert'            => Logger::getMetric('insert'),
-            'update'            => Logger::getMetric('update'),
-            'delete'            => Logger::getMetric('delete'),
-            'select'            => Logger::getMetric('select'),
-        ];
+        // $options = [
+        //     'ram'               => $this->getMemoryUsage( true ),
+        //     'load'              => $this->getCpuUsage( true ),
+        //     'execution_time'    => $this->getExecutionTime( true ),
+        //     'errors'            => Logger::getMetric('error'),
+        //     'warnings'          => Logger::getMetric('warn'),
+        //     'critical'          => Logger::getMetric('critical'),
+        //     'insert'            => Logger::getMetric('insert'),
+        //     'update'            => Logger::getMetric('update'),
+        //     'delete'            => Logger::getMetric('delete'),
+        //     'select'            => Logger::getMetric('select'),
+        // ];
 
-        $status = 'ok';
+        // $status = 'ok';
 
-        if ($options['errors'] > 0 || $options['critical'] > 0)
-            $status = 'ko';
+        // if ($options['errors'] > 0 || $options['critical'] > 0)
+        //     $status = 'ko';
 
-        // if ($options['critical'] > 0)
-        //     $options['critical_message'] = Logger::getCriticalMessage();
+        // // if ($options['critical'] > 0)
+        // //     $options['critical_message'] = Logger::getCriticalMessage();
 
-        $options['status'] = $status;
+        // $options['status'] = $status;
 
-        $this->updateLog($options, true);
+        // $this->updateLog($options, true);
     }
 }

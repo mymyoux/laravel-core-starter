@@ -40,6 +40,11 @@ trait Job
             $dbData = json_decode(Cache::get($this->id));
             if(!isset($dbData))
             {
+                $dbData = std([
+                    'json'      => null,
+                    'id_user'   => null
+                ]);
+                
                 $dbData->tries = 0;
             }
          }else {

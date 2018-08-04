@@ -37,6 +37,7 @@ class Config extends Command
     {
        $config = config();
        $config = $config->all();
+       dd(base_path(config('update.config')));
        file_put_contents(base_path(config('update.config')), json_encode($config, \JSON_PRETTY_PRINT));
     }
 }
