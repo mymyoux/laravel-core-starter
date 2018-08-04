@@ -192,6 +192,19 @@ class Param extends CoreAnnotation
 
             foreach ($data as $k=>$d)
             {
+                if($this->requirements == "timestamp")
+                {
+                    $this->type = 'int';
+                    if(!is_timestamp($d))
+                    {
+                        $result = strtotime($d);
+                        if($result === False)
+                        {
+                            throw new ApiException($this->name." must be a timestamp");
+                        }
+                        $data[$k] = $d = strtotime($d);
+                    }
+                }else
                 if($this->requirements == "boolean")
                 {
                     if($d == "true")

@@ -22,6 +22,18 @@ if (!function_exists('first'))
         return array_values($array)[0];
     }
 }
+if(!function_exists('is_timestamp')) 
+{
+    function is_timestamp($timestamp)
+    {
+        $check = (is_int($timestamp) OR is_float($timestamp))
+            ? $timestamp
+            : (string) (int) $timestamp;
+        return  ($check === $timestamp)
+                AND ( (int) $timestamp <=  PHP_INT_MAX)
+                AND ( (int) $timestamp >= ~PHP_INT_MAX);
+    }
+}
 if (!function_exists('is_url')) 
 {
     /**
