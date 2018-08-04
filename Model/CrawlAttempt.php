@@ -7,8 +7,8 @@ use DB;
 
 class CrawlAttempt extends \Tables\Model\Crawl\Attempt
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
 
     protected $table = 'crawl_attempt';

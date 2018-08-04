@@ -28,7 +28,7 @@ class UserLoginToken extends \Tables\Model\User\Login\Token
         $class = new UserLoginToken();
         $token = $class->find($user->getKey());
 
-        if ($token->updated_time->diffInSeconds(\Carbon\Carbon::now()->subSeconds($seconds), false) >= 0)
+        if ($token->updated_at->diffInSeconds(\Carbon\Carbon::now()->subSeconds($seconds), false) >= 0)
         {
             return self::renew($user);
         }

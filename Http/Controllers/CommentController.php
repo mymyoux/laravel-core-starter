@@ -51,7 +51,7 @@ class CommentController extends Controller
         $request = Comment::select('comment.*')->with('user','relation.objects.external')
         ->join('comment_relation','comment_relation.id_comment_relation','=','comment.id_comment_relation')
         ->join('comment_relation_user','comment_relation.id_comment_relation','=','comment_relation_user.id_comment_relation')
-        //->orderBy('comment.created_time', 'DESC')
+        //->orderBy('comment.created_at', 'DESC')
         ->groupBy('comment.id_comment');
 
         if(!empty($objects))
@@ -137,7 +137,7 @@ class CommentController extends Controller
             $comment_state->save();
         }
 
-        $request->orderBy('comment.created_time','ASC');
+        $request->orderBy('comment.created_at','ASC');
 
         return $request->get();
     }
@@ -355,7 +355,7 @@ class CommentController extends Controller
                         $comment_state->id_user = Auth::getUser()->id_user;
                         $comment_state->read_time = date('Y-m-d H:i:s');
                     }
-                    $comment_state->created_time = date('Y-m-d H:i:s');
+                    $comment_state->created_at = date('Y-m-d H:i:s');
                     $comment_state->save();
                 }
                 $relation->load('objects.external');
@@ -393,7 +393,7 @@ class CommentController extends Controller
     {
         $id_user = Auth::id();
 
-        $request = CommentStateModel::select("comment_state.id", "comment_state_me.read_time", "comment_state.created_time")
+        $request = CommentStateModel::select("comment_state.id", "comment_state_me.read_time", "comment_state.created_at")
             ->join('comment_state as comment_state_me', 'comment_state_me.id_user', '=', DB::raw('"' . Auth::getUser()->id_user . '"'))
             ->where('comment_state.id_user_cabinet', '=', $id_user)
             ->where('comment_state.id_user', '!=', $id_user)

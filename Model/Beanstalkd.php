@@ -7,8 +7,8 @@ use DB;
 
 class Beanstalkd extends \Tables\Model\Beanstalkd\Log
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     const STATE_CREATED = "created";
     const STATE_EXECUTED = "executed";

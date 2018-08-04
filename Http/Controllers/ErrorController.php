@@ -32,19 +32,19 @@ class ErrorController extends Controller
      * @ghost\Param(name="is_api", required=false, type="boolean", default=null)
      * @ghost\Param(name="front", required=false, type="boolean", default=false)
      * @ghost\Param(name="back", required=false, type="boolean", default=false)
-     * @ghost\Paginate(allowed="last_created_time,last_updated_time,count,time",keys="last_created_time",directions="-1", limit=10)
+     * @ghost\Paginate(allowed="last_created_at,last_updated_at,count,time",keys="last_created_at",directions="-1", limit=10)
      * @return void
      */
     public function list(Request $request, Paginate $paginate)
     {
-        $javascript = DB::table('error_javascripts')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascripts.created_time) as last_created_time"),"error_url","type","session","error_message","user_id","user_id",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascripts.updated_time) as last_updated_time"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
+        $javascript = DB::table('error_javascripts')->select([DB::raw('COUNT(*) as count'),"id_error",DB::raw("MAX(error_javascripts.created_at) as last_created_at"),"error_url","type","session","error_message","user_id","user_id",DB::raw("null as file"), "error_line",DB::raw("MAX(error_javascripts.updated_at) as last_updated_at"),DB::raw("null as ip"),DB::raw("CONCAT(SUBSTRING_INDEX(error_url,'?',1),'-',error_line,'-',type) as identifier")])
         ->groupBy('identifier');
 
-        $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_time) as last_created_time"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        $req = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_at) as last_created_at"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_at) as last_updated_at"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
         ->where('errors.is_api', '=', false)
         ->groupBy('identifier');
 
-        $req_api = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_time) as last_created_time"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_time) as last_updated_time"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
+        $req_api = Error::select([DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_at) as last_created_at"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_at) as last_updated_at"),"ip",DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
         ->where('errors.is_api', '=', true)
         ->groupBy('identifier');
 
@@ -62,9 +62,9 @@ class ErrorController extends Controller
             }
             $start = date("Y-m-d H:i:s", $start);
             
-            $req->where("errors.created_time",">=",$start);
-            $req_api->where("errors.created_time",">=",$start);
-            $javascript->where("error_javascripts.created_time",">=",$start);
+            $req->where("errors.created_at",">=",$start);
+            $req_api->where("errors.created_at",">=",$start);
+            $javascript->where("error_javascripts.created_at",">=",$start);
         }
         if(isset($end))
         {
@@ -74,9 +74,9 @@ class ErrorController extends Controller
             }
             $end = date("Y-m-d H:i:s",$end);
             
-            $req->where("errors.created_time","<=",$end);
-            $req_api->where("errors.created_time","<=",$end);
-            $javascript->where("error_javascripts.created_time","<=",$end);
+            $req->where("errors.created_at","<=",$end);
+            $req_api->where("errors.created_at","<=",$end);
+            $javascript->where("error_javascripts.created_at","<=",$end);
         }
 
         $request = null;
@@ -141,11 +141,11 @@ class ErrorController extends Controller
         $interval = collect($interval);
 
    
-        $request = Error::select([DB::raw("(UNIX_TIMESTAMP(errors.created_time) DIV $step)*$step as time"),DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_time) as last_created_time"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_time) as last_updated_time"),"ip",
+        $request = Error::select([DB::raw("(UNIX_TIMESTAMP(errors.created_at) DIV $step)*$step as time"),DB::raw('COUNT(*) as count'),"id",DB::raw("MAX(errors.created_at) as last_created_at"),"url","type","code","message","user_id","user_id_real","file","line",DB::raw("MAX(errors.updated_at) as last_updated_at"),"ip",
         DB::raw("CONCAT(SUBSTRING_INDEX(url,'?',1),'-',file,'-',line,'-',type,'-',code) as identifier")])
-        ->where("created_time",">=",$start)
-        ->where("created_time","<=",$end)
-        ->groupBy([DB::raw("UNIX_TIMESTAMP(errors.created_time) DIV ".$step)]);
+        ->where("created_at",">=",$start)
+        ->where("created_at","<=",$end)
+        ->groupBy([DB::raw("UNIX_TIMESTAMP(errors.created_at) DIV ".$step)]);
         $result = $request->get()->map(function($item)
         {
             //$item->count = rand(0,100000);

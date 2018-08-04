@@ -9,8 +9,8 @@ use Core\Model\Slack as SlackModel;
 class Answer extends \Tables\Model\Slack\Answer
 {
 
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
 	protected $table = 'slack_answer';
 	protected $primaryKey = 'id_slack_answer';

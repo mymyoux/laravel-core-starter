@@ -103,7 +103,7 @@ class UserController extends Controller
     }
     /**
      * @ghost\Param(name="search")
-     * @ghost\Paginate(allowed="id_user,created_time,updated_time,email,first_name,last_name,login",keys="first_name",directions="1", limit=10)
+     * @ghost\Paginate(allowed="id_user,created_at,updated_at,email,first_name,last_name,login",keys="first_name",directions="1", limit=10)
 	 */
     public function list(Request $request, Paginate $paginate)
     {

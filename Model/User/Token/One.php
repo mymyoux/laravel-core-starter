@@ -9,8 +9,8 @@ use Core\Model\User\Token\History;
 
 class One extends \Tables\Model\User\One\Token
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     const TOKEN_LIFETIME = 8467200000;//14*7*24*3600*1000; //2 weeks
     
     protected $table = 'user_one_token';

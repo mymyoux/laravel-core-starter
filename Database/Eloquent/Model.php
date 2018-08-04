@@ -9,8 +9,8 @@ use DateTime;
 
 abstract class Model extends BaseModel
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     private $_prepared = False;
     
     public function __construct(array $attributes = [])

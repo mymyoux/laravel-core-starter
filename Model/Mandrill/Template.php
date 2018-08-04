@@ -6,8 +6,8 @@ use Core\Database\Eloquent\Model;
 
 class Template extends \Tables\Model\Mandrill\Template
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $table = 'mandrill_template';
     protected $primaryKey = 'id_template';

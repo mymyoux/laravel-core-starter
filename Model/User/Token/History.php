@@ -7,8 +7,8 @@ use DB;
 
 class History extends \Tables\Model\User\One\Token\History
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     
     protected $table = 'user_one_token_history';
 

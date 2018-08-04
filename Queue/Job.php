@@ -204,7 +204,7 @@ class Job
     {
         $request = \Core\Model\Beanstalkd::where('queue', '=', $this->tube)
             ->where('state', '=', Beanstalkd::STATE_EXECUTED_FRONT)
-            ->where('created_time', '>=', DB::raw('NOW() - INTERVAL 1 HOUR'))
+            ->where('created_at', '>=', DB::raw('NOW() - INTERVAL 1 HOUR'))
             ;
 
         $count = $request->count();

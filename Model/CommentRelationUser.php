@@ -7,8 +7,8 @@ use DB;
 
 class CommentRelationUser extends \Tables\Model\Comment\Relation\User
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $table = 'comment_relation_user';
     protected $primaryKey = 'id_comment_relation_user';

@@ -9,15 +9,15 @@ class Repository extends Model
 {
     use SoftDeletes;
     public $timestamps = false; 
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_time';
 
 
     protected $table = 'github_repository';
     protected $primaryKey = 'id_github_repository';
 
-    protected $fillable = ['id','owner','name','full_name','description','url','private','push_time','created_time','updated_time'];
+    protected $fillable = ['id','owner','name','full_name','description','url','private','push_time','created_at','updated_at'];
 
     public function webhook()
     {

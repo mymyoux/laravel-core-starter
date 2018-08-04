@@ -73,8 +73,8 @@ class UserTable extends AbstractMigration
         }
         if(!isset($column))
         {
-            $this->execute("ALTER TABLE `".$tablename."` MODIFY updated_time TIMESTAMP(".$precision.") DEFAULT CURRENT_TIMESTAMP(".$precision.") ON UPDATE CURRENT_TIMESTAMP(".$precision.")");
-            $this->execute("ALTER TABLE `".$tablename."` MODIFY created_time TIMESTAMP(".$precision.") DEFAULT CURRENT_TIMESTAMP(".$precision.")");
+            $this->execute("ALTER TABLE `".$tablename."` MODIFY updated_at TIMESTAMP(".$precision.") DEFAULT CURRENT_TIMESTAMP(".$precision.") ON UPDATE CURRENT_TIMESTAMP(".$precision.")");
+            $this->execute("ALTER TABLE `".$tablename."` MODIFY created_at TIMESTAMP(".$precision.") DEFAULT CURRENT_TIMESTAMP(".$precision.")");
         }else
         {
              $this->execute("ALTER TABLE `".$tablename."` MODIFY `".$column."` TIMESTAMP(".$precision.") DEFAULT CURRENT_TIMESTAMP(".$precision.")");
@@ -102,8 +102,8 @@ class UserTable extends AbstractMigration
         {
              $excludes = [];
         }
-        $excludes[] = "created_time";
-        $excludes[] = "updated_time";
+        $excludes[] = "created_at";
+        $excludes[] = "updated_at";
         $db_name = $this->adapter->getOptions()["name"];
 
 
@@ -152,8 +152,8 @@ class UserTable extends AbstractMigration
             }
             
         }
-        $creation[] = ' `created_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)';
-        $creation[] = ' `updated_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)';
+        $creation[] = ' `created_at` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)';
+        $creation[] = ' `updated_at` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)';
         $this->execute('CREATE TABLE '.$tablename_history.' ('. implode(",\n", $creation).')');
 
 

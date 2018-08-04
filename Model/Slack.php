@@ -13,8 +13,8 @@ use Job;
 use Logger;
 class Slack extends \Tables\Model\Slack
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
 	protected $table = 'slack';
 	protected $primaryKey = 'id_slack';

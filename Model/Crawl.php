@@ -49,8 +49,8 @@ class Crawl extends \Tables\Model\Crawl
 	 */
 	const STATE_PARSED = "parsed";
 
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
 
     protected $table = 'crawl';

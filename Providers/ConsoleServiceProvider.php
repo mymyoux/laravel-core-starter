@@ -20,6 +20,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'Core\Console\Commands\Cli\Certificate',
         'Core\Console\Commands\Config',
         'Core\Console\Commands\Db\Clean',
+        'Core\Console\Commands\Db\Timestamps',
         'Core\Console\Commands\Doc\Generate',
         'Core\Console\Commands\Notifications\Send',
         'Core\Console\Commands\Phinx\Create',

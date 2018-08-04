@@ -11,15 +11,15 @@ use Illuminate\Console\Application;
 use DB;
 class Mail extends \Tables\Model\Mail
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
-        'type','id_user','subject','recipient','sender','message','from','created_time','updated_time','reason','status','id_mandrill'
+        'type','id_user','subject','recipient','sender','message','from','created_at','updated_at','reason','status','id_mandrill'
     ];
     protected function getLastRejectReason($id_user)
     {
-        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.type"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_time','DESC')->first();
+        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.type"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_at','DESC')->first();
         if(isset($result))
         {
             return $result->type;
@@ -29,10 +29,10 @@ class Mail extends \Tables\Model\Mail
 
     protected function noEmailSince($id_user)
     {
-        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.*"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_time','DESC')->first();
+        $result = Mail::join('mail_webhook','mail_webhook.id_mandrill','=','mail.id_mandrill')->select(["mail_webhook.*"])->where(["id_user"=>$id_user])->whereNotIn('mail_webhook.type', ['click','open','deferral','send', 'reject'])->orderBy('mail_webhook.created_at','DESC')->first();
         if(isset($result))
         {
-            return $result->created_time;
+            return $result->created_at;
         }
         return NULL;
     }
@@ -63,17 +63,17 @@ class Mail extends \Tables\Model\Mail
         if(isset($date))
         {
             //TODO:test this + maybe authorize use of carbon instead of php date
-            $filter->where(DB::raw('DATE_FORMAT(created_time, "%Y-%m-%d")'),'=', date('Y-m-d', strtotime($date)));
+            $filter->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),'=', date('Y-m-d', strtotime($date)));
         }
 
         return $filter;
 
         // if (null !== $date)
-        //     $where->and->expression('DATE_FORMAT(tp.created_time, "%Y-%m-%d") = "' . date('Y-m-d', strtotime($date)) . '"', []);
+        //     $where->and->expression('DATE_FORMAT(tp.created_at, "%Y-%m-%d") = "' . date('Y-m-d', strtotime($date)) . '"', []);
 
         // $request = $this->select([ 'tp' => self::TABLE ])
         //             ->where( $where )
-        //             ->order('created_time DESC');
+        //             ->order('created_at DESC');
 
         // $result = $this->execute($request);
 

@@ -7,8 +7,8 @@ use DB;
 
 class Cron extends \Tables\Model\Cron
 {
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     const STATE_PROCESSING = 'processing';
     const STATE_OK = 'ok';

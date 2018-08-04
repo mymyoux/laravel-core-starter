@@ -26,8 +26,8 @@ class Event extends \Tables\Model\Event
 	 */
 	const STATE_CREATED = "created";
 
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
 
     protected $fillable = ['external_id','external_type','type','state','data','result','owner_id','owner_type'];

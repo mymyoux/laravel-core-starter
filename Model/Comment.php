@@ -9,8 +9,8 @@ use DB;
 class Comment extends \Tables\Model\Comment
 {
     use SoftDeletes;
-	const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
+	const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $dates = ['deleted_at'];
 

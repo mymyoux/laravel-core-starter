@@ -32,7 +32,7 @@ class EventController extends Controller
 {
     /**
      * @ghost\Api
-     * @ghost\Paginate(allowed="id_event,created_time,updated_time",keys="created_time",directions="-1", limit=2)
+     * @ghost\Paginate(allowed="id_event,created_at,updated_at",keys="created_at",directions="-1", limit=2)
      */
     public function list(Request $request, Paginate $paginate)
     {
