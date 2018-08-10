@@ -25,6 +25,6 @@
         <div class="profile-picture edit" :class="(user.company.profile.pictures[index].picture ? '' : 'no-picture')" :style="'background-image:url(\'' + (user.company.profile.pictures[index].picture ? user.company.profile.pictures[index].picture : '')" v-else >
             <span class="icon-photos" v-if="!user.company.profile.pictures[index].picture"></span>
             <input type="file" class="picture" @change="uploadPicture"/>
-        </div>
+        </div> 
     </template>
 </div>
