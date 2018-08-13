@@ -112,19 +112,6 @@ class Error extends \Tables\Model\Error//\Tables\Model\Error
         }
         //return id
         return static::insertGetId($info);
-
-        // try
-        // {
-        //     if($this->sm->get("Identity")->isLoggued())
-        //     {
-        //         $info["user"] = $this->sm->get("Identity")->user;
-        //     }
-        //     $info["id_error"] = $this->table()->lastInsertValue;
-        //     $this->sm->get("Notifications")->sendError($info);
-        // }catch(\Exception $e)
-        // {
-
-        // }
     }
 
 

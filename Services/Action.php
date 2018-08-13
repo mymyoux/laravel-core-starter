@@ -42,12 +42,6 @@ class Action
 
 
         $action->save();
-
-        // if(isset($id_user_action) && !isset($user_action))
-        // {
-        //     $user_action = $this->sm->get("UserTable")->getUser($id_user_action);
-        // }
-        // $this->sm->get("Notifications")->addAction($user, $action, $user_action, $value);
     }
 
     public function del( $id_action )

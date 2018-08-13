@@ -115,20 +115,4 @@ class Crawl extends JobHandler
 		// $this->api->crawl->updateparse(NULL, 'POST', array("id_crawl_attempt"=>$next["id_crawl_attempt"], "state"=>CrawlTable::STATE_CREATED,"success"=>false));
   //   }
 
-  //   public function sendToBeanstalkd($queue = NULL, $data = NULL )
-  //   {
-  //       $next = $this->params()->fromRoute("next");
-  //       if(!isset($queue))
-  //       {
-  //           $queue = $next["type"];
-  //       }
-  //       //TODO:get id_external
-  //       $object = ["id"=>$next["id_crawl"]];
-  //       if(isset($data))
-  //           $object = array_merge($object, $data);
-  //       $job = $this->sm->get('QueueService')->createJob($queue, $object);
-
-  //       $job->send();
-  //   }
-
 }

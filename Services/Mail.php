@@ -8,7 +8,7 @@ use Core\Model\Mail as MailModel;
 use Logger;
 use Auth;
 use Exception;
-
+use Mail as MailService;
 use Core\Model\Mandrill\Template as MandrillTemplateModel;
 
 
@@ -48,6 +48,14 @@ class Mail
         return Job::create(\Core\Jobs\Mail::class, ["template"=>$template,"to"=>$to,"variables"=>$data,"message"=>$message,"send_at"=>$send_at,"ip_pool"=>$ip_pool])->send();
     }
 
+    static public function raw($content, $to, $data = [], $message = NULL, $send_at = NULL, $ip_pool = NULL)
+    {
+        $data['content'] = $content;
+        $template = 'raw-content';
+
+        return MailService::_sendTemplateJob($template, $to, $data, $message, $send_at, $ip_pool);
+    }
+
     public function forbidden($template)
     {
         return NULL;
@@ -81,6 +89,7 @@ class Mail
         
         return True;
     }
+    
     public function removeFromBlacklist($email)
     {
         Logger::file("remove from blacklist: ".$email);
@@ -202,12 +211,14 @@ class Mail
             $message = (object) $message;
         }
 
+
+
         if(!isset($message->merge_language))
             $message->merge_language = 'handlebars';
 
-        if (empty($message->from_mail))
+        if (empty($message->from_email))
             $message->from_email  = config('services.mandrill.from_email');
-
+        
         if (empty($message->from_name))
             $message->from_name   = config('services.mandrill.from_name');
 
@@ -232,7 +243,17 @@ class Mail
         
         $data = array_values($data);
         $message->global_merge_vars = $data;
-        $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, true, $send_at, $ip_pool);
+
+        if ($template === 'raw-content')
+        {
+            $message->html = $message->global_merge_vars[0]['content'];
+
+            $result = $this->mandrill->messages()->send($message);
+        }
+        else
+        {
+            $result = $this->mandrill->messages()->sendTemplate($template, $data, $message, true, $send_at, $ip_pool);
+        }
 
         foreach($result as $key=>$resultemail)
         {

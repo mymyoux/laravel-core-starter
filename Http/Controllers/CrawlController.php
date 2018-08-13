@@ -125,6 +125,7 @@ class CrawlController extends Controller
 	 * @ghost\Param(name="curl",required=false)
 	 * @ghost\Param(name="state",required=false,default="crawl_needs_login")
 	 * @ghost\Param(name="uuid",required=false)
+	 * @ghost\Param(name="id_external",required=false)
 	 * @ghost\Param(name="data",required=false)
 
 	 * @ghost\Param(name="post_params",required=false)
@@ -147,6 +148,7 @@ class CrawlController extends Controller
         $crawl->type = $request->input('type');
 		$crawl->state = $request->input('state');
 		$crawl->uuid = $request->input('uuid');
+		$crawl->id_external = $request->input('id_external');
 		$crawl->data = $request->input('data');
 		$crawl->binary = (int) $request->input('binary', 0);
 		$crawl->id_crawl_login = $request->input('id_crawl_login');

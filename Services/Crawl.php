@@ -22,17 +22,10 @@ class Crawl
 
 		if ($config)
 		{
-			if (isset($config['id_external']))
-				$params['id_external'] = $config['id_external'];
-			
-			if (isset($config['id_crawl_login']))
-				$params['id_crawl_login'] = $config['id_crawl_login'];
-			
-			if (isset($config['post_params']))
-				$params['post_params'] = $config['post_params'];
-
-			if (isset($config['referrer']))
-				$params['referrer'] = $config['referrer'];
+			foreach ($config as $key => $value)
+			{
+				$params[$key] = $value;
+			}
 		}
 
     	$result = Api::post('crawl/add')->params( $params )->response();
@@ -43,8 +36,15 @@ class Crawl
 	public static function parse( $id_crawl, $data = [] )
 	{
     	$crawl = CrawlModel::find($id_crawl);
+		if ($crawl)
+		{
+			$cls = $crawl->cls;
+			if (!$crawl->cls && $crawl->type)
+			{
+				$cls = '\App\Jobs\Crawl\\' . $crawl->type;
+			}
 
-    	if ($crawl)
-			Job::create($crawl->cls, array_merge($data, ["id_crawl"=> $id_crawl]))->send();
+			Job::create($cls, array_merge($data, ["id_crawl"=> $id_crawl]))->sendNow();
+		}
 	}
 }
