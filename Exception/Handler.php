@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
             parent::report($exception);
         }catch(\Exception $e)
         {
-            dd($e);
+            // dd($e);
         }
     }
 
