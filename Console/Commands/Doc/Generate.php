@@ -577,7 +577,7 @@ class Generate extends CoreCommand
             ->where('value','not like','{"data":null%')
             ->where('value','not like','{"exception":%')
             ->whereNotNull('value')
-            ->orderBy('created_at','desc')->first();
+            ->orderBy('created_time','desc')->first();
             if(isset($exemple))
             {
                 $json = $exemple->value;
