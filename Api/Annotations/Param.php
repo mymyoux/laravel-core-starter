@@ -112,6 +112,7 @@ class Param extends CoreAnnotation
      * @var boolean
      */
     public $required = false;
+    public $description = false;
     /**
      * @var boolean
      */
