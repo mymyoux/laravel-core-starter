@@ -10,9 +10,6 @@ class Translation extends \Tables\Model\Translate
 {
 
     const DEFAULT_LOCALE = "en";
-	const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
 
     protected $fillable = ['controller','action','key','singular','plurial','locale','type','missing','id_user'];
     public $hidden = ["id","missing","id_user","sync_time","created_at"];
