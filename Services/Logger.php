@@ -309,7 +309,7 @@ class Logger
                     {
                         $message = "<$style>$message</$style>";
                     }
-                     $this->output->writeln($message, null);
+                     $this->output->writeln($message);
                 }
             }
             if(is_object($msg) || is_array($msg))
