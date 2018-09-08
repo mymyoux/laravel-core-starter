@@ -1,7 +1,7 @@
 <?php
 namespace Core\Api;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
+
+use Core\Api\Doctrine\Common\Annotations\AnnotationReader;
 use File;
 use Route;
 use Request;
@@ -281,7 +281,8 @@ class Api
                 $files = File::allFiles($folder);
                 foreach ($files as $file)
                 {
-                    AnnotationRegistry::registerFile($file->getPathname());
+                    // AnnotationRegistry is completly removed from doctrine, it was only doing a require_once
+                    require_once $file->getPathname();
                 }
             }
         }

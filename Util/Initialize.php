@@ -112,7 +112,7 @@ if (!function_exists('dd'))
         }
 
         array_map(function ($x) {
-                (new Illuminate\Support\Debug\Dumper)->dump($x);
+                (new \Symfony\Component\VarDumper\VarDumper)->dump($x);
             }, func_get_args());
         exit();
 
@@ -185,7 +185,7 @@ if (!function_exists('d'))
         }
 
         array_map(function ($x) {
-                (new Illuminate\Support\Debug\Dumper)->dump($x);
+                (new \Symfony\Component\VarDumper\VarDumper)->dump($x);
             }, func_get_args());
     }
 }
