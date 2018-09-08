@@ -6,10 +6,10 @@ use Phinx\Migration\MigrationInterface;
 class PhinxManager extends Manager
 {
 	protected $countMigrations = 0;
-	public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP)
+	public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP, $fake = false)
 	{
 		$this->countMigrations++;
-		parent::executeMigration($name, $migration, $direction);
+		parent::executeMigration($name, $migration, $direction, $fake);
 	}
 	public function getCountMigrations()
 	{
