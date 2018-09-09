@@ -74,6 +74,8 @@ class UserController extends Controller
 
             $result->real_user->token = $token;
         }
+        if (!$result)
+            return null;
         return $result->makeVisible('token');
     }
    /**
