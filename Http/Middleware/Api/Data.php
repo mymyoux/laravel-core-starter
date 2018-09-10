@@ -25,11 +25,10 @@ class Data
         $data = Api::popApiData();
         if(!empty($data))
         {
-            if($response instanceof JsonResponse)
-            {
+            if (is_array($response))
+                $response['api_data'] = $data;
+            else
                 $response->api_data = $data;
-            }else
-            $response["api_data"] = $data;
         }
         return $response;
     }
