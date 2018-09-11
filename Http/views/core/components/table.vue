@@ -129,9 +129,6 @@
                 </span>
             </div>
         </div>
-        <div v-if="!loading && (!list || !list.models || !list.models.length)" class="no-result">
-				<p>no result</p>
-        </div>
         <div class="table-tr table-item width-fix">
                 <div v-for="(column,i) in list.columns" class="table-td">
                     <div>
@@ -145,7 +142,11 @@
         </div>
     </div>
 
-    <div v-on:click="paginate" class="btn">Load More</div>
+    <div v-if="!loading && (!list || !list.models || !list.models.length)" class="no-result">
+        <p>no result</p>
+    </div>
+
+    <div v-on:click="paginate" v-else class="btn">Load More</div>
 
 </div>
 

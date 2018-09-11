@@ -26,7 +26,7 @@ trait HasCompositePrimaryKey
    {
        foreach ($this->getKeyName() as $key) {
            if (isset($this->$key))
-               $query->where($key, '=', $this->$key);
+               $query->where($key, '=', $this->getOriginal($key));
            else
                throw new Exception(__METHOD__ . 'Missing part of the primary key: ' . $key);
        }
@@ -38,7 +38,7 @@ trait HasCompositePrimaryKey
         $data = [];
         
         foreach ($this->getKeyName() as $key) {
-            $data[ $key ] = $this->getAttribute($key);
+            $data[ $key ] = $this->getOriginal($key);
         }
         
         return $data;
