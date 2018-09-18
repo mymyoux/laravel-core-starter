@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use DeepCopy\DeepCopy;
 
 use Core\Model\Traits\HasCompositePrimaryKey;
+use CacheManager;
 
 trait CachedAuto
 {
@@ -213,6 +214,7 @@ trait CachedAuto
 		$key = $this->getCacheKey();
 		Cache::forget($key);
 		Logger::info("forget: ".$key);
+		$this->removeFromCache();
 	}
 	public static function forget($ids)
     {
@@ -268,5 +270,47 @@ trait CachedAuto
 	public function hasCompositeKey()
 	{
 		return is_array($this->primaryKey);
+	}
+
+    public function addToCache($key, $function, $minutes = 10)
+    {
+		if (!(CacheManager::driver()->getStore() instanceof \Illuminate\Cache\RedisStore))
+			return;
+			
+        $base_key   = $this->getCacheKey() . ':keys';
+        $store_key  = $this->getCacheKey() . ':' . $key;
+
+        $data = CacheManager::get($store_key);
+
+        if (null === $data)
+        {
+            $data = $function();
+            CacheManager::put($store_key, $data, \Carbon\Carbon::now()->addMinutes($minutes));
+
+            $redis = CacheManager::connection();
+            $redis->sAdd($base_key, $store_key);
+        }
+
+        return $data;
+    }
+
+	public function removeFromCache()
+	{
+		if (!(CacheManager::driver()->getStore() instanceof \Illuminate\Cache\RedisStore))
+            return;
+
+        $base_key   = $this->getCacheKey() . ':keys';
+        $redis 		= CacheManager::connection();
+        $keys 		= $redis->sMembers($base_key);
+        
+        foreach ($keys as $key)
+        {
+            Logger::normal('api:forget sub:cache ' . $key);
+            CacheManager::forget($key);
+        }
+        
+        Logger::normal('api:forget base_key:cache ' . $base_key);
+
+        CacheManager::forget($base_key);
 	}
 }
