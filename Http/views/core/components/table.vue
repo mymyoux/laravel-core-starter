@@ -2,7 +2,7 @@
 
 <div class="new-template-page scroll-list-users">
 
-    <slot name="title">
+    <slot name="title" v-if="title">
         <h1>((.title))</h1>
         <span class="subtitle">((.subtitle))</span>
     </slot>
@@ -19,10 +19,11 @@
             <!--<div class="export">
                 <div class="cta-blue-s">export</div>
             </div>-->
-            <div v-on:click="openSearch()" class="searchbox btn" :class="{open:search_open || list.search, fill:list.search}">
-                <input class="search_global" v-model="list.search" type="search" placeholder="search" value="" @keyup.enter="onSearchGlobal($event)" @blur="onSearchGlobal($event, true)"/>
+            <div v-on:click="openSearch()" class="searchbox btn" :class="{open:search_open || list.search}">
+                <input class="search_global" v-model="list.search" type="search" :placeholder="((search))" value="" @keyup.enter="onSearchGlobal($event)" @blur="onSearchGlobal($event, true)"/>
                 <i class="icon-search"></i>
             </div>
+
             <div v-for="choice, key in list.choices" class="custom-select custom-select-no-conflict">
                 <select v-model="list.choosen[key]" @change="choiceChange(key, $event)">
                     <option v-for="item in choice" :value="item.value" >{{item.label}}</option>
@@ -30,10 +31,10 @@
             </div>
 
             <!-- filters -->
-            <div v-if="!list.multiFilters() && list.displayFilters().length > 0" :class="'custom-select custom-select-no-conflict' +( list.current_filter?' fill':'')">
+            <div v-if="!list.multiFilters() && filter && list.displayFilters().length > 0" :class="'custom-select custom-select-no-conflict'">
                 <select v-model="list.current_filter" @change="filterChange( list )">
-                    <option value="">((filter_all))</option>
-                    <option v-for="value, key in list.displayFilters()" :value="value" :selected="(list.current_filter == value ? 'selected' : '')">{{ value }}</option>
+                    <option value="">((all))</option>
+                    <option v-for="value, key in list.displayFilters()" :value="value" :selected="(list.current_filter == value ? 'selected' : '')">(( '' + value))</option>
                 </select>
             </div>
             <div v-else-if="list.multiFilters() && list.displayFilters().length > 0" class="item">
@@ -128,9 +129,6 @@
                 </span>
             </div>
         </div>
-        <div v-if="!loading && (!list || !list.models || !list.models.length)" class="no-result">
-				<p>no result</p>
-        </div>
         <div class="table-tr table-item width-fix">
                 <div v-for="(column,i) in list.columns" class="table-td">
                     <div>
@@ -144,7 +142,11 @@
         </div>
     </div>
 
-    <div v-on:click="paginate" class="btn">Load More</div>
+    <div v-if="!loading && (!list || !list.models || !list.models.length)" class="no-result">
+        <p>no result</p>
+    </div>
+
+    <div v-on:click="paginate" v-else class="btn">Load More</div>
 
 </div>
 

@@ -42,7 +42,6 @@ class Action
 
 
         $action->save();
-
         return $action;
     }
 
