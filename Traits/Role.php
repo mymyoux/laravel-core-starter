@@ -13,6 +13,15 @@ trait Role
 	{
 		$this->roles[] = $role;
 	}
+
+	public function isNeg($role)
+	{
+		if (mb_strpos($role, 'no_') === 0)
+			return true;
+
+		return false;
+	}
+
 	public function hasRole($role, $strict = false)
 	{
 		if(empty($this->roles))
@@ -25,7 +34,8 @@ trait Role
 		if ($strict)
 			return in_array($role, $this->roles);
 
-		return in_array($role, $this->roles) || ($role != static::$ROLE_DISCONNECTED && in_array(static::$ROLE_ADMIN, $this->roles));
+		// hasRole || isAdmin and is not a negative role like "no_email"
+		return in_array($role, $this->roles) || (!$this->isNeg($role) && $role != static::$ROLE_DISCONNECTED && in_array(static::$ROLE_ADMIN, $this->roles));
 	}
 	public function removeRole($role)
 	{
