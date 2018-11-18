@@ -42,6 +42,8 @@ class Cache
                 $value = $request->input( $key );
                 if (false === $value)
                     $value = 0;
+                if (is_array($value))
+                    $value = implode('-', $value);
                 $cache_key .= '-' . $value;
             }
         }
