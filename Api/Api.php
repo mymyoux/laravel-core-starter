@@ -374,9 +374,15 @@ class Api
 
                     foreach($methodAnnotations as $methodName=>$annotations)
                     {
+                        // do class annotation every time
+                        // bug with roles. The annotation merge the role to the classes roles, so all the next methods will have the class roles merge with the first method with a role defined
+                        $classAnnotations = $annotationReader->getClassAnnotations($reflectedClass);
+
                         foreach($classAnnotations as $annotation)
                         {
-                           $annotation->handleAnnotations($annotations);
+                            $annotation->setIsFromClass(true);
+                            $annotation->boot();
+                            $annotation->handleAnnotations($annotations);
                         }
                         foreach($classAnnotations as $annotation)
                         {
@@ -389,11 +395,22 @@ class Api
                         $config->middlewares = [];
                         $config->path = $path.uncamel($methodName);
                         $config->route = $className.'@'.$methodName;
-                        //method annotations
+
+                        // always put cache at the end
+                        foreach($annotations as $key => $annotation)
+                        {
+                            if ($annotation instanceof \Core\Api\Annotations\Cache)
+                            {
+                                unset($annotations[$key]);
+                                $annotations[] = $annotation;
+                                break;
+                            }
+                        }
+                        //method annotations                        
                         foreach($annotations as $annotation)
                         {
-                           $annotation->boot();
-                           $annotation->handle($config);
+                            $annotation->boot();
+                            $annotation->handle($config);
                         }
                         if(in_array($config->path, $paths))
                         {
